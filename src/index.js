@@ -53,24 +53,16 @@ app.get("/callback", (req, res) => {
   })
     .then((response) => {
       if (response.status === 200) {
-        const { access_token, token_type } = response.data;
+        const { access_token, refresh_token } = response.data;
 
-        axios
-          .get("https://api.spotify.com/v1/me", {
-            headers: {
-              Authorization: `${token_type} ${access_token}`,
-            },
-          })
-          .then((response) => {
-            res.send(`<pre>
-        ${JSON.stringify(response.data, null, 2)}
-      </pre>`);
-          })
-          .catch((error) => {
-            res.send(error);
-          });
+        const queryParams = new URLSearchParams({
+          access_token,
+          refresh_token,
+        });
+
+        res.redirect(`http://localhost:5173/?${queryParams}`);
       } else {
-        res.send(response);
+        res.redirect(`http://localhost:5173/?error=invalid_token`);
       }
     })
     .catch((error) => {

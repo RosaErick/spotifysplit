@@ -3,5 +3,9 @@
 @tailwind utilities;
 
 
+/* reset.css */
+html {
+  box-sizing: border-box;
+}
 
 

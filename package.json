@@ -4,7 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon ./src/index.js"
+    "start": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
+    "server": "nodemon ./src/index.js",
+    "client": "cd client && npm run dev",
+    "postinstall": "cd client && npm install"
   },
   "keywords": [],
   "author": "",
@@ -16,6 +19,7 @@
     "sucrase": "^3.28.0"
   },
   "devDependencies": {
+    "concurrently": "^7.5.0",
     "nodemon": "^2.0.20"
   }
 }
