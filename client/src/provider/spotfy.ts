@@ -1,9 +1,4 @@
-interface LocalStorageValues {
-  accessToken: string | null;
-  refreshToken: string | null;
-  expireTime: string | null;
-  timestamp: string | null;
-}
+import { LocalStorageValues } from "../interfaces/interfaces";
 
 const LOCALSTORAGE_KEYS: any = {
   accessToken: "spotify_access_token",
@@ -111,41 +106,35 @@ export const getAcessToken = () => {
 
 export const accessToken: string | null | undefined = getAcessToken();
 
-
-
-
-
 const spotfyURI = "https://api.spotify.com/v1";
 const headers = new Headers({
-    Authorization: `Bearer ${accessToken}`,
-    "Content-Type": "application/json",
+  Authorization: `Bearer ${accessToken}`,
+  "Content-Type": "application/json",
 });
 
-
 export const getUserProfile = async () => {
-    const response = await fetch(`${spotfyURI}/me`, {
-        method: "GET",
-        headers,
-    });
+  const response = await fetch(`${spotfyURI}/me`, {
+    method: "GET",
+    headers,
+  });
 
-    return response.json();
-}
-
+  return response.json();
+};
 
 export const getPlaylists = async () => {
-    const response = await fetch(`${spotfyURI}/me/playlists`, {
-        method: "GET",
-        headers,
-    });
+  const response = await fetch(`${spotfyURI}/me/playlists`, {
+    method: "GET",
+    headers,
+  });
 
-    return response.json();
-}
+  return response.json();
+};
 
 export const getPlaylistTracks = async (playlistId: string) => {
-    const response = await fetch(`${spotfyURI}/playlists/${playlistId}/tracks`, {
-        method: "GET",
-        headers,
-    });
+  const response = await fetch(`${spotfyURI}/playlists/${playlistId}/tracks`, {
+    method: "GET",
+    headers,
+  });
 
-    return response.json();
-}
+  return response.json();
+};

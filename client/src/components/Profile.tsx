@@ -2,35 +2,14 @@ import React from "react";
 import { useState, useEffect } from "react";
 import { getUserProfile } from "../provider/spotfy";
 import { catchErrors } from "../utils/utils";
+import { UserProfile } from "../interfaces/interfaces";
+
 
 type Props = {};
 
-interface UserProfile {
-  display_name: string;
-  email: string;
-  external_urls: {
-    spotify: string;
-  };
-  followers: {
-    href: string;
-    total: number;
-  };
-  href: string;
-  id: string;
-  images: [
-    {
-      height: number;
-      url: string;
-      width: number;
-    }
-  ];
-  product: string;
-  type: string;
-  uri: string;
-  country: string;
-}
 
-export const UserProfile = (props: Props) => {
+
+export const Profile = (props: Props) => {
   const [profile, setProfile] = useState<UserProfile>();
 
   useEffect(() => {

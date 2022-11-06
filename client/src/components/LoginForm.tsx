@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { accessToken, logout } from "../provider/spotfy";
-import {UserProfile} from './UserProfile'
-
-
+import { Profile } from "./Profile";
 
 export const LoginForm = () => {
   const [token, setToken] = useState<string | null | undefined>(null);
@@ -42,7 +40,7 @@ export const LoginForm = () => {
               {" "}
               Log Out
             </button>
-            <UserProfile /> 
+            <Profile />
           </>
         )}
       </div>
