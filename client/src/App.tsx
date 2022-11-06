@@ -1,15 +1,11 @@
-import "./App.css";
-import { Container } from "./components/Container";
-import { LoginForm } from "./components/LoginForm";
+import { BrowserRouter as Router, Routes } from "react-router-dom";
+import { AppRoutes } from "./routes/Routes";
 
 function App() {
-
   return (
-    <div className="App">
-      <Container>
-        <LoginForm />
-      </Container>
-    </div>
+    <Router>
+      <AppRoutes />
+    </Router>
   );
 }
 

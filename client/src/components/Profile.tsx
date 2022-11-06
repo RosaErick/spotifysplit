@@ -16,10 +16,19 @@ export const Profile = (props: Props) => {
     const fetchUserData = async () => {
       const response = await getUserProfile();
       console.log(response);
-      setProfile(response);
+
+      if (response.error) {
+        window.location.href = "/login";
+      } else {
+
+        setProfile(response);
+      }
     };
 
     catchErrors(fetchUserData());
+
+
+    
   }, []);
 
   return (
