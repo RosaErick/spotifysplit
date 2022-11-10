@@ -4,32 +4,12 @@ import { getUserProfile } from "../provider/spotfy";
 import { catchErrors } from "../utils/utils";
 import { UserProfile } from "../interfaces/interfaces";
 
-
-type Props = {};
-
-
+type Props = {
+  profile: UserProfile | undefined;
+};
 
 export const Profile = (props: Props) => {
-  const [profile, setProfile] = useState<UserProfile>();
-
-  useEffect(() => {
-    const fetchUserData = async () => {
-      const response = await getUserProfile();
-      console.log(response);
-
-      if (response.error) {
-        window.location.href = "/login";
-      } else {
-
-        setProfile(response);
-      }
-    };
-
-    catchErrors(fetchUserData());
-
-
-    
-  }, []);
+  const { profile } = props;
 
   return (
     <div>
