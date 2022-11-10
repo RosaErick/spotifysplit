@@ -1,4 +1,3 @@
-import React from "react";
 import { Profile } from "../components/Profile";
 import { useState, useEffect } from "react";
 import { getUserProfile, logout } from "../provider/spotfy";
