@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { getUserProfile, logout } from "../provider/spotfy";
 import { catchErrors } from "../utils/utils";
 import { UserProfile } from "../interfaces/interfaces";
+import { useQuery } from "react-query";
 
 type Props = {};
 

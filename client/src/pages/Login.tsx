@@ -10,7 +10,7 @@ export const Login = () => {
   useEffect(() => setToken(accessToken));
 
   return (
-    <div>
+    <div className="login">
       <Container>
         {!token && <LoginForm />}
         {token && <Navigate to="/" />}
