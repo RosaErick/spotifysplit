@@ -9,6 +9,8 @@ type Props = {};
 export const Home = (props: Props) => {
   const [profile, setProfile] = useState<UserProfile>();
 
+
+
   useEffect(() => {
     const fetchUserData = async () => {
       const response = await getUserProfile();
