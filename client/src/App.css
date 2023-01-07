@@ -1,9 +1,20 @@
-.login{
-    text-align: center;
-    background-color: #09090a;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+.login {
+  text-align: center;
+  background-color: #09090a;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.top-heade {
+  display: flex;
+  align-items: flex-end;
+  position: relative;
+  background: linear-gradient(transparent, rgba(0, 0, 0, 0.5));
+  background-color:rgb(132, 128, 128);
+  height: 30vh;
+  max-height: 500px;
+  min-height: 250px;
 }
