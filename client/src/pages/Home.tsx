@@ -1,9 +1,10 @@
 import { Profile } from "../components/Profile";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { logout, getTotalUserInfo, accessToken } from "../provider/spotfy";
 import { UserProfile } from "../interfaces/interfaces";
 import { useQuery } from "react-query";
 import { Navigate } from "react-router";
+import TopArtists from "../components/TopArtists";
 
 type Props = {};
 
@@ -14,7 +15,7 @@ export const Home = (props: Props) => {
   const [topArtists, setTopArtists] = useState<any>();
   const [token, setToken] = useState<any>(null);
 
-  const getTotalUserInfoQuery = useQuery("getTotalUserInfo", getTotalUserInfo, {
+  useQuery("getTotalUserInfo", getTotalUserInfo, {
     refetchOnWindowFocus: false,
     onSuccess: (data) => {
       console.log(data);
@@ -34,7 +35,7 @@ export const Home = (props: Props) => {
     },
   });
 
-  const tokenQuery = useQuery("getAccessToken", () => accessToken, {
+  useQuery("getAccessToken", () => accessToken, {
     refetchOnWindowFocus: false,
     onSuccess: (data) => {
       setToken(data);
@@ -42,13 +43,6 @@ export const Home = (props: Props) => {
     onError: (error) => {
       console.log(error);
     },
-  });
-
-  console.log("token", token);
-  console.log("tokenQuery", tokenQuery);
-
-  useEffect(() => {
-    setToken(accessToken);
   });
 
   return (
@@ -66,9 +60,10 @@ export const Home = (props: Props) => {
             type="button"
             onClick={() => logout()}
           >
-            {" "}
             Log Out
           </button>
+
+          <TopArtists artists={topArtists} />
         </div>
       )}
     </>
