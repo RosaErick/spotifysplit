@@ -3,7 +3,7 @@ export const LoginForm = () => {
     <div className="flex-col justify-center items-center h-24">
       <div className="mb-4">
         <h1 className="block text-white text-sm font-bold mb-2 sm:text-2xl">
-          Welcome to SpotStats
+          Welcome to Spotfy Split
         </h1>
       </div>
 
