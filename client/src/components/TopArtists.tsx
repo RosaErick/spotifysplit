@@ -17,7 +17,9 @@ const TopArtists = (props: Props) => {
 
   return (
     <>
-      <div>TopArtists</div>
+      <h3
+        className="text-white font-bold text-2xl mt-10"
+      >TopArtists</h3>
       <div className="flex flex-col gap-10">
       {artist?.items?.map((artist: any) => (
         <div className="flex items-center gap-5 justify-start" key={artist.id}>

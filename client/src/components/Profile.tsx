@@ -19,7 +19,7 @@ export const Profile = (props: Props) => {
         <img
           src={profile.images[0].url}
           alt="profile"
-          className="m-auto rounded-full"
+          className="m-auto rounded-full mt-10 h-40 w-40"
         />
       )}
       <h1 className=" m-auto text-white font-bold text-center">

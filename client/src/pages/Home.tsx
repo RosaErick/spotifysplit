@@ -56,7 +56,7 @@ export const Home = (props: Props) => {
           />
 
           <button
-            className="bg-red-700 m-auto hover:bg-red-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            className="bg-red-700 m-auto mt-10 hover:bg-red-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             type="button"
             onClick={() => logout()}
           >
