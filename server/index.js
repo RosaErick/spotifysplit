@@ -24,7 +24,7 @@ app.get("/login", (req, res) => {
     client_id: CLIENT_ID,
     response_type: "code",
     redirect_uri: REDIRECT_URI,
-    scope: "user-read-private user-read-email",
+    scope: "user-read-private user-read-email user-read-recently-played user-top-read user-follow-read user-follow-modify playlist-read-private playlist-read-collaborative playlist-modify-public",
     state: state,
   });
 

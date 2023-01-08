@@ -19,7 +19,7 @@ export const logout = () => {
     window.localStorage.removeItem(LOCALSTORAGE_KEYS[property]);
   }
 
-  window.location.href = "/";
+  window.location.href = "/login";
 };
 
 const hasTokenExpired = () => {
@@ -104,7 +104,7 @@ export const getAcessToken = () => {
   return null;
 };
 
-export const accessToken: string | null | undefined = getAcessToken();
+export const accessToken: any = getAcessToken();
 
 const spotfyURI = "https://api.spotify.com/v1";
 const headers = new Headers({
@@ -121,11 +121,32 @@ export const getUserProfile = async () => {
   return response.json();
 };
 
+export const getUserFollowedArtist = async () => {
+  const response = await fetch(`${spotfyURI}/me/following?type=artist`, {
+    method: "GET",
+    headers,
+  });
+
+  return response.json();
+};
+
 export const getPlaylists = async () => {
   const response = await fetch(`${spotfyURI}/me/playlists`, {
     method: "GET",
     headers,
   });
+
+  console.log("playlist", response);
+
+  return response.json();
+};
+
+export const getTopArtists = async () => {
+  const response = await fetch(`${spotfyURI}/me/top/artists`, {
+    method: "GET",
+    headers,
+  });
+  console.log("top", response);
 
   return response.json();
 };
@@ -137,4 +158,26 @@ export const getPlaylistTracks = async (playlistId: string) => {
   });
 
   return response.json();
+};
+
+export const getTotalUserInfo = async () => {
+  const [userProfile, followedArtists, playlists, topArtists] =
+    await Promise.all([
+      getUserProfile(),
+      getUserFollowedArtist(),
+      getPlaylists(),
+      getTopArtists(),
+    ]);
+
+  console.log("userProfile", userProfile);
+  console.log("followedArtists", followedArtists);
+  console.log("playlists", playlists);
+  console.log("topArtists", topArtists);
+
+  return {
+    userProfile,
+    followedArtists,
+    playlists,
+    topArtists,
+  };
 };
