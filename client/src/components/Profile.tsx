@@ -22,11 +22,13 @@ export const Profile = (props: Props) => {
           className="m-auto rounded-full mt-10 h-40 w-40"
         />
       )}
-      <h1 className=" m-auto text-white font-bold text-center">
+      <h1 className=" m-auto mt-3 text-white font-bold text-center">
         {profile?.display_name}
       </h1>
       <div className="flex flex-col items-center text-white font-bold">
-        <p>{profile?.product}</p>
+        <p className="rounded-full px-3 py-2 m-5 bg-green-600">
+          {profile?.product}
+        </p>
         <div className="flex gap-5">
           <div className="m-auto flex flex-col items-center">
             <p>{profile?.followers.total}</p>

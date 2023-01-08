@@ -1,3 +1,4 @@
+
 import { LocalStorageValues } from "../interfaces/interfaces";
 
 const LOCALSTORAGE_KEYS: any = {
@@ -151,6 +152,17 @@ export const getTopArtists = async () => {
   return response.json();
 };
 
+
+export const getTopTracks = async () => {
+  const response = await fetch(`${spotfyURI}/me/top/tracks`, {
+    method: "GET",
+    headers,
+  });
+
+  return response.json();
+}
+
+
 export const getPlaylistTracks = async (playlistId: string) => {
   const response = await fetch(`${spotfyURI}/playlists/${playlistId}/tracks`, {
     method: "GET",
@@ -161,23 +173,26 @@ export const getPlaylistTracks = async (playlistId: string) => {
 };
 
 export const getTotalUserInfo = async () => {
-  const [userProfile, followedArtists, playlists, topArtists] =
+  const [userProfile, followedArtists, playlists, topArtists, topTracks] =
     await Promise.all([
       getUserProfile(),
       getUserFollowedArtist(),
       getPlaylists(),
       getTopArtists(),
+      getTopTracks(),
     ]);
 
   console.log("userProfile", userProfile);
   console.log("followedArtists", followedArtists);
   console.log("playlists", playlists);
   console.log("topArtists", topArtists);
+  console.log("topTracks", topTracks);
 
   return {
     userProfile,
     followedArtists,
     playlists,
     topArtists,
+    topTracks,
   };
 };

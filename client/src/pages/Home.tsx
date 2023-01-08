@@ -5,6 +5,7 @@ import { UserProfile } from "../interfaces/interfaces";
 import { useQuery } from "react-query";
 import { Navigate } from "react-router";
 import TopArtists from "../components/TopArtists";
+import TopTracks from "../components/TopTracks";
 
 type Props = {};
 
@@ -13,6 +14,7 @@ export const Home = (props: Props) => {
   const [followedArtists, setFollowedArtists] = useState<any>();
   const [playlists, setPlaylists] = useState<any>();
   const [topArtists, setTopArtists] = useState<any>();
+  const [topTracks, setTopTracks] = useState<any>();
   const [token, setToken] = useState<any>(null);
 
   useQuery("getTotalUserInfo", getTotalUserInfo, {
@@ -29,6 +31,7 @@ export const Home = (props: Props) => {
       setFollowedArtists(data.followedArtists);
       setPlaylists(data.playlists);
       setTopArtists(data.topArtists);
+      setTopTracks(data.topTracks);
     },
     onError: (error) => {
       console.log(error);
@@ -63,7 +66,10 @@ export const Home = (props: Props) => {
             Log Out
           </button>
 
-          <TopArtists artists={topArtists} />
+          <div className="flex gap-10 justify-around px-20 items-center m-auto mt-10 w-full">
+            <TopArtists artists={topArtists} />
+            <TopTracks tracks={topTracks} />
+          </div>
         </div>
       )}
     </>
