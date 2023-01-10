@@ -9,7 +9,7 @@ const TopArtists = (props: Props) => {
 
   const { artists } = props;
 
-  console.log(artists);
+
 
   useEffect(() => {
     setTopArtists(artists);
