@@ -1,4 +1,5 @@
 
+import { useNavigate } from "react-router-dom";
 import { LocalStorageValues } from "../interfaces/interfaces";
 
 const LOCALSTORAGE_KEYS: any = {
@@ -20,7 +21,8 @@ export const logout = () => {
     window.localStorage.removeItem(LOCALSTORAGE_KEYS[property]);
   }
 
-  window.location.href = "/login";
+  const navigate = useNavigate();
+  navigate("/");
 };
 
 const hasTokenExpired = () => {
