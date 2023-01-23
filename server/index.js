@@ -4,12 +4,15 @@ import { generateRandomString } from "./utils/common";
 import axios from "axios";
 
 const app = express();
-const port = process.env.PORT || 5173;
+const port = process.env.PORT || 3000;
 
 const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REDIRECT_URI = process.env.REDIRECT_URI;
 
+app.get("/", (req, res) => {
+  res.send("health check");
+});
 
 app.get("/login", (req, res) => {
   const state = generateRandomString(16);

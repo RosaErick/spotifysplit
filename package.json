@@ -8,7 +8,7 @@
     "server": "nodemon ./server/index.js",
     "client": "cd client && npm run dev",
     "build-client": "cd client && npm run build",
-    "build": "concurrently --kill-others-on-fail \"npm run server\" \"npm run build-client\""
+    "build": "npm run server"
   },
   "keywords": [],
   "author": "",
