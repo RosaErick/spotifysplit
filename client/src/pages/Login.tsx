@@ -19,7 +19,7 @@ export const Login = () => {
     <div className="login">
       <Container>
         <LoginForm />
-        <Navigate to="/" />
+
       </Container>
     </div>
   );
