@@ -24,7 +24,7 @@ export const Home = (props: Props) => {
 
       if (data.userProfile.error) {
         logout();
-        return <Navigate to="/login" />;
+
       }
 
       setProfile(data.userProfile);
