@@ -11,11 +11,15 @@ export const Login = () => {
 
   console.log(token);
 
+  if (token) {
+    return <Navigate to="/" />;
+  }
+
   return (
     <div className="login">
       <Container>
-        {!token && <LoginForm />}
-        {token && <Navigate to="/" />}
+        <LoginForm />
+        <Navigate to="/" />
       </Container>
     </div>
   );
