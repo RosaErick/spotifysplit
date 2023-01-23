@@ -3,7 +3,7 @@ import { useState } from "react";
 import { logout, getTotalUserInfo, accessToken } from "../provider/spotfy";
 import { UserProfile } from "../interfaces/interfaces";
 import { useQuery } from "react-query";
-import { Navigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import TopArtists from "../components/TopArtists";
 import TopTracks from "../components/TopTracks";
 
@@ -16,6 +16,7 @@ export const Home = (props: Props) => {
   const [topArtists, setTopArtists] = useState<any>();
   const [topTracks, setTopTracks] = useState<any>();
   const [token, setToken] = useState<any>(null);
+  const navigate = useNavigate();
 
   useQuery("getTotalUserInfo", getTotalUserInfo, {
     refetchOnWindowFocus: false,
@@ -24,7 +25,7 @@ export const Home = (props: Props) => {
 
       if (data.userProfile.error) {
         logout();
-
+        navigate("/login");
       }
 
       setProfile(data.userProfile);
