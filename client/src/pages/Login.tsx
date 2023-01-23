@@ -19,7 +19,6 @@ export const Login = () => {
     <div className="login">
       <Container>
         <LoginForm />
-
       </Container>
     </div>
   );
