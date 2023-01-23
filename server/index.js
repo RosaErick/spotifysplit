@@ -10,9 +10,6 @@ const CLIENT_ID = process.env.CLIENT_ID;
 const CLIENT_SECRET = process.env.CLIENT_SECRET;
 const REDIRECT_URI = process.env.REDIRECT_URI;
 
-app.get("/", (req, res) => {
-  res.send("health check");
-});
 
 app.get("/login", (req, res) => {
   const state = generateRandomString(16);
@@ -61,9 +58,9 @@ app.get("/callback", (req, res) => {
           expires_in,
         });
 
-        res.redirect(`http://localhost:5173/?${queryParams}`);
+        res.redirect(`https://spotifysplit.onrender.com/?${queryParams}`);
       } else {
-        res.redirect(`http://localhost:5173/?error=invalid_token`);
+        res.redirect(`https://spotifysplit.onrender.com/?error=invalid_token`);
       }
     })
     .catch((error) => {
