@@ -13,7 +13,7 @@ export const LoginForm = () => {
           type="button"
         >
           <a
-            href="http://localhost:3000/login"
+            href="https://spotifysplitapi.onrender.com/login"
             className="text-white font-bold py-2 px-2  focus:outline-none focus:shadow-outline "
           >
             Login with Spotify
