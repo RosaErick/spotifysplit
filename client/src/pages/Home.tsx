@@ -1,11 +1,10 @@
 import { Profile } from "../components/Profile";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { logout, getTotalUserInfo, accessToken } from "../provider/spotfy";
 import { UserProfile } from "../interfaces/interfaces";
-import { useQuery } from "react-query";
 import { useNavigate } from "react-router-dom";
 import { TopArtists } from "../components/TopArtists";
-import  TopTracks  from "../components/TopTracks";
+import TopTracks from "../components/TopTracks";
 import TopAlbums from "../components/TopAlbums";
 
 type Props = {};
@@ -14,41 +13,32 @@ export const Home = (props: Props) => {
   const [profile, setProfile] = useState<UserProfile>();
   const [followedArtists, setFollowedArtists] = useState<any>();
   const [playlists, setPlaylists] = useState<any>();
-  const [topArtists, setTopArtists] = useState<any>();
-  const [topTracks, setTopTracks] = useState<any>();
   const [token, setToken] = useState<any>(null);
   const navigate = useNavigate();
 
-  useQuery("getTotalUserInfo", getTotalUserInfo, {
-    refetchOnWindowFocus: false,
-    onSuccess: (data) => {
-      console.log(data);
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const data = await getTotalUserInfo();
 
-      if (data.userProfile.error) {
-        logout();
-        navigate("/login");
+        if (data.userProfile.error) {
+          logout();
+        }
+
+        setProfile(data.userProfile);
+        setFollowedArtists(data.followedArtists);
+        setPlaylists(data.playlists);
+      } catch (error) {
+        console.log(error);
       }
+    }
 
-      setProfile(data.userProfile);
-      setFollowedArtists(data.followedArtists);
-      setPlaylists(data.playlists);
-      setTopArtists(data.topArtists);
-      setTopTracks(data.topTracks);
-    },
-    onError: (error) => {
-      console.log(error);
-    },
-  });
+    fetchData();
+  }, [navigate]);
 
-  useQuery("getAccessToken", () => accessToken, {
-    refetchOnWindowFocus: false,
-    onSuccess: (data) => {
-      setToken(data);
-    },
-    onError: (error) => {
-      console.log(error);
-    },
-  });
+  useEffect(() => {
+    setToken(accessToken);
+  }, []);
 
   return (
     <>

@@ -18,6 +18,8 @@ export const logout = () => {
   for (const property in LOCALSTORAGE_KEYS) {
     window.localStorage.removeItem(LOCALSTORAGE_KEYS[property]);
   }
+
+  window.location.href = "/login";
 };
 
 const hasTokenExpired = () => {
@@ -192,9 +194,6 @@ export const getRecommendationsBasedOnTrack = async (
       headers,
     }
   );
-
-  
-
 
   return response.json();
 };
