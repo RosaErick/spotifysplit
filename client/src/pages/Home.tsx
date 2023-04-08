@@ -71,21 +71,12 @@ export const Home = (props: Props) => {
 
             <div>
               <div className="w-full">
-                <h2 className="text-2xl font-bold mb-4 md:text-3xl">
-                  Top Artists
-                </h2>
                 <TopArtists />
               </div>
               <div className="w-full">
-                <h2 className="text-2xl font-bold mb-4 md:text-3xl">
-                  Top Tracks
-                </h2>
                 <TopTracks />
               </div>
               <div className="w-full">
-                <h2 className="text-2xl font-bold mb-4 md:text-3xl">
-                  Top Albums
-                </h2>
                 <TopAlbums />
               </div>
             </div>
