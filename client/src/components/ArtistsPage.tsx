@@ -35,7 +35,11 @@ const ArtistPage = () => {
         <h1 className="text-3xl font-bold text-center mb-4">{artist?.name}</h1>
         <div className="rounded-full overflow-hidden w-64 h-64 flex items-center justify-center mb-4">
           {artist?.images[0] && (
-            <img src={artist?.images[0].url} alt={artist?.name} className="w-full h-full object-cover rounded-full" />
+            <img
+              src={artist?.images[0].url}
+              alt={artist?.name}
+              className="w-full h-full object-cover rounded-full"
+            />
           )}
         </div>
         <div className="flex flex-col space-y-4 mb-4">
@@ -61,10 +65,16 @@ const ArtistPage = () => {
       </div>
       {relatedArtists && (
         <div className="mt-8">
-          <h2 className="text-2xl font-bold text-center mb-4">Related Artists</h2>
+          <h2 className="text-2xl font-bold text-center mb-4">
+            Related Artists
+          </h2>
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
             {relatedArtists.map((artist: any) => (
-              <ArtistCard key={artist.id} artist={artist} onClick={() => handleArtistClick(artist.id)} />
+              <ArtistCard
+                key={artist.id}
+                artist={artist}
+                onClick={() => handleArtistClick(artist.id)}
+              />
             ))}
           </div>
         </div>

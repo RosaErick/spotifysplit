@@ -30,7 +30,9 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onClick }) => {
       </div>
       <div className="artist-info mt-4">
         <h3 className="text-white font-semibold text-lg">{name}</h3>
-        <p className="text-gray-400 text-sm mt-2">Genres: {genres.join(", ")}</p>
+        <p className="text-gray-400 text-sm mt-2">
+          Genres: {genres.join(", ")}
+        </p>
       </div>
       <div className="artist-link mt-4">
         <a

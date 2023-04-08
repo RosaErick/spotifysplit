@@ -1,4 +1,4 @@
-import { getTopArtists } from  "../provider/spotfy"
+import { getTopArtists } from "../provider/spotfy";
 import { ArtistCard } from "./ArtistCard";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
@@ -28,7 +28,11 @@ export const TopArtists = () => {
       <h2 className="text-white mb-4 text-2xl">Top Artists</h2>
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         {topArtists.map((artist: any) => (
-          <ArtistCard key={artist.id} artist={artist} onClick={() => handleArtistClick(artist)} />
+          <ArtistCard
+            key={artist.id}
+            artist={artist}
+            onClick={() => handleArtistClick(artist)}
+          />
         ))}
       </div>
     </div>

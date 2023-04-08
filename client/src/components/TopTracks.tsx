@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getTopTracks } from   "../provider/spotfy";
+import { getTopTracks } from "../provider/spotfy";
 import { TrackCard } from "./TrackCard";
 
 export const TopTracks: React.FC = () => {

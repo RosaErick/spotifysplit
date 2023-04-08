@@ -54,7 +54,7 @@ export const Home = (props: Props) => {
     <>
       {token && (
         <div className="bg-[#191414] min-h-screen flex flex-col items-center">
-          <div className="container px-4 mx-auto max-w-screen-lg">
+          <div className="containerpx-4 mx-auto max-w-screen-lg">
             <Profile
               profile={profile}
               playlists={playlists}
@@ -62,7 +62,7 @@ export const Home = (props: Props) => {
             />
 
             <button
-              className="bg-red-700 m-auto mt-6 mb-10 hover:bg-red-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              className="bg-red-700 m-auto flex mt-6 mb-10 hover:bg-red-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
               type="button"
               onClick={() => logout()}
             >
