@@ -14,7 +14,7 @@ export const TopTracks: React.FC = () => {
   if (!tracks) return <div>Loading...</div>;
 
   return (
-    <div>
+    <div className="pt-5">
       <h2 className="text-white mb-4 text-2xl">Top Tracks</h2>
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
         {tracks.map((track: any) => (
