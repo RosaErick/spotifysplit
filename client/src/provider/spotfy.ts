@@ -24,8 +24,9 @@ const hasTokenExpired = () => {
   const { accessToken, timestamp, expireTime } = LOCALSTORAGE_VALEUS;
 
   if (!accessToken || !timestamp) {
-    return false;
+    return true;
   }
+
   const milisecondsElapsed = Date.now() - Number(timestamp);
   return milisecondsElapsed / 1000 > Number(expireTime);
 };
@@ -66,7 +67,7 @@ const refreshToken = async () => {
   }
 };
 
-export const getAcessToken = () => {
+export const getAcessToken = async () => {
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
 
@@ -76,17 +77,14 @@ export const getAcessToken = () => {
     [LOCALSTORAGE_KEYS.expireTime]: urlParams.get("expires_in"),
   };
 
-  const hasError = hasTokenExpired();
-
-  if (hasError || LOCALSTORAGE_VALEUS.accessToken === "undefined") {
-    refreshToken();
-  }
-
-  if (LOCALSTORAGE_VALEUS.accessToken) {
+  if (LOCALSTORAGE_VALEUS.accessToken && !hasTokenExpired()) {
     return LOCALSTORAGE_VALEUS.accessToken;
   }
 
-  if (queryParams[LOCALSTORAGE_KEYS.accessToken]) {
+  if (
+    queryParams[LOCALSTORAGE_KEYS.accessToken] &&
+    queryParams[LOCALSTORAGE_KEYS.expireTime]
+  ) {
     for (const property in queryParams) {
       window.localStorage.setItem(property, queryParams[property]);
     }
@@ -99,10 +97,15 @@ export const getAcessToken = () => {
     return queryParams[LOCALSTORAGE_KEYS.accessToken];
   }
 
+  if (LOCALSTORAGE_VALEUS.refreshToken) {
+    await refreshToken();
+    return LOCALSTORAGE_VALEUS.accessToken;
+  }
+
   return null;
 };
 
-export const accessToken: any = getAcessToken();
+export const accessToken: any =  await getAcessToken();
 
 const spotfyURI = "https://api.spotify.com/v1";
 const headers = new Headers({
