@@ -1,5 +1,3 @@
-
-
 import { LocalStorageValues } from "../interfaces/interfaces";
 
 const LOCALSTORAGE_KEYS: any = {
@@ -20,8 +18,6 @@ export const logout = () => {
   for (const property in LOCALSTORAGE_KEYS) {
     window.localStorage.removeItem(LOCALSTORAGE_KEYS[property]);
   }
-
-
 };
 
 const hasTokenExpired = () => {
@@ -154,6 +150,52 @@ export const getTopArtists = async () => {
 };
 
 
+export const getOneArtist = async (artistId: string | undefined) => {
+  const response = await fetch(`${spotfyURI}/artists/${artistId}`, {
+    method: "GET",
+    headers,
+  });
+
+  return response.json();
+};
+
+
+export const getRelatedArtists = async (artistId: string | undefined) => {
+  const response = await fetch(`${spotfyURI}/artists/${artistId}/related-artists`, {
+    method: "GET",
+    headers,
+  });
+
+  return response.json();
+};
+
+
+
+
+export const getTopAlbums = async () => {
+  try {
+    const topArtists = await getTopArtists();
+    const artistIds = topArtists.items.map((artist: any) => artist.id);
+
+    const albumsPromises = artistIds.map(async (artistId: any) => {
+      const response = await fetch(`${spotfyURI}/artists/${artistId}/albums?limit=5`, {
+        method: "GET",
+        headers,
+      });
+      const data = await response.json();
+      return data.items;
+    });
+
+    const albumsResults = await Promise.all(albumsPromises);
+
+    const albums = albumsResults.flat();
+    return albums;
+  } catch (error) {
+    console.error("Error fetching top albums:", error);
+    return [];
+  }
+};
+
 export const getTopTracks = async () => {
   const response = await fetch(`${spotfyURI}/me/top/tracks`, {
     method: "GET",
@@ -161,8 +203,7 @@ export const getTopTracks = async () => {
   });
 
   return response.json();
-}
-
+};
 
 export const getPlaylistTracks = async (playlistId: string) => {
   const response = await fetch(`${spotfyURI}/playlists/${playlistId}/tracks`, {

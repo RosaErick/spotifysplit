@@ -1,40 +1,36 @@
-import React, { useEffect, useState } from "react";
+import { getTopArtists } from  "../provider/spotfy"
+import { ArtistCard } from "./ArtistCard";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 
-type Props = {
-  artists: any;
-};
-
-const TopArtists = (props: Props) => {
-  const [artist, setTopArtists] = useState<any>();
-
-  const { artists } = props;
-
-
+export const TopArtists = () => {
+  const [topArtists, setTopArtists] = useState<any[] | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    setTopArtists(artists);
-  }, [artists]);
+    const fetchTopArtists = async () => {
+      const data = await getTopArtists();
+      setTopArtists(data?.items);
+    };
+    fetchTopArtists();
+  }, []);
+
+  const handleArtistClick = (artist: any) => {
+    navigate(`/artists/${artist.id}`);
+  };
+
+  if (!topArtists) {
+    return <div>Loading...</div>;
+  }
 
   return (
-    <div className="flex flex-col gap-10 w-full">
-      <h3 className="text-white font-bold text-lg mt-10">Most Played Artists of All Time</h3>
-      <div className="flex flex-col gap-10">
-        {artist?.items?.map((artist: any) => (
-          <div
-            className="flex items-center gap-5 justify-start"
-            key={artist.id}
-          >
-            <img
-              className="rounded-full h-20 w-20"
-              src={artist.images[0].url}
-              alt="artist"
-            />
-            <p className="text-white font-semibold">{artist.name}</p>
-          </div>
+    <div>
+      <h2 className="text-white mb-4 text-2xl">Top Artists</h2>
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+        {topArtists.map((artist: any) => (
+          <ArtistCard key={artist.id} artist={artist} onClick={() => handleArtistClick(artist)} />
         ))}
       </div>
     </div>
   );
 };
-
-export default TopArtists;

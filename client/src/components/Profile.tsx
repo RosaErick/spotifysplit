@@ -1,11 +1,7 @@
 import React from "react";
-import { useState, useEffect } from "react";
-import { getUserProfile } from "../provider/spotfy";
-import { catchErrors } from "../utils/utils";
-import { UserProfile } from "../interfaces/interfaces";
 
 type Props = {
-  profile: UserProfile | undefined;
+  profile: any;
   playlists: any;
   following: any;
 };
@@ -14,36 +10,35 @@ export const Profile = (props: Props) => {
   const { profile, playlists, following } = props;
 
   return (
-    <div className="bg-black hover:from-pink-500 hover:to-yellow-500  flex-col items-center justify-center">
+    <div className="bg-[#191414] flex flex-col items-center justify-center py-8">
       {profile?.images.length && profile.images[0].url && (
         <img
           src={profile.images[0].url}
           alt="profile"
-          className="m-auto rounded-full mt-10 h-40 w-40"
+          className="m-auto rounded-full mt-6 h-32 w-32 shadow-md border-2 border-green-600"
         />
       )}
-      <h1 className=" m-auto mt-3 text-white font-bold text-center">
+      <h1 className="m-auto mt-4 text-white font-bold text-xl text-center">
         {profile?.display_name}
       </h1>
       <div className="flex flex-col items-center text-white font-bold">
-        <p className="rounded-full px-3 py-2 m-5 bg-green-600">
+        <p className="rounded-full px-3 py-1 mt-4 bg-green-600">
           {profile?.product}
         </p>
-        <div className="flex gap-5">
-          <div className="m-auto flex flex-col items-center">
+        <div className="flex gap-5 mt-6">
+          <div className="flex flex-col items-center">
             <p>{profile?.followers.total}</p>
-            <p>Followers</p>
+            <p className="text-gray-300">Followers</p>
           </div>
-          <div className="m-auto flex flex-col items-center">
+          <div className="flex flex-col items-center">
             <p>{playlists?.total}</p>
-            <p>Playlists</p>
+            <p className="text-gray-300">Playlists</p>
           </div>
-          <div className="m-auto flex flex-col items-center">
+          <div className="flex flex-col items-center">
             <p>{following?.artists?.items?.length}</p>
-            <p>Following</p>
+            <p className="text-gray-300">Following</p>
           </div>
         </div>
-        <p></p>
       </div>
     </div>
   );

@@ -1,33 +1,26 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { getTopTracks } from   "../provider/spotfy";
+import { TrackCard } from "./TrackCard";
 
-type Props = {
-  tracks: any;
-};
+export const TopTracks: React.FC = () => {
+  const [tracks, setTracks] = useState<any | null>(null);
 
-const TopTracks = (props: Props) => {
-  const { tracks } = props;
+  useEffect(() => {
+    getTopTracks().then((data) => {
+      setTracks(data.items);
+    });
+  }, []);
+
+  if (!tracks) return <div>Loading...</div>;
 
   return (
-    <div className="flex flex-col gap-10 w-full">
-      <div className="text-white font-bold  mt-10 text-lg">
-        Most Played Songs of All Time
-      </div>
-
-      <div className="flex flex-col gap-10">
-        {tracks?.items?.map((track: any) => (
-          <div className="flex items-center gap-5 justify-start" key={track.id}>
-            <img
-              className="rounded-full h-20 w-20"
-              src={track.album.images[0].url}
-              alt="artist"
-            />
-            <p className="text-white font-semibold size">{track.name}</p>
-            <p className="text-white font-semibold">{track.artists[0].name}</p>
-          </div>
+    <div>
+      <h2 className="text-white mb-4 text-2xl">Top Tracks</h2>
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+        {tracks.map((track: any) => (
+          <TrackCard key={track.id} track={track} />
         ))}
       </div>
     </div>
   );
 };
-
-export default TopTracks;

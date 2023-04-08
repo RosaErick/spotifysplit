@@ -4,8 +4,9 @@ import { logout, getTotalUserInfo, accessToken } from "../provider/spotfy";
 import { UserProfile } from "../interfaces/interfaces";
 import { useQuery } from "react-query";
 import { useNavigate } from "react-router-dom";
-import TopArtists from "../components/TopArtists";
-import TopTracks from "../components/TopTracks";
+import { TopArtists } from "../components/TopArtists";
+import { TopTracks } from "../components/TopTracks";
+import TopAlbums from "../components/TopAlbums";
 
 type Props = {};
 
@@ -52,24 +53,42 @@ export const Home = (props: Props) => {
   return (
     <>
       {token && (
-        <div className="bg-black  flex flex-col justify-center items-center">
-          <Profile
-            profile={profile}
-            playlists={playlists}
-            following={followedArtists}
-          />
+        <div className="bg-[#191414] min-h-screen flex flex-col items-center">
+          <div className="container px-4 mx-auto max-w-screen-lg">
+            <Profile
+              profile={profile}
+              playlists={playlists}
+              following={followedArtists}
+            />
 
-          <button
-            className="bg-red-700 m-auto mt-10 hover:bg-red-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            type="button"
-            onClick={() => logout()}
-          >
-            Log Out
-          </button>
+            <button
+              className="bg-red-700 m-auto mt-6 mb-10 hover:bg-red-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              type="button"
+              onClick={() => logout()}
+            >
+              Log Out
+            </button>
 
-          <div className="flex gap-10 justify-around px-20 items-center m-auto mt-10 w-full">
-            <TopArtists artists={topArtists} />
-            <TopTracks tracks={topTracks} />
+            <div>
+              <div className="w-full">
+                <h2 className="text-2xl font-bold mb-4 md:text-3xl">
+                  Top Artists
+                </h2>
+                <TopArtists />
+              </div>
+              <div className="w-full">
+                <h2 className="text-2xl font-bold mb-4 md:text-3xl">
+                  Top Tracks
+                </h2>
+                <TopTracks />
+              </div>
+              <div className="w-full">
+                <h2 className="text-2xl font-bold mb-4 md:text-3xl">
+                  Top Albums
+                </h2>
+                <TopAlbums />
+              </div>
+            </div>
           </div>
         </div>
       )}
