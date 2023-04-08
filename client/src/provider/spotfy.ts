@@ -105,7 +105,7 @@ export const getAcessToken = async () => {
   return null;
 };
 
-export const accessToken: any =  await getAcessToken();
+export const accessToken: any = await getAcessToken();
 
 const spotfyURI = "https://api.spotify.com/v1";
 const headers = new Headers({
@@ -152,7 +152,6 @@ export const getTopArtists = async () => {
   return response.json();
 };
 
-
 export const getOneArtist = async (artistId: string | undefined) => {
   const response = await fetch(`${spotfyURI}/artists/${artistId}`, {
     method: "GET",
@@ -162,9 +161,20 @@ export const getOneArtist = async (artistId: string | undefined) => {
   return response.json();
 };
 
-
 export const getRelatedArtists = async (artistId: string | undefined) => {
-  const response = await fetch(`${spotfyURI}/artists/${artistId}/related-artists`, {
+  const response = await fetch(
+    `${spotfyURI}/artists/${artistId}/related-artists`,
+    {
+      method: "GET",
+      headers,
+    }
+  );
+
+  return response.json();
+};
+
+export const getOneTrack = async (trackId: string | undefined) => {
+  const response = await fetch(`${spotfyURI}/tracks/${trackId}`, {
     method: "GET",
     headers,
   });
@@ -172,8 +182,22 @@ export const getRelatedArtists = async (artistId: string | undefined) => {
   return response.json();
 };
 
+export const getRecommendationsBasedOnTrack = async (
+  trackId: string | undefined
+) => {
+  const response = await fetch(
+    `${spotfyURI}/recommendations?seed_tracks=${trackId}&limit=5`,
+    {
+      method: "GET",
+      headers,
+    }
+  );
+
+  
 
 
+  return response.json();
+};
 
 export const getTopAlbums = async () => {
   try {
@@ -181,10 +205,13 @@ export const getTopAlbums = async () => {
     const artistIds = topArtists.items.map((artist: any) => artist.id);
 
     const albumsPromises = artistIds.map(async (artistId: any) => {
-      const response = await fetch(`${spotfyURI}/artists/${artistId}/albums?limit=5`, {
-        method: "GET",
-        headers,
-      });
+      const response = await fetch(
+        `${spotfyURI}/artists/${artistId}/albums?limit=5`,
+        {
+          method: "GET",
+          headers,
+        }
+      );
       const data = await response.json();
       return data.items;
     });
