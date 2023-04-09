@@ -1,16 +1,12 @@
 import { Profile } from "../components/Profile/Profile";
 import { useState, useEffect } from "react";
-import {
-  logout,
-  getAccessToken,
-} from "../provider/spotfy";
-import { Navigate} from "react-router-dom";
+import { logout, getAccessToken } from "../provider/spotfy";
+import { Navigate } from "react-router-dom";
 import { TopArtists } from "../components/Artist/TopArtists";
 import TopTracks from "../components/Track/TopTracks";
 import TopAlbums from "../components/Album/TopAlbums";
 import { RecentlyPlayedTracks } from "../components/Track/RecentlyPlayedTracks";
 import { motion } from "framer-motion";
-
 
 export const Home = () => {
   const [loading, setLoading] = useState<boolean>(true);
@@ -64,7 +60,10 @@ export const Home = () => {
         <button
           className="bg-red-700 m-auto flex mt-6 mb-10 hover:bg-red-600 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
           type="button"
-          onClick={() => logout()}
+          onClick={() => {
+            logout();
+            setIsAuthenticated(false);
+          }}
         >
           Log Out
         </button>
