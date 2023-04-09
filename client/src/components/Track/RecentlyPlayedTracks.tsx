@@ -47,18 +47,18 @@ export const RecentlyPlayedTracks: React.FC = () => {
       <div className="py-10 px-5 relative">
         <div>
           <button
-            className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 text-green-500 hover:text-green-600 transition-all duration-200 ease-in-out"
+            className="hidden md:block absolute left-0 top-1/2 transform -translate-y-1/2 z-10 text-green-500 hover:text-green-600 transition-all duration-200 ease-in-out"
             onClick={scrollLeft}
           >
             &lt;
           </button>
           <button
-            className="absolute right-0  top-1/2 transform -translate-y-1/2 z-10 text-green-500 hover:text-green-600 transition-all duration-200 ease-in-out"
+            className="hidden md:block absolute right-0  top-1/2 transform -translate-y-1/2 z-10 text-green-500 hover:text-green-600 transition-all duration-200 ease-in-out"
             onClick={scrollRight}
           >
             &gt;
           </button>
-          <div className="overflow-hidden relative w-full h-80" ref={scrollRef}>
+          <div className="overflow-x-scroll md:overflow-hidden relative w-full h-80" ref={scrollRef}>
             <div className="flex gap-1 py-4 pl-4 space-x-4 transition-all duration-200 ease-in-out whitespace-nowrap">
               {tracks.map((track: ITrack) => (
                 <div

@@ -6,7 +6,7 @@ interface AlbumCardProps {
 
 export const AlbumCard: React.FC<AlbumCardProps> = ({ album }) => {
   return (
-    <div className="bg-gray-900 text-white p-4 rounded shadow cursor-pointer">
+    <div className="bg-[#121212] p-4 rounded-lg shadow-md cursor-pointer transform hover:scale-105 transition-all duration-200 ease-in-out ">
       <div className="w-full h-40 mb-2">
         <img
           src={album.images[0].url}

@@ -16,7 +16,7 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onClick }) => {
 
   return (
     <div
-      className="bg-[#121212] text-white  p-4 rounded-lg shadow-md cursor-pointer transform hover:scale-105 transition-all duration-200 ease-in-out "
+      className="bg-[#121212] text-white h-70 w-80 p-4 rounded-lg shadow-md cursor-pointer transform hover:scale-105 transition-all duration-200 ease-in-out "
       onClick={onClick}
     >
       <div>
