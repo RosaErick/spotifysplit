@@ -18,6 +18,8 @@ const TopAlbums: React.FC = () => {
     navigate(`/albums/${id}`);
   };
 
+  if (albums.length === 0) return null;
+
   return (
     <div className="pt-5">
       <h2 className="text-white mb-4 text-2xl">Top Albums</h2>
