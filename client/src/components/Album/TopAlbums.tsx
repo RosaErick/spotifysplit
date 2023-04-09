@@ -18,7 +18,7 @@ const TopAlbums: React.FC = () => {
     navigate(`/albums/${id}`);
   };
 
-  if (albums.length === 0) return null;
+  if (albums?.length === 0) return null;
 
   return (
     <div className="pt-5">
