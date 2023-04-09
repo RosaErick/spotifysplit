@@ -116,12 +116,17 @@ const headers = new Headers({
 });
 
 export const getUserProfile = async () => {
-  const response = await fetch(`${spotfyURI}/me`, {
-    method: "GET",
-    headers,
-  });
+  try {
+    const response = await fetch(`${spotfyURI}/me`, {
+      method: "GET",
+      headers,
+    });
 
-  return response.json();
+    return response.json();
+  } catch (err) {
+    console.log(err);
+    logout();
+  }
 };
 
 export const getUserFollowedArtist = async () => {
@@ -225,8 +230,7 @@ export const getTopAlbums = async () => {
   }
 };
 
-
-export const getAlbumById = async (albumId: string | undefined)  => {
+export const getAlbumById = async (albumId: string | undefined) => {
   const response = await fetch(`${spotfyURI}/albums/${albumId}`, {
     method: "GET",
     headers,
@@ -243,8 +247,6 @@ export const getAlbumTracks = async (albumId: string | undefined) => {
 
   return response.json();
 };
-
-
 
 export const getTopTracks = async () => {
   const response = await fetch(`${spotfyURI}/me/top/tracks`, {
