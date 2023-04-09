@@ -17,11 +17,11 @@ export const Home = (props: Props) => {
 
   useEffect(() => {
     setToken(token);
-  }, []);
 
-  if (!hasToken) {
-    navigate("/login");
-  }
+    if (!hasToken) {
+      navigate("/login");
+    }
+  }, []);
 
   console.log(hasToken);
 
