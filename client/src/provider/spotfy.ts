@@ -107,7 +107,7 @@ export const getAcessToken = async () => {
   return null;
 };
 
-export const accessToken: any = await getAcessToken();
+export const accessToken: any = async () => await getAcessToken();
 
 const spotfyURI = "https://api.spotify.com/v1";
 const headers = new Headers({
