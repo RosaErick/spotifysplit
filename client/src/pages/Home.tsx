@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { TopArtists } from "../components/Artist/TopArtists";
 import TopTracks from "../components/Track/TopTracks";
 import TopAlbums from "../components/Album/TopAlbums";
+import { RecentlyPlayedTracks } from "../components/Track/RecentlyPlayedTracks";
 
 type Props = {};
 
@@ -44,7 +45,7 @@ export const Home = (props: Props) => {
     <>
       {token && (
         <div className="bg-[#191414] min-h-screen flex flex-col items-center">
-          <div className="containerpx-4 mx-auto max-w-screen-lg">
+          <div className="container px-4 mx-auto max-w-screen-lg">
             <Profile
               profile={profile}
               playlists={playlists}
@@ -58,7 +59,7 @@ export const Home = (props: Props) => {
             >
               Log Out
             </button>
-
+            <RecentlyPlayedTracks />
             <div>
               <div className="w-full">
                 <TopArtists />

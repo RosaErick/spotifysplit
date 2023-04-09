@@ -205,7 +205,7 @@ export const getTopAlbums = async () => {
 
     const albumsPromises = artistIds.map(async (artistId: any) => {
       const response = await fetch(
-        `${spotfyURI}/artists/${artistId}/albums?limit=5`,
+        `${spotfyURI}/artists/${artistId}/albums?limit=1`,
         {
           method: "GET",
           headers,
@@ -248,6 +248,15 @@ export const getAlbumTracks = async (albumId: string | undefined) => {
 
 export const getTopTracks = async () => {
   const response = await fetch(`${spotfyURI}/me/top/tracks`, {
+    method: "GET",
+    headers,
+  });
+
+  return response.json();
+};
+
+export const getRecentlyPlayedTracks = async () => {
+  const response = await fetch(`${spotfyURI}/me/player/recently-played`, {
     method: "GET",
     headers,
   });

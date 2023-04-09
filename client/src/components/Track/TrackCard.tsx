@@ -6,21 +6,21 @@ interface TrackCardProps {
 
 export const TrackCard: React.FC<TrackCardProps> = ({ track }) => {
   return (
-    <div className="bg-gray-900 text-white p-4 rounded shadow cursor-pointer">
-      <div className="artist-image">
-        <div className="artist-image">
-          <img
-            src={track.album.images[0].url}
-            alt={`Album cover for ${track.name}`}
-            className="w-full h-full object-cover m-1 rounded-lg"
-          />
-        </div>
-        <div>
-          <h3 className="text-white text-lg">{track.name}</h3>
-          <p className="text-gray-400">
-            {track.artists.map((artist: any) => artist.name).join(", ")}
-          </p>
-        </div>
+    <div className="bg-gray-800 text-white w-60 h-30 p-4 rounded-lg shadow-md cursor-pointer transform hover:scale-105 transition-all duration-200 ease-in-out h-full flex flex-col">
+      <div className="artist-image mb-4 flex-grow">
+        <img
+          src={track.album.images[0].url}
+          alt={`Album cover for ${track.name}`}
+          className="w-full h-48 w-100 object-cover rounded-lg shadow-md"
+        />
+      </div>
+      <div className="flex flex-col justify-end">
+        <h3 className="text-white text-base font-semibold mb-1 truncate">
+          {track.name}
+        </h3>
+        <p className="text-gray-400 text-sm truncate">
+          {track.artists.map((artist: any) => artist.name).join(", ")}
+        </p>
       </div>
     </div>
   );
