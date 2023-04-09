@@ -11,9 +11,7 @@ export const Login = () => {
 
   console.log(token);
 
-  if (token) {
-    return <Navigate to="/" />;
-  }
+ 
 
   return (
     <div className="login">
