@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import {
   getOneTrack,
   getRecommendationsBasedOnTrack,
@@ -51,7 +51,15 @@ const TrackPage = () => {
             <div className="flex items-center space-x-4 mb-4">
               <p className="text-gray-500 font-medium">Artists:</p>
               <p>
-                {track.artists.map((artist: any) => artist.name).join(", ")}
+                {track.artists.map((artist: any) => (
+                  <Link
+                    to={`/artists/${artist.id}`}
+                    key={artist.id}
+                    className="text-blue-500 hover:underline"
+                  >
+                    {artist.name}
+                  </Link>
+                ))}
               </p>
             </div>
             <div className="flex items-center space-x-4 mb-4">

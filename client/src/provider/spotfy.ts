@@ -225,6 +225,27 @@ export const getTopAlbums = async () => {
   }
 };
 
+
+export const getAlbumById = async (albumId: string | undefined)  => {
+  const response = await fetch(`${spotfyURI}/albums/${albumId}`, {
+    method: "GET",
+    headers,
+  });
+
+  return response.json();
+};
+
+export const getAlbumTracks = async (albumId: string | undefined) => {
+  const response = await fetch(`${spotfyURI}/albums/${albumId}/tracks`, {
+    method: "GET",
+    headers,
+  });
+
+  return response.json();
+};
+
+
+
 export const getTopTracks = async () => {
   const response = await fetch(`${spotfyURI}/me/top/tracks`, {
     method: "GET",
