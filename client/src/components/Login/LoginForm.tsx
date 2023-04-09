@@ -35,7 +35,7 @@ export const LoginForm = () => {
       )}
 
       {loading && (
-        <div className="bg-[#181818] min-h-screen flex flex-col items-center ">
+        <div className="flex-col justify-center items-center h-24">
           <div className="flex flex-col items-center justify-center h-full">
             <div role="status">
               <svg
