@@ -10,11 +10,7 @@ import Router from "./routes/Router";
 const queryClient = new QueryClient();
 
 function App() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <Router />
-    </QueryClientProvider>
-  );
+  return <Router />;
 }
 
 export default App;
