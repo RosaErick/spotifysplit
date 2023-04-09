@@ -1,4 +1,4 @@
-import { getTopArtists } from "../provider/spotfy";
+import { getTopArtists } from "../../provider/spotfy";
 import { ArtistCard } from "./ArtistCard";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";

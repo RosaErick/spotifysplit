@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getTopAlbums } from "../provider/spotfy";
+import { getTopAlbums } from "../../provider/spotfy";
 import { AlbumCard } from "./AlbumCard";
 import { useNavigate } from "react-router-dom";
 

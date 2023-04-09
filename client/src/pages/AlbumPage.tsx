@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getAlbumById, getAlbumTracks } from "../provider/spotfy";
-import { TrackCard } from "../components/TrackCard";
-import { ArtistCard } from "../components/ArtistCard";
+import { TrackCard } from "../components/Track/TrackCard";
+import { ArtistCard } from "../components/Artist/ArtistCard";
 
 const AlbumPage = () => {
   const [album, setAlbum] = useState<any>(null);

@@ -4,7 +4,7 @@ import {
   getOneTrack,
   getRecommendationsBasedOnTrack,
 } from "../provider/spotfy";
-import { TrackCard } from "../components/TrackCard";
+import { TrackCard } from "../components/Track/TrackCard";
 
 const TrackPage = () => {
   const [track, setTrack] = useState<any>(null);

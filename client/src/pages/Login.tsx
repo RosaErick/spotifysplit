@@ -1,6 +1,6 @@
 import "../App.css";
-import { Container } from "../components/Container";
-import { LoginForm } from "../components/LoginForm";
+import { Container } from "../components/Profile/Container";
+import { LoginForm } from "../components/Login/LoginForm";
 import { accessToken, logout } from "../provider/spotfy";
 import { useState, useEffect } from "react";
 import { Navigate } from "react-router";

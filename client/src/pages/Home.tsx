@@ -1,11 +1,11 @@
-import { Profile } from "../components/Profile";
+import { Profile } from "../components/Profile/Profile";
 import { useState, useEffect } from "react";
 import { logout, getTotalUserInfo, accessToken } from "../provider/spotfy";
 import { UserProfile } from "../interfaces/interfaces";
 import { useNavigate } from "react-router-dom";
-import { TopArtists } from "../components/TopArtists";
-import TopTracks from "../components/TopTracks";
-import TopAlbums from "../components/TopAlbums";
+import { TopArtists } from "../components/Artist/TopArtists";
+import TopTracks from "../components/Track/TopTracks";
+import TopAlbums from "../components/Album/TopAlbums";
 
 type Props = {};
 

@@ -2,9 +2,9 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "react-query";
 import { Home, Login } from "./pages";
 import { Test } from "./pages/Test";
-import ArtistPage from "./components/ArtistsPage";
-import TrackPage from "./components/TrackPage";
-import AlbumPage from "./components/AlbumPage";
+import ArtistPage from "./pages/ArtistsPage";
+import TrackPage from "./pages/TrackPage";
+import AlbumPage from "./pages/AlbumPage";
 
 const queryClient = new QueryClient();
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { getOneArtist, getRelatedArtists } from "../provider/spotfy";
-import { ArtistCard } from "../components/ArtistCard";
+import { ArtistCard } from "../components/Artist/ArtistCard";
 
 const ArtistPage = () => {
   const [artist, setArtist] = useState<any>(null);
