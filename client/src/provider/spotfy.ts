@@ -1,4 +1,7 @@
+import { useNavigate } from "react-router-dom";
 import { LocalStorageValues } from "../interfaces/interfaces";
+
+const navigate = useNavigate();
 
 const LOCALSTORAGE_KEYS: any = {
   accessToken: "spotify_access_token",
@@ -19,7 +22,7 @@ export const logout = () => {
     window.localStorage.removeItem(LOCALSTORAGE_KEYS[property]);
   }
 
-  window.location.href = "/login";
+  navigate("/login");
 };
 
 const hasTokenExpired = () => {
