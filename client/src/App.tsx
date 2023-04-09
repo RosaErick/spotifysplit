@@ -5,23 +5,15 @@ import { Test } from "./pages/Test";
 import ArtistPage from "./pages/ArtistsPage";
 import TrackPage from "./pages/TrackPage";
 import AlbumPage from "./pages/AlbumPage";
+import Router from "./routes/Router";
 
 const queryClient = new QueryClient();
 
 function App() {
   return (
-    <BrowserRouter>
-      <QueryClientProvider client={queryClient}>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/artists/:id" element={<ArtistPage />} />
-          <Route path="/tracks/:id" element={<TrackPage />} />
-          <Route path="/albums/:id" element={<AlbumPage />} />
-          <Route path="/test" element={<Test />} />
-        </Routes>
-      </QueryClientProvider>
-    </BrowserRouter>
+    <QueryClientProvider client={queryClient}>
+      <Router />
+    </QueryClientProvider>
   );
 }
 

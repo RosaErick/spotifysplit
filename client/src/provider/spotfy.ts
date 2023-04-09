@@ -1,126 +1,80 @@
-import { useNavigate } from "react-router-dom";
-import { LocalStorageValues } from "../interfaces/interfaces";
+const EXPIRATION_TIME = 3600 * 1000; // 3600 seconds * 1000 = 1 hour in milliseconds
 
-const navigate = useNavigate();
+const setTokenTimestamp = () =>
+  window.localStorage.setItem("spotify_token_timestamp", Date.now().toString());
+const setLocalAccessToken = (token: string) => {
+  setTokenTimestamp();
+  window.localStorage.setItem("spotify_access_token", token);
+};
+const setLocalRefreshToken = (token: any) =>
+  window.localStorage.setItem("spotify_refresh_token", token);
+const getTokenTimestamp = () =>
+  window.localStorage.getItem("spotify_token_timestamp");
+const getLocalAccessToken = () =>
+  window.localStorage.getItem("spotify_access_token");
+const getLocalRefreshToken = () =>
+  window.localStorage.getItem("spotify_refresh_token");
 
-const LOCALSTORAGE_KEYS: any = {
-  accessToken: "spotify_access_token",
-  refreshToken: "spotify_refresh_token",
-  expireTime: "spotify_expire_time",
-  timestamp: "spotfy_token_timestamp",
+const refreshAccessToken = async () => {
+  try {
+    const response = await fetch(
+      `/refresh_token?refresh_token=${getLocalRefreshToken()}`
+    );
+    const data = await response.json();
+    const { access_token } = data;
+    setLocalAccessToken(access_token);
+    window.location.reload();
+    return;
+  } catch (e) {
+    console.error(e);
+    return false;
+  }
 };
 
-const LOCALSTORAGE_VALEUS: LocalStorageValues = {
-  accessToken: window.localStorage.getItem(LOCALSTORAGE_KEYS.accessToken),
-  refreshToken: window.localStorage.getItem(LOCALSTORAGE_KEYS.refreshToken),
-  expireTime: window.localStorage.getItem(LOCALSTORAGE_KEYS.expireTime),
-  timestamp: window.localStorage.getItem(LOCALSTORAGE_KEYS.timestamp),
+export const getAccessToken = () => {
+  const urlParams = new URLSearchParams(window.location.search);
+  const error = urlParams.get("error");
+  const access_token = urlParams.get("access_token");
+  const refresh_token = urlParams.get("refresh_token");
+
+  if (error) {
+    console.error(error);
+    refreshAccessToken();
+  }
+
+  if (Date.now() - Number(getTokenTimestamp() ?? 0) > EXPIRATION_TIME) {
+    console.warn("Access token has expired, refreshing...");
+    refreshAccessToken();
+  }
+
+  const localAccessToken = getLocalAccessToken();
+
+  if ((!localAccessToken || localAccessToken === "undefined") && access_token) {
+    setLocalAccessToken(access_token);
+    setLocalRefreshToken(refresh_token);
+    return access_token;
+  }
+
+  return localAccessToken;
 };
+
+export const token = getAccessToken();
 
 export const logout = () => {
-  for (const property in LOCALSTORAGE_KEYS) {
-    window.localStorage.removeItem(LOCALSTORAGE_KEYS[property]);
-  }
-
-  navigate("/login");
+  window.localStorage.removeItem("spotify_token_timestamp");
+  window.localStorage.removeItem("spotify_access_token");
+  window.localStorage.removeItem("spotify_refresh_token");
+  window.location.reload();
 };
 
-const hasTokenExpired = () => {
-  const { accessToken, timestamp, expireTime } = LOCALSTORAGE_VALEUS;
-
-  if (!accessToken || !timestamp) {
-    return true;
-  }
-
-  const milisecondsElapsed = Date.now() - Number(timestamp);
-  return milisecondsElapsed / 1000 > Number(expireTime);
+const headers = {
+  Authorization: `Bearer ${token}`,
+  "Content-Type": "application/json",
 };
 
-const refreshToken = async () => {
-  try {
-    if (
-      !LOCALSTORAGE_VALEUS.refreshToken ||
-      LOCALSTORAGE_VALEUS.refreshToken === "undefined" ||
-      Number(Date.now) - Number(LOCALSTORAGE_VALEUS.timestamp) / 1000 < 1000
-    ) {
-      console.error("No refresh token");
-      logout();
-    }
-
-    const { data } = await fetch(
-      `api/refresh_token?refresh_token=${LOCALSTORAGE_VALEUS.refreshToken}`,
-      {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      }
-    ).then((res) => res.json());
-
-    window.localStorage.setItem(
-      LOCALSTORAGE_KEYS.accessToken,
-      data.access_token
-    );
-    window.localStorage.setItem(
-      LOCALSTORAGE_KEYS.timestamp,
-      String(Date.now())
-    );
-
-    window.location.reload();
-  } catch (err) {
-    console.error(err);
-  }
-};
-
-export const getAcessToken = async () => {
-  const queryString = window.location.search;
-  const urlParams = new URLSearchParams(queryString);
-
-  const queryParams: any = {
-    [LOCALSTORAGE_KEYS.accessToken]: urlParams.get("access_token"),
-    [LOCALSTORAGE_KEYS.refreshToken]: urlParams.get("refresh_token"),
-    [LOCALSTORAGE_KEYS.expireTime]: urlParams.get("expires_in"),
-  };
-
-  if (LOCALSTORAGE_VALEUS.accessToken && !hasTokenExpired()) {
-    return LOCALSTORAGE_VALEUS.accessToken;
-  }
-
-  if (
-    queryParams[LOCALSTORAGE_KEYS.accessToken] &&
-    queryParams[LOCALSTORAGE_KEYS.expireTime]
-  ) {
-    for (const property in queryParams) {
-      window.localStorage.setItem(property, queryParams[property]);
-    }
-
-    window.localStorage.setItem(
-      LOCALSTORAGE_KEYS.timestamp,
-      Date.now().toString()
-    );
-
-    return queryParams[LOCALSTORAGE_KEYS.accessToken];
-  }
-
-  if (LOCALSTORAGE_VALEUS.refreshToken) {
-    await refreshToken();
-    return LOCALSTORAGE_VALEUS.accessToken;
-  }
-
-  return null;
-};
-
-export let accessToken: any;
-
-(async function () {
-  accessToken = await getAcessToken();
-})();
+// ... Rest of the code remains unchanged ...
 
 const spotfyURI = "https://api.spotify.com/v1";
-const headers = new Headers({
-  Authorization: `Bearer ${accessToken}`,
-  "Content-Type": "application/json",
-});
 
 export const getUserProfile = async () => {
   try {
@@ -283,26 +237,19 @@ export const getPlaylistTracks = async (playlistId: string) => {
 };
 
 export const getTotalUserInfo = async () => {
-  const [userProfile, followedArtists, playlists, topArtists, topTracks] =
-    await Promise.all([
-      getUserProfile(),
-      getUserFollowedArtist(),
-      getPlaylists(),
-      getTopArtists(),
-      getTopTracks(),
-    ]);
+  const [userProfile, followedArtists, playlists] = await Promise.all([
+    getUserProfile(),
+    getUserFollowedArtist(),
+    getPlaylists(),
+  ]);
 
   console.log("userProfile", userProfile);
   console.log("followedArtists", followedArtists);
   console.log("playlists", playlists);
-  console.log("topArtists", topArtists);
-  console.log("topTracks", topTracks);
 
   return {
     userProfile,
     followedArtists,
     playlists,
-    topArtists,
-    topTracks,
   };
 };

@@ -1,4 +1,6 @@
-import React from "react";
+
+import { getTotalUserInfo } from "../../provider/spotfy";
+import { useEffect, useState } from "react";
 
 type Props = {
   profile: any;
@@ -6,8 +8,25 @@ type Props = {
   following: any;
 };
 
-export const Profile = (props: Props) => {
-  const { profile, playlists, following } = props;
+export const Profile = () => {
+  const [profile, setProfile] = useState<any | null>(null);
+  const [playlists, setPlaylists] = useState<any | null>(null);
+  const [following, setFollowing] = useState<any | null>(null);
+
+
+
+
+  useEffect(() => {
+    getTotalUserInfo().then((data) => {
+      setProfile(data.userProfile);
+      setPlaylists(data.playlists);
+      setFollowing(data.followedArtists);
+    });
+  }, []);
+
+
+
+
 
   return (
     <div className="bg-gradient-to-b from-black to-transparent w-full flex flex-col items-center justify-center py-8">
