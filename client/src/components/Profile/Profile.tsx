@@ -10,7 +10,7 @@ export const Profile = (props: Props) => {
   const { profile, playlists, following } = props;
 
   return (
-    <div className="bg-[#191414] flex flex-col items-center justify-center py-8">
+    <div className="bg-gradient-to-b from-black to-transparent w-full flex flex-col items-center justify-center py-8">
       {profile?.images.length && profile.images[0].url && (
         <img
           src={profile.images[0].url}

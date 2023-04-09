@@ -26,7 +26,7 @@ export const TopArtists = () => {
   return (
     <div>
       <h2 className="text-white mb-4 text-2xl">Top Artists</h2>
-      <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-3 grid-rows-1">
+      <div className="grid gap-6 mx-5 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-3 ">
         {topArtists.map((artist: any) => (
           <ArtistCard
             key={artist.id}
