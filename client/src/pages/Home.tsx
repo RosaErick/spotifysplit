@@ -2,21 +2,17 @@ import { Profile } from "../components/Profile/Profile";
 import { useState, useEffect } from "react";
 import {
   logout,
-  getTotalUserInfo,
-  token,
   getAccessToken,
 } from "../provider/spotfy";
-import { UserProfile } from "../interfaces/interfaces";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate} from "react-router-dom";
 import { TopArtists } from "../components/Artist/TopArtists";
 import TopTracks from "../components/Track/TopTracks";
 import TopAlbums from "../components/Album/TopAlbums";
 import { RecentlyPlayedTracks } from "../components/Track/RecentlyPlayedTracks";
 import { motion } from "framer-motion";
 
-type Props = {};
 
-export const Home = (props: Props) => {
+export const Home = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
@@ -30,7 +26,6 @@ export const Home = (props: Props) => {
 
   if (loading) {
     return (
-      // Put your loading spinner here
       <div className="bg-[#181818] min-h-screen flex flex-col items-center ">
         <div className="flex flex-col items-center justify-center h-full">
           <div role="status">
