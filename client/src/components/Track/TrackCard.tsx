@@ -6,7 +6,7 @@ interface TrackCardProps {
 
 export const TrackCard: React.FC<TrackCardProps> = ({ track }) => {
   return (
-    <div className="bg-gray-800 text-white w-60 h-30 p-4 rounded-lg shadow-md cursor-pointer transform hover:scale-105 transition-all duration-200 ease-in-out h-full flex flex-col">
+    <div className="bg-[#1f1a1a] text-white w-60 h-30 p-4 rounded-lg shadow-md cursor-pointer transform hover:scale-105 transition-all duration-200 ease-in-out h-full flex flex-col">
       <div className="artist-image mb-4 flex-grow">
         <img
           src={track.album.images[0].url}
