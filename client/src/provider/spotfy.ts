@@ -1,3 +1,5 @@
+import { getApiUrl } from "../config/env";
+
 const EXPIRATION_TIME = 3600 * 1000; // 3600 seconds * 1000 = 1 hour in milliseconds
 
 const setTokenTimestamp = () =>
@@ -6,7 +8,7 @@ const setLocalAccessToken = (token: string) => {
   setTokenTimestamp();
   window.localStorage.setItem("spotify_access_token", token);
 };
-const setLocalRefreshToken = (token: any) =>
+const setLocalRefreshToken = (token: string) =>
   window.localStorage.setItem("spotify_refresh_token", token);
 const getTokenTimestamp = () =>
   window.localStorage.getItem("spotify_token_timestamp");
@@ -16,18 +18,40 @@ const getLocalRefreshToken = () =>
   window.localStorage.getItem("spotify_refresh_token");
 
 const refreshAccessToken = async () => {
+  const refreshToken = getLocalRefreshToken();
+
+  if (!refreshToken) {
+    return null;
+  }
+
   try {
     const response = await fetch(
-      `/refresh_token?refresh_token=${getLocalRefreshToken()}`
+      getApiUrl(
+        `/refresh_token?refresh_token=${encodeURIComponent(
+          refreshToken
+        )}`
+      )
     );
+
+    if (!response.ok) {
+      logout();
+      return null;
+    }
+
     const data = await response.json();
     const { access_token } = data;
+
+    if (!access_token) {
+      logout();
+      return null;
+    }
+
     setLocalAccessToken(access_token);
     window.location.reload();
-    return;
+    return access_token;
   } catch (e) {
     console.error(e);
-    return false;
+    return null;
   }
 };
 
@@ -39,26 +63,33 @@ export const getAccessToken = () => {
 
   if (error) {
     console.error(error);
-    refreshAccessToken();
-  }
-
-  if (Date.now() - Number(getTokenTimestamp() ?? 0) > EXPIRATION_TIME) {
-    console.warn("Access token has expired, refreshing...");
-    refreshAccessToken();
+    return null;
   }
 
   const localAccessToken = getLocalAccessToken();
+  const localRefreshToken = getLocalRefreshToken();
 
   if ((!localAccessToken || localAccessToken === "undefined") && access_token) {
     setLocalAccessToken(access_token);
-    setLocalRefreshToken(refresh_token);
+    if (refresh_token) {
+      setLocalRefreshToken(refresh_token);
+    }
     return access_token;
+  }
+
+  if (!localAccessToken || localAccessToken === "undefined") {
+    return null;
+  }
+
+  if (
+    localRefreshToken &&
+    Date.now() - Number(getTokenTimestamp() ?? 0) > EXPIRATION_TIME
+  ) {
+    refreshAccessToken();
   }
 
   return localAccessToken;
 };
-
-export const token = getAccessToken();
 
 export const logout = () => {
   window.localStorage.removeItem("spotify_token_timestamp");
@@ -67,63 +98,57 @@ export const logout = () => {
   window.location.reload();
 };
 
-const headers = {
-  Authorization: `Bearer ${token}`,
+const getHeaders = () => ({
+  Authorization: `Bearer ${getAccessToken()}`,
   "Content-Type": "application/json",
-};
+});
 
-// ... Rest of the code remains unchanged ...
-
-const spotfyURI = "https://api.spotify.com/v1";
+const spotifyUri = "https://api.spotify.com/v1";
 
 export const getUserProfile = async () => {
   try {
-    const response = await fetch(`${spotfyURI}/me`, {
+    const response = await fetch(`${spotifyUri}/me`, {
       method: "GET",
-      headers,
+      headers: getHeaders(),
     });
 
     return response.json();
   } catch (err) {
-    console.log(err);
+    console.error(err);
     logout();
   }
 };
 
 export const getUserFollowedArtist = async () => {
-  const response = await fetch(`${spotfyURI}/me/following?type=artist`, {
+  const response = await fetch(`${spotifyUri}/me/following?type=artist`, {
     method: "GET",
-    headers,
+    headers: getHeaders(),
   });
 
   return response.json();
 };
 
 export const getPlaylists = async () => {
-  const response = await fetch(`${spotfyURI}/me/playlists`, {
+  const response = await fetch(`${spotifyUri}/me/playlists`, {
     method: "GET",
-    headers,
+    headers: getHeaders(),
   });
-
-  console.log("playlist", response);
 
   return response.json();
 };
 
 export const getTopArtists = async () => {
-  const response = await fetch(`${spotfyURI}/me/top/artists`, {
+  const response = await fetch(`${spotifyUri}/me/top/artists`, {
     method: "GET",
-    headers,
+    headers: getHeaders(),
   });
-  console.log("top", response);
-
   return response.json();
 };
 
 export const getOneArtist = async (artistId: string | undefined) => {
-  const response = await fetch(`${spotfyURI}/artists/${artistId}`, {
+  const response = await fetch(`${spotifyUri}/artists/${artistId}`, {
     method: "GET",
-    headers,
+    headers: getHeaders(),
   });
 
   return response.json();
@@ -131,10 +156,10 @@ export const getOneArtist = async (artistId: string | undefined) => {
 
 export const getRelatedArtists = async (artistId: string | undefined) => {
   const response = await fetch(
-    `${spotfyURI}/artists/${artistId}/related-artists`,
+    `${spotifyUri}/artists/${artistId}/related-artists`,
     {
       method: "GET",
-      headers,
+      headers: getHeaders(),
     }
   );
 
@@ -142,9 +167,9 @@ export const getRelatedArtists = async (artistId: string | undefined) => {
 };
 
 export const getOneTrack = async (trackId: string | undefined) => {
-  const response = await fetch(`${spotfyURI}/tracks/${trackId}`, {
+  const response = await fetch(`${spotifyUri}/tracks/${trackId}`, {
     method: "GET",
-    headers,
+    headers: getHeaders(),
   });
 
   return response.json();
@@ -154,10 +179,10 @@ export const getRecommendationsBasedOnTrack = async (
   trackId: string | undefined
 ) => {
   const response = await fetch(
-    `${spotfyURI}/recommendations?seed_tracks=${trackId}&limit=5`,
+    `${spotifyUri}/recommendations?seed_tracks=${trackId}&limit=5`,
     {
       method: "GET",
-      headers,
+      headers: getHeaders(),
     }
   );
 
@@ -171,10 +196,10 @@ export const getTopAlbums = async () => {
 
     const albumsPromises = artistIds.map(async (artistId: any) => {
       const response = await fetch(
-        `${spotfyURI}/artists/${artistId}/albums?limit=1`,
+        `${spotifyUri}/artists/${artistId}/albums?limit=1`,
         {
           method: "GET",
-          headers,
+          headers: getHeaders(),
         }
       );
       const data = await response.json();
@@ -192,45 +217,45 @@ export const getTopAlbums = async () => {
 };
 
 export const getAlbumById = async (albumId: string | undefined) => {
-  const response = await fetch(`${spotfyURI}/albums/${albumId}`, {
+  const response = await fetch(`${spotifyUri}/albums/${albumId}`, {
     method: "GET",
-    headers,
+    headers: getHeaders(),
   });
 
   return response.json();
 };
 
 export const getAlbumTracks = async (albumId: string | undefined) => {
-  const response = await fetch(`${spotfyURI}/albums/${albumId}/tracks`, {
+  const response = await fetch(`${spotifyUri}/albums/${albumId}/tracks`, {
     method: "GET",
-    headers,
+    headers: getHeaders(),
   });
 
   return response.json();
 };
 
 export const getTopTracks = async () => {
-  const response = await fetch(`${spotfyURI}/me/top/tracks`, {
+  const response = await fetch(`${spotifyUri}/me/top/tracks`, {
     method: "GET",
-    headers,
+    headers: getHeaders(),
   });
 
   return response.json();
 };
 
 export const getRecentlyPlayedTracks = async () => {
-  const response = await fetch(`${spotfyURI}/me/player/recently-played`, {
+  const response = await fetch(`${spotifyUri}/me/player/recently-played`, {
     method: "GET",
-    headers,
+    headers: getHeaders(),
   });
 
   return response.json();
 };
 
 export const getPlaylistTracks = async (playlistId: string) => {
-  const response = await fetch(`${spotfyURI}/playlists/${playlistId}/tracks`, {
+  const response = await fetch(`${spotifyUri}/playlists/${playlistId}/tracks`, {
     method: "GET",
-    headers,
+    headers: getHeaders(),
   });
 
   return response.json();
@@ -242,10 +267,6 @@ export const getTotalUserInfo = async () => {
     getUserFollowedArtist(),
     getPlaylists(),
   ]);
-
-  console.log("userProfile", userProfile);
-  console.log("followedArtists", followedArtists);
-  console.log("playlists", playlists);
 
   return {
     userProfile,

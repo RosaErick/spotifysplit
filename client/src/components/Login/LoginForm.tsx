@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { getApiUrl } from "../../config/env";
 
 export const LoginForm = () => {
   const [loading, setLoading] = useState(false);
@@ -23,7 +24,7 @@ export const LoginForm = () => {
               type="button"
             >
               <a
-                href="https://spotifysplitapi.onrender.com/login"
+                href={getApiUrl("/login")}
                 className="text-white font-bold py-2 px-2  focus:outline-none focus:shadow-outline"
                 onClick={handleLogin}
               >
