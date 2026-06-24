@@ -1,20 +1,13 @@
-
-import { getTotalUserInfo } from "../../provider/spotfy";
+import { Avatar, Badge, Box, Card, Flex, Grid, Heading, Text } from "@radix-ui/themes";
 import { useEffect, useState } from "react";
-
-type Props = {
-  profile: any;
-  playlists: any;
-  following: any;
-};
+import { getTotalUserInfo } from "../../provider/spotfy";
+import { formatNumber } from "../../utils/format";
+import { LoadingState } from "../Layout/LoadingState";
 
 export const Profile = () => {
   const [profile, setProfile] = useState<any | null>(null);
   const [playlists, setPlaylists] = useState<any | null>(null);
   const [following, setFollowing] = useState<any | null>(null);
-
-
-
 
   useEffect(() => {
     getTotalUserInfo().then((data) => {
@@ -24,41 +17,52 @@ export const Profile = () => {
     });
   }, []);
 
+  if (!profile) return <LoadingState label="Carregando perfil" />;
 
-
-
+  const imageUrl = profile?.images?.[0]?.url;
+  const stats = [
+    ["Seguidores", formatNumber(profile?.followers?.total)],
+    ["Playlists", formatNumber(playlists?.total)],
+    ["Seguindo", formatNumber(following?.artists?.items?.length)],
+  ];
 
   return (
-    <div className="bg-gradient-to-b from-black to-transparent w-full flex flex-col items-center justify-center py-8">
-      {profile?.images?.length && profile.images[0]?.url && (
-        <img
-          src={profile.images[0].url}
-          alt="profile"
-          className="m-auto rounded-full mt-6 h-32 w-32 shadow-md border-2 border-green-600"
-        />
-      )}
-      <h1 className="m-auto mt-4 text-white font-bold text-xl text-center">
-        {profile?.display_name}
-      </h1>
-      <div className="flex flex-col items-center text-white font-bold">
-        <p className="rounded-full px-3 py-1 mt-4 bg-green-600">
-          {profile?.product}
-        </p>
-        <div className="flex gap-5 mt-6">
-          <div className="flex flex-col items-center">
-            <p>{profile?.followers.total}</p>
-            <p className="text-gray-300">Followers</p>
-          </div>
-          <div className="flex flex-col items-center">
-            <p>{playlists?.total}</p>
-            <p className="text-gray-300">Playlists</p>
-          </div>
-          <div className="flex flex-col items-center">
-            <p>{following?.artists?.items?.length}</p>
-            <p className="text-gray-300">Following</p>
-          </div>
-        </div>
-      </div>
-    </div>
+    <Grid columns={{ initial: "1", md: "1fr 320px" }} gap="4" mb="5">
+      <Card className="hero-panel">
+        <Flex align={{ initial: "start", sm: "end" }} gap="5" direction={{ initial: "column", sm: "row" }}>
+          <Avatar
+            src={imageUrl}
+            fallback="SS"
+            size="8"
+            radius="large"
+            color="green"
+          />
+          <Box>
+            <Text as="p" size="1" weight="bold" color="green" className="section-eyebrow">
+              Perfil conectado
+            </Text>
+            <Heading size={{ initial: "6", sm: "8" }} mt="2">
+              {profile.display_name}
+            </Heading>
+            <Badge color="green" variant="soft" mt="4">
+              {profile.product || "spotify"}
+            </Badge>
+          </Box>
+        </Flex>
+      </Card>
+
+      <Grid columns={{ initial: "3", md: "1" }} gap="3">
+        {stats.map(([label, value]) => (
+          <Card key={label}>
+            <Text as="p" size="1" color="gray">
+              {label}
+            </Text>
+            <Text as="p" size="5" weight="bold" mt="1">
+              {value}
+            </Text>
+          </Card>
+        ))}
+      </Grid>
+    </Grid>
   );
 };

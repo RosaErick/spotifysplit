@@ -1,36 +1,36 @@
-import React, { useEffect, useState } from "react";
-import { getTopAlbums } from "../../provider/spotfy";
-import { AlbumCard } from "./AlbumCard";
+import { Box, Grid } from "@radix-ui/themes";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { getTopAlbums } from "../../provider/spotfy";
+import { LoadingState } from "../Layout/LoadingState";
+import { Section } from "../Layout/Section";
+import { AlbumCard } from "./AlbumCard";
 
-const TopAlbums: React.FC = () => {
-  const [albums, setAlbums] = useState<any[]>([]);
+const TopAlbums = () => {
+  const [albums, setAlbums] = useState<any[] | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    (async () => {
-      const response = await getTopAlbums();
-      setAlbums(response);
-    })();
+    getTopAlbums().then((response) => setAlbums(response || []));
   }, []);
 
-  const handleAlbumClick = (id: string) => {
-    navigate(`/albums/${id}`);
-  };
-
-  if (albums?.length === 0) return null;
-
   return (
-    <div className="pt-5">
-      <h2 className="text-white mb-4 text-2xl">Top Albums</h2>
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-        {albums.map((album, index) => (
-          <div onClick={() => handleAlbumClick(album.id)}>
-            <AlbumCard key={index} album={album} />
-          </div>
-        ))}
-      </div>
-    </div>
+    <Section title="Albuns para investigar" eyebrow="Descoberta">
+      {!albums ? (
+        <LoadingState label="Carregando albuns" />
+      ) : (
+        <Grid columns={{ initial: "1", xs: "2", sm: "3", lg: "5" }} gap="4">
+          {albums.map((album, index) => (
+            <Box
+              key={`${album.id}-${index}`}
+              onClick={() => navigate(`/albums/${album.id}`)}
+            >
+              <AlbumCard album={album} />
+            </Box>
+          ))}
+        </Grid>
+      )}
+    </Section>
   );
 };
 

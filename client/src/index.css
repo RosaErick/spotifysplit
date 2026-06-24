@@ -2,52 +2,130 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: "Inter", sans-serif;
-  background-color: #121212;
-  color: #ffffff;
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    margin: 0;
+    min-width: 320px;
+    min-height: 100vh;
+    font-family: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI",
+      sans-serif;
+    background: var(--gray-1);
+  }
+
+  button,
+  a {
+    -webkit-tap-highlight-color: transparent;
+  }
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
+.app-background {
+  background:
+    radial-gradient(circle at 16% 8%, var(--green-a4), transparent 25rem),
+    linear-gradient(135deg, var(--gray-1) 0%, var(--gray-2) 52%, var(--green-2) 100%);
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  border-bottom: 1px solid var(--gray-a5);
+  background: color-mix(in srgb, var(--gray-1) 82%, transparent);
+  backdrop-filter: blur(18px);
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
+.brand-mark {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: var(--radius-4);
+  background: var(--green-9);
+  color: var(--green-contrast);
+  font-size: var(--font-size-1);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  box-shadow: 0 12px 32px var(--green-a4);
+}
+
+.brand-title,
+.section-eyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+}
+
+.hero-panel {
+  border: 1px solid var(--gray-a5);
+  background: color-mix(in srgb, var(--gray-1) 78%, transparent);
+  box-shadow: 0 20px 80px var(--gray-a3);
+  backdrop-filter: blur(18px);
+}
+
+.media-tile {
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: var(--gray-4);
+}
+
+.media-tile img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 240ms ease;
+}
+
+.interactive-card {
+  height: 100%;
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    box-shadow 180ms ease;
 }
 
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+.interactive-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--green-a7);
+  box-shadow: 0 14px 32px var(--green-a3);
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+.interactive-card:hover .media-tile img {
+  transform: scale(1.035);
+}
+
+.truncate-2 {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.scroll-row {
+  scrollbar-width: thin;
+  scrollbar-color: var(--gray-a7) transparent;
+}
+
+.track-row {
+  display: grid;
+  width: 100%;
+  grid-template-columns: 2rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-4);
+  border: 0;
+  border-bottom: 1px solid var(--gray-a4);
+  background: transparent;
+  color: inherit;
+  padding: var(--space-3) var(--space-2);
+  text-align: left;
+  cursor: pointer;
+  transition: background 160ms ease;
+}
+
+.track-row:last-child {
+  border-bottom: 0;
+}
+
+.track-row:hover {
+  background: var(--green-a3);
 }

@@ -1,36 +1,46 @@
-import React, { useState, useEffect } from "react";
-import { getTopTracks } from "../../provider/spotfy";
-import { TrackCard } from "./TrackCard";
+import { Grid } from "@radix-ui/themes";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { getTopTracks } from "../../provider/spotfy";
+import { LoadingState } from "../Layout/LoadingState";
+import { Section } from "../Layout/Section";
+import { TrackCard } from "./TrackCard";
 
-const TopTracks: React.FC = () => {
+const TopTracks = () => {
   const [tracks, setTracks] = useState<any[] | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    getTopTracks().then((data) => {
-      setTracks(data.items);
-    });
+    getTopTracks().then((data) => setTracks(data?.items || []));
   }, []);
 
-  const handleTrackClick = (id: string) => {
-    navigate(`/tracks/${id}`);
-  };
-
-  if (!tracks) return null;
-
   return (
-    <div className="pt-5">
-      <h2 className="text-white mb-4 text-2xl">Top Tracks</h2>
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-        {tracks?.map((track: any) => (
-          <div key={track.id} onClick={() => handleTrackClick(track.id)}>
-            <TrackCard track={track} />
-          </div>
-        ))}
-      </div>
-    </div>
+    <Section title="Faixas que definem seu momento" eyebrow="Mais ouvidas">
+      {!tracks ? (
+        <LoadingState label="Carregando faixas" />
+      ) : (
+        <Grid columns={{ initial: "1", xs: "2", sm: "3", lg: "5" }} gap="4">
+          {tracks.map((track) => (
+            <BoxButton key={track.id} onClick={() => navigate(`/tracks/${track.id}`)}>
+              <TrackCard track={track} />
+            </BoxButton>
+          ))}
+        </Grid>
+      )}
+    </Section>
   );
 };
+
+const BoxButton = ({
+  children,
+  onClick,
+}: {
+  children: React.ReactNode;
+  onClick: () => void;
+}) => (
+  <button type="button" onClick={onClick} className="contents">
+    {children}
+  </button>
+);
 
 export default TopTracks;

@@ -1,38 +1,34 @@
-import { getTopArtists } from "../../provider/spotfy";
-import { ArtistCard } from "./ArtistCard";
-import { useNavigate } from "react-router-dom";
+import { Grid } from "@radix-ui/themes";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { getTopArtists } from "../../provider/spotfy";
+import { LoadingState } from "../Layout/LoadingState";
+import { Section } from "../Layout/Section";
+import { ArtistCard } from "./ArtistCard";
 
 export const TopArtists = () => {
   const [topArtists, setTopArtists] = useState<any[] | null>(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchTopArtists = async () => {
-      const data = await getTopArtists();
-      setTopArtists(data?.items);
-    };
-    fetchTopArtists();
+    getTopArtists().then((data) => setTopArtists(data?.items || []));
   }, []);
 
-  const handleArtistClick = (artist: any) => {
-    navigate(`/artists/${artist.id}`);
-  };
-
-  if (!topArtists) return null;
-
   return (
-    <div>
-      <h2 className="text-white mb-4 text-2xl">Top Artists</h2>
-      <div className="grid gap-6 grid-cols-1 mx-5  sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-        {topArtists.map((artist: any) => (
-          <ArtistCard
-            key={artist.id}
-            artist={artist}
-            onClick={() => handleArtistClick(artist)}
-          />
-        ))}
-      </div>
-    </div>
+    <Section title="Artistas em alta para voce" eyebrow="Top pessoal">
+      {!topArtists ? (
+        <LoadingState label="Carregando artistas" />
+      ) : (
+        <Grid columns={{ initial: "1", xs: "2", md: "3", lg: "4" }} gap="4">
+          {topArtists.map((artist) => (
+            <ArtistCard
+              key={artist.id}
+              artist={artist}
+              onClick={() => navigate(`/artists/${artist.id}`)}
+            />
+          ))}
+        </Grid>
+      )}
+    </Section>
   );
 };
