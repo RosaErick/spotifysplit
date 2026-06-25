@@ -15,6 +15,7 @@ export const AccentPicker = () => {
           type="button"
           variant="soft"
           color="gray"
+          className="utility-icon-action clickable-control"
           aria-label="Escolher a cor do tema"
         >
           <span

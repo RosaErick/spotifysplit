@@ -13,6 +13,7 @@ export const ThemeToggle = () => {
         variant="soft"
         color="gray"
         highContrast
+        className="utility-icon-action clickable-control"
         onClick={toggleTheme}
         aria-label={isDark ? "Ativar tema claro" : "Ativar tema escuro"}
       >

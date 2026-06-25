@@ -6,11 +6,12 @@ import {
 } from "@radix-ui/react-icons";
 import { Box, Button, Container, Flex, IconButton, Text, Tooltip } from "@radix-ui/themes";
 import { Link, NavLink } from "react-router-dom";
-import React from "react";
+import React, { useState } from "react";
 import { AccentPicker } from "./AccentPicker";
 import { EqualizerMark } from "./EqualizerMark";
 import { ThemeToggle } from "./ThemeToggle";
-import { MiniPlayer } from "../Player/MiniPlayer";
+import { useAuth } from "../../features/auth/useAuth";
+import { PlayerDock, PlayerNavControl, useNowPlaying } from "../Player/MiniPlayer";
 
 type AppShellProps = {
   children: React.ReactNode;
@@ -18,12 +19,21 @@ type AppShellProps = {
 };
 
 export const AppShell = ({ children, onLogout }: AppShellProps) => {
+  const { logout } = useAuth();
+  const [isPlayerDockHidden, setIsPlayerDockHidden] = useState(false);
+  const playerState = useNowPlaying();
+  const showPlayerDock = playerState.isPlaying && !isPlayerDockHidden;
+  const handleLogout = onLogout ?? logout;
+
   return (
-    <Box className="app-background" minHeight="100vh">
+    <Box
+      className={`app-background ${showPlayerDock ? "has-player-dock" : ""}`}
+      minHeight="100vh"
+    >
       <Box className="app-header">
         <Container size="4" px={{ initial: "4", sm: "5" }}>
-          <Flex align="center" justify="between" py="3" gap="3">
-            <Flex asChild align="center" gap="3">
+          <Box className="app-header-row" py="3">
+            <Flex asChild className="brand-link" align="center" gap="3">
               <Link to="/" aria-label="Voltar ao início">
                 <Flex className="brand-mark" align="center" justify="center">
                   <EqualizerMark />
@@ -39,34 +49,44 @@ export const AppShell = ({ children, onLogout }: AppShellProps) => {
               </Link>
             </Flex>
 
-            <Flex align="center" gap="3">
-              <Flex className="nav-actions" align="center" gap="1">
-                <NavLink
-                  to="/search"
-                  className={({ isActive }) =>
-                    `nav-action ${isActive ? "nav-action-active" : ""}`
-                  }
-                >
-                  <MagnifyingGlassIcon />
-                  <span>Busca</span>
-                </NavLink>
-                <NavLink
-                  to="/library"
-                  className={({ isActive }) =>
-                    `nav-action ${isActive ? "nav-action-active" : ""}`
-                  }
-                >
-                  <BackpackIcon />
-                  <span>Biblioteca</span>
-                </NavLink>
-              </Flex>
+            <Flex className="nav-actions" align="center" gap="1">
+              <NavLink
+                to="/search"
+                className={({ isActive }) =>
+                  `nav-action ${isActive ? "nav-action-active" : ""}`
+                }
+              >
+                <MagnifyingGlassIcon />
+                <span>Busca</span>
+              </NavLink>
+              <NavLink
+                to="/library"
+                className={({ isActive }) =>
+                  `nav-action ${isActive ? "nav-action-active" : ""}`
+                }
+              >
+                <BackpackIcon />
+                <span>Biblioteca</span>
+              </NavLink>
+            </Flex>
+
+            <Flex className="utility-actions" align="center" gap="2">
+              {!showPlayerDock && (
+                <Box className="player-nav-slot">
+                  <PlayerNavControl
+                    state={playerState}
+                    showDock={showPlayerDock}
+                    onShowDock={() => setIsPlayerDockHidden(false)}
+                  />
+                </Box>
+              )}
               <Tooltip content="GitHub do projeto">
                 <IconButton
                   asChild
                   variant="ghost"
                   color="gray"
                   highContrast
-                  className="github-nav-action clickable-control"
+                  className="github-nav-action utility-icon-action clickable-control"
                 >
                   <a
                     href="https://github.com/RosaErick/spotifysplit"
@@ -80,29 +100,27 @@ export const AppShell = ({ children, onLogout }: AppShellProps) => {
               </Tooltip>
               <AccentPicker />
               <ThemeToggle />
-              {onLogout && (
-                <Button
-                  type="button"
-                  variant="soft"
-                  color="gray"
-                  className="clickable-control"
-                  onClick={onLogout}
-                >
-                  <ExitIcon />
-                  <Box asChild display={{ initial: "none", xs: "inline" }}>
-                    <span>Sair</span>
-                  </Box>
-                </Button>
-              )}
+              <Button
+                type="button"
+                variant="soft"
+                color="gray"
+                className="logout-action clickable-control"
+                onClick={handleLogout}
+              >
+                <ExitIcon />
+                <Box asChild display={{ initial: "none", xs: "inline" }}>
+                  <span>Sair</span>
+                </Box>
+              </Button>
             </Flex>
-          </Flex>
+          </Box>
         </Container>
       </Box>
 
       <Container size="4" px={{ initial: "4", sm: "5" }} py={{ initial: "5", sm: "6" }}>
-        <MiniPlayer />
         {children}
       </Container>
+      <PlayerDock state={playerState} onDismiss={() => setIsPlayerDockHidden(true)} />
     </Box>
   );
 };
