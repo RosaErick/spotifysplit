@@ -1,31 +1,37 @@
 import { Grid } from "@radix-ui/themes";
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getTopArtists } from "../../provider/spotfy";
-import { LoadingState } from "../Layout/LoadingState";
+import { useTopArtists } from "../../shared/api/queries";
+import { EmptyState } from "../Layout/EmptyState";
+import { ErrorState } from "../Layout/ErrorState";
+import { Reveal } from "../Layout/Reveal";
+import { CardGridSkeleton } from "../Layout/Skeleton";
 import { Section } from "../Layout/Section";
 import { ArtistCard } from "./ArtistCard";
 
-export const TopArtists = () => {
-  const [topArtists, setTopArtists] = useState<any[] | null>(null);
-  const navigate = useNavigate();
+const columns = { initial: "1", xs: "2", md: "3", lg: "4" };
 
-  useEffect(() => {
-    getTopArtists().then((data) => setTopArtists(data?.items || []));
-  }, []);
+export const TopArtists = () => {
+  const { data, isLoading, isError, error, refetch } = useTopArtists();
+  const navigate = useNavigate();
+  const artists = data?.items ?? [];
 
   return (
-    <Section title="Artistas em alta para voce" eyebrow="Top pessoal">
-      {!topArtists ? (
-        <LoadingState label="Carregando artistas" />
+    <Section title="Artistas em alta para você" eyebrow="Top pessoal">
+      {isLoading ? (
+        <CardGridSkeleton count={4} columns={columns} />
+      ) : isError ? (
+        <ErrorState error={error} onRetry={refetch} />
+      ) : artists.length === 0 ? (
+        <EmptyState message="Nenhum artista em alta por enquanto." />
       ) : (
-        <Grid columns={{ initial: "1", xs: "2", md: "3", lg: "4" }} gap="4">
-          {topArtists.map((artist) => (
-            <ArtistCard
-              key={artist.id}
-              artist={artist}
-              onClick={() => navigate(`/artists/${artist.id}`)}
-            />
+        <Grid columns={columns} gap="4">
+          {artists.map((artist, index) => (
+            <Reveal key={artist.id} delay={Math.min(index, 8) * 0.04}>
+              <ArtistCard
+                artist={artist}
+                onClick={() => navigate(`/artists/${artist.id}`)}
+              />
+            </Reveal>
           ))}
         </Grid>
       )}

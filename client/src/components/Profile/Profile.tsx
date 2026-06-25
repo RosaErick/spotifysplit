@@ -1,68 +1,82 @@
-import { Avatar, Badge, Box, Card, Flex, Grid, Heading, Text } from "@radix-ui/themes";
-import { useEffect, useState } from "react";
-import { getTotalUserInfo } from "../../provider/spotfy";
+import { Avatar, Badge, Box, Card, Flex, Heading, Text } from "@radix-ui/themes";
+import { useProfileOverview } from "../../shared/api/queries";
 import { formatNumber } from "../../utils/format";
-import { LoadingState } from "../Layout/LoadingState";
+import { ErrorState } from "../Layout/ErrorState";
+import { ProfileSkeleton } from "../Layout/Skeleton";
+import { Reveal } from "../Layout/Reveal";
+
+const initialsOf = (name?: string) =>
+  (name ?? "")
+    .split(" ")
+    .map((part) => part[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join("")
+    .toUpperCase() || "SS";
 
 export const Profile = () => {
-  const [profile, setProfile] = useState<any | null>(null);
-  const [playlists, setPlaylists] = useState<any | null>(null);
-  const [following, setFollowing] = useState<any | null>(null);
+  const { data, isLoading, isError, error, refetch } = useProfileOverview();
 
-  useEffect(() => {
-    getTotalUserInfo().then((data) => {
-      setProfile(data.userProfile);
-      setPlaylists(data.playlists);
-      setFollowing(data.followedArtists);
-    });
-  }, []);
+  if (isLoading) return <ProfileSkeleton />;
+  if (isError || !data) return <ErrorState error={error} onRetry={refetch} />;
 
-  if (!profile) return <LoadingState label="Carregando perfil" />;
-
-  const imageUrl = profile?.images?.[0]?.url;
-  const stats = [
-    ["Seguidores", formatNumber(profile?.followers?.total)],
-    ["Playlists", formatNumber(playlists?.total)],
-    ["Seguindo", formatNumber(following?.artists?.items?.length)],
+  const { profile, playlists, followedArtists } = data;
+  const imageUrl = profile.images?.[0]?.url;
+  const stats: Array<[string, string]> = [
+    ["Seguidores", formatNumber(profile.followers?.total)],
+    ["Playlists", formatNumber(playlists.total)],
+    ["Seguindo", formatNumber(followedArtists.artists.items.length)],
   ];
 
   return (
-    <Grid columns={{ initial: "1", md: "1fr 320px" }} gap="4" mb="5">
-      <Card className="hero-panel">
-        <Flex align={{ initial: "start", sm: "end" }} gap="5" direction={{ initial: "column", sm: "row" }}>
-          <Avatar
-            src={imageUrl}
-            fallback="SS"
-            size="8"
-            radius="large"
-            color="green"
-          />
-          <Box>
-            <Text as="p" size="1" weight="bold" color="green" className="section-eyebrow">
-              Perfil conectado
-            </Text>
-            <Heading size={{ initial: "6", sm: "8" }} mt="2">
-              {profile.display_name}
-            </Heading>
-            <Badge color="green" variant="soft" mt="4">
-              {profile.product || "spotify"}
-            </Badge>
+    <Reveal>
+      <Card className="hero-panel profile-card" mb="2">
+        <Flex
+          className="profile-layout"
+          align="center"
+          gap={{ initial: "4", sm: "6" }}
+          direction={{ initial: "column", sm: "row" }}
+        >
+          <Flex className="profile-identity" align="center" gap="4">
+            <Box className="avatar-ring">
+              <Avatar
+                src={imageUrl}
+                fallback={initialsOf(profile.display_name)}
+                size={{ initial: "5", sm: "7" }}
+                radius="full"
+                color="amber"
+              />
+            </Box>
+
+            <Box style={{ minWidth: 0 }}>
+              <Text as="p" color="gray" className="section-eyebrow profile-eyebrow" mb="1">
+                Conectado ao Spotify
+              </Text>
+              <Heading className="display-heading truncate-2 profile-name" size={{ initial: "5", sm: "6" }}>
+                {profile.display_name}
+              </Heading>
+              <Box mt="2">
+                <Badge color="amber" variant="soft" radius="full" size="1">
+                  {profile.product || "spotify"}
+                </Badge>
+              </Box>
+            </Box>
+          </Flex>
+
+          <Box className="stat-strip">
+            {stats.map(([label, value]) => (
+              <Box className="stat-cell" key={label}>
+                <Heading className="display-heading stat-value" size={{ initial: "3", sm: "4" }}>
+                  {value}
+                </Heading>
+                <Text as="p" size="1" color="gray" mt="1">
+                  {label}
+                </Text>
+              </Box>
+            ))}
           </Box>
         </Flex>
       </Card>
-
-      <Grid columns={{ initial: "3", md: "1" }} gap="3">
-        {stats.map(([label, value]) => (
-          <Card key={label}>
-            <Text as="p" size="1" color="gray">
-              {label}
-            </Text>
-            <Text as="p" size="5" weight="bold" mt="1">
-              {value}
-            </Text>
-          </Card>
-        ))}
-      </Grid>
-    </Grid>
+    </Reveal>
   );
 };

@@ -1,36 +1,44 @@
 import { Box, Flex, IconButton, ScrollArea } from "@radix-ui/themes";
 import { ChevronLeftIcon, ChevronRightIcon } from "@radix-ui/react-icons";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { getRecentlyPlayedTracks } from "../../provider/spotfy";
+import { useRecentlyPlayed } from "../../shared/api/queries";
+import { ErrorState } from "../Layout/ErrorState";
+import { RowSkeleton } from "../Layout/Skeleton";
 import { Section } from "../Layout/Section";
 import { TrackCard } from "./TrackCard";
 
-interface ITrack {
-  played_at: string;
-  track: {
-    id: string;
-  };
-}
+const sectionTitle = "Últimas reproduções";
 
 export const RecentlyPlayedTracks = () => {
-  const [tracks, setTracks] = useState<ITrack[] | null>(null);
+  const { data, isLoading, isError, error, refetch } = useRecentlyPlayed();
   const scrollRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    getRecentlyPlayedTracks().then((data) => setTracks(data?.items || []));
-  }, []);
+  const items = data?.items ?? [];
 
   const scroll = (left: number) => {
     scrollRef.current?.scrollBy({ left, behavior: "smooth" });
   };
 
-  if (!tracks?.length) return null;
+  if (isLoading) {
+    return (
+      <Section title={sectionTitle} eyebrow="Linha do tempo">
+        <RowSkeleton count={6} />
+      </Section>
+    );
+  }
+  if (isError) {
+    return (
+      <Section title={sectionTitle} eyebrow="Linha do tempo">
+        <ErrorState error={error} onRetry={refetch} />
+      </Section>
+    );
+  }
+  if (items.length === 0) return null;
 
   return (
     <Section
-      title="Ultimas reproducoes"
+      title={sectionTitle}
       eyebrow="Linha do tempo"
       action={
         <Flex gap="2" display={{ initial: "none", sm: "flex" }}>
@@ -45,14 +53,16 @@ export const RecentlyPlayedTracks = () => {
     >
       <ScrollArea scrollbars="horizontal" className="scroll-row">
         <Flex ref={scrollRef} gap="4" pb="3">
-          {tracks.map((item) => (
+          {items.map((item) => (
             <Box
               key={item.played_at}
-              width={{ initial: "220px", sm: "240px" }}
+              width={{ initial: "200px", sm: "230px" }}
               flexShrink="0"
-              onClick={() => navigate(`/tracks/${item.track.id}`)}
             >
-              <TrackCard track={item.track} />
+              <TrackCard
+                track={item.track}
+                onClick={() => navigate(`/tracks/${item.track.id}`)}
+              />
             </Box>
           ))}
         </Flex>

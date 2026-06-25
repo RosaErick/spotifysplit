@@ -1,35 +1,43 @@
 import { ArrowLeftIcon } from "@radix-ui/react-icons";
 import { Badge, Box, Button, Card, Flex, Grid, Heading, Text } from "@radix-ui/themes";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AppShell } from "../components/Layout/AppShell";
+import { ErrorState } from "../components/Layout/ErrorState";
 import { LoadingState } from "../components/Layout/LoadingState";
-import { getAlbumById, getAlbumTracks } from "../provider/spotfy";
+import { Reveal } from "../components/Layout/Reveal";
+import { useAlbum, useAlbumTracks } from "../shared/api/queries";
 import { formatDuration } from "../utils/format";
 
 const AlbumPage = () => {
-  const [album, setAlbum] = useState<any>(null);
-  const [tracks, setTracks] = useState<any[]>([]);
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    getAlbumById(id).then(setAlbum);
-    getAlbumTracks(id).then((response) => setTracks(response?.items || []));
-  }, [id]);
+  const albumQuery = useAlbum(id);
+  const tracksQuery = useAlbumTracks(id);
+  const tracks = tracksQuery.data?.items ?? [];
 
   const totalDuration = useMemo(
-    () => tracks.reduce((acc, track) => acc + track.duration_ms, 0),
+    () => tracks.reduce((acc, track) => acc + (track.duration_ms ?? 0), 0),
     [tracks]
   );
 
-  if (!album) {
+  if (albumQuery.isLoading) {
     return (
       <AppShell>
-        <LoadingState label="Carregando album" />
+        <LoadingState label="Carregando álbum" />
       </AppShell>
     );
   }
+
+  if (albumQuery.isError || !albumQuery.data) {
+    return (
+      <AppShell>
+        <ErrorState error={albumQuery.error} onRetry={albumQuery.refetch} />
+      </AppShell>
+    );
+  }
+
+  const album = albumQuery.data;
 
   return (
     <AppShell>
@@ -38,26 +46,27 @@ const AlbumPage = () => {
         Voltar
       </Button>
 
-      <Card className="hero-panel">
+      <Reveal>
+      <Card className="hero-panel" size="3">
         <Grid columns={{ initial: "1", md: "280px 1fr" }} gap="5" align="center">
           <Box className="media-tile" style={{ borderRadius: "var(--radius-5)" }}>
-            {album?.images?.[0]?.url && (
+            {album.images?.[0]?.url && (
               <img src={album.images[0].url} alt={album.name} />
             )}
           </Box>
 
           <Box>
-            <Text as="p" size="1" weight="bold" color="green" className="section-eyebrow">
-              Album
+            <Text as="p" size="1" weight="bold" color="amber" className="section-eyebrow">
+              Álbum
             </Text>
             <Heading size={{ initial: "6", sm: "8" }} mt="2">
               {album.name}
             </Heading>
             <Flex gap="2" wrap="wrap" mt="4">
-              {album.artists?.map((artist: any) => (
+              {album.artists?.map((artist) => (
                 <Badge
                   key={artist.id}
-                  color="green"
+                  color="amber"
                   variant="soft"
                   onClick={() => navigate(`/artists/${artist.id}`)}
                   style={{ cursor: "pointer" }}
@@ -68,20 +77,21 @@ const AlbumPage = () => {
             </Flex>
 
             <Grid columns={{ initial: "2", sm: "3" }} gap="3" mt="5">
-              <Stat label="Faixas" value={album.total_tracks} />
-              <Stat label="Duracao" value={formatDuration(totalDuration)} />
-              <Stat label="Lancamento" value={album.release_date} compact />
+              <Stat label="Faixas" value={album.total_tracks ?? tracks.length} />
+              <Stat label="Duração" value={formatDuration(totalDuration)} />
+              <Stat label="Lançamento" value={album.release_date ?? "-"} compact />
             </Grid>
           </Box>
         </Grid>
       </Card>
+      </Reveal>
 
       <Box py="5">
-        <Text as="p" size="1" weight="bold" color="green" className="section-eyebrow">
+        <Text as="p" size="1" weight="bold" color="amber" className="section-eyebrow">
           Tracklist
         </Text>
         <Heading size="6" mt="1" mb="4">
-          Faixas do album
+          Faixas do álbum
         </Heading>
         <Card>
           {tracks.map((track, index) => (
@@ -91,7 +101,7 @@ const AlbumPage = () => {
               onClick={() => navigate(`/tracks/${track.id}`)}
               className="track-row"
             >
-              <Text size="2" color="gray" weight="bold">
+              <Text size="3" color="amber" className="track-index">
                 {index + 1}
               </Text>
               <Box>
@@ -99,7 +109,7 @@ const AlbumPage = () => {
                   {track.name}
                 </Text>
                 <Text as="p" size="1" color="gray">
-                  {track.artists?.map((artist: any) => artist.name).join(", ")}
+                  {track.artists?.map((artist) => artist.name).join(", ")}
                 </Text>
               </Box>
               <Text size="2" color="gray" weight="medium">

@@ -1,4 +1,4 @@
-import { Flex, Spinner, Text } from "@radix-ui/themes";
+import { Flex, Text } from "@radix-ui/themes";
 
 type LoadingStateProps = {
   label?: string;
@@ -6,9 +6,14 @@ type LoadingStateProps = {
 
 export const LoadingState = ({ label = "Carregando" }: LoadingStateProps) => {
   return (
-    <Flex minHeight="40vh" align="center" justify="center" gap="3">
-      <Spinner />
-      <Text size="2" color="gray" weight="medium">
+    <Flex minHeight="40vh" align="center" justify="center" direction="column" gap="3">
+      <span className="loading-eq" aria-hidden="true">
+        <span />
+        <span />
+        <span />
+        <span />
+      </span>
+      <Text size="2" color="gray" className="serif-accent">
         {label}
       </Text>
     </Flex>

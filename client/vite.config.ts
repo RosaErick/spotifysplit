@@ -12,9 +12,4 @@ export default defineConfig({
       },
     },
   },
-  server: {
-    proxy: {
-      '/refresh_token': 'http://localhost:3000',
-    },
-  },
 })

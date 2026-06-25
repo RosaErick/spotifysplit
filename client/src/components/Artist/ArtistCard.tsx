@@ -1,15 +1,11 @@
 import { Badge, Box, Card, Flex, Text } from "@radix-ui/themes";
 import React from "react";
+import { SpotifyArtist } from "../../shared/types/spotify";
 import { formatNumber } from "../../utils/format";
+import { interactiveProps } from "../Layout/interactive";
 
 interface ArtistCardProps {
-  artist: {
-    id: string;
-    name: string;
-    images?: { url: string }[];
-    genres?: string[];
-    followers?: { total: number };
-  };
+  artist: SpotifyArtist;
   onClick?: () => void;
 }
 
@@ -18,10 +14,10 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onClick }) => {
   const genres = artist.genres?.slice(0, 2);
 
   return (
-    <Card className="interactive-card" onClick={onClick}>
+    <Card className="interactive-card" {...interactiveProps(onClick)}>
       <Box className="media-tile" mb="3">
         {imageUrl ? (
-          <img src={imageUrl} alt={artist.name} />
+          <img src={imageUrl} alt={artist.name} loading="lazy" />
         ) : (
           <Flex height="100%" align="center" justify="center">
             <Text size="6" color="gray" weight="bold">
@@ -38,12 +34,12 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onClick }) => {
       <Flex gap="2" wrap="wrap" mt="3">
         {genres?.length ? (
           genres.map((genre) => (
-            <Badge key={genre} color="green" variant="soft">
+            <Badge key={genre} color="amber" variant="soft" radius="full">
               {genre}
             </Badge>
           ))
         ) : (
-          <Badge color="gray" variant="soft">
+          <Badge color="gray" variant="soft" radius="full">
             artista
           </Badge>
         )}

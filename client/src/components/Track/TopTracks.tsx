@@ -1,46 +1,42 @@
 import { Grid } from "@radix-ui/themes";
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getTopTracks } from "../../provider/spotfy";
-import { LoadingState } from "../Layout/LoadingState";
+import { useTopTracks } from "../../shared/api/queries";
+import { EmptyState } from "../Layout/EmptyState";
+import { ErrorState } from "../Layout/ErrorState";
+import { Reveal } from "../Layout/Reveal";
+import { CardGridSkeleton } from "../Layout/Skeleton";
 import { Section } from "../Layout/Section";
 import { TrackCard } from "./TrackCard";
 
-const TopTracks = () => {
-  const [tracks, setTracks] = useState<any[] | null>(null);
-  const navigate = useNavigate();
+const columns = { initial: "2", xs: "2", sm: "3", lg: "5" };
 
-  useEffect(() => {
-    getTopTracks().then((data) => setTracks(data?.items || []));
-  }, []);
+const TopTracks = () => {
+  const { data, isLoading, isError, error, refetch } = useTopTracks();
+  const navigate = useNavigate();
+  const tracks = data?.items ?? [];
 
   return (
     <Section title="Faixas que definem seu momento" eyebrow="Mais ouvidas">
-      {!tracks ? (
-        <LoadingState label="Carregando faixas" />
+      {isLoading ? (
+        <CardGridSkeleton count={5} columns={columns} />
+      ) : isError ? (
+        <ErrorState error={error} onRetry={refetch} />
+      ) : tracks.length === 0 ? (
+        <EmptyState message="Nenhuma faixa em destaque por enquanto." />
       ) : (
-        <Grid columns={{ initial: "1", xs: "2", sm: "3", lg: "5" }} gap="4">
-          {tracks.map((track) => (
-            <BoxButton key={track.id} onClick={() => navigate(`/tracks/${track.id}`)}>
-              <TrackCard track={track} />
-            </BoxButton>
+        <Grid columns={columns} gap="4">
+          {tracks.map((track, index) => (
+            <Reveal key={track.id} delay={Math.min(index, 10) * 0.035}>
+              <TrackCard
+                track={track}
+                onClick={() => navigate(`/tracks/${track.id}`)}
+              />
+            </Reveal>
           ))}
         </Grid>
       )}
     </Section>
   );
 };
-
-const BoxButton = ({
-  children,
-  onClick,
-}: {
-  children: React.ReactNode;
-  onClick: () => void;
-}) => (
-  <button type="button" onClick={onClick} className="contents">
-    {children}
-  </button>
-);
 
 export default TopTracks;

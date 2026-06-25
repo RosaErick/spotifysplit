@@ -1,19 +1,22 @@
 import { Badge, Box, Card, Flex, Text } from "@radix-ui/themes";
 import React from "react";
+import { SpotifyAlbum } from "../../shared/types/spotify";
+import { interactiveProps } from "../Layout/interactive";
 
 interface AlbumCardProps {
-  album: any;
+  album: SpotifyAlbum;
+  onClick?: () => void;
 }
 
-export const AlbumCard: React.FC<AlbumCardProps> = ({ album }) => {
-  const imageUrl = album?.images?.[0]?.url;
-  const artists = album?.artists?.map((artist: any) => artist.name).join(", ");
+export const AlbumCard: React.FC<AlbumCardProps> = ({ album, onClick }) => {
+  const imageUrl = album.images?.[0]?.url;
+  const artists = album.artists?.map((artist) => artist.name).join(", ");
 
   return (
-    <Card className="interactive-card">
+    <Card className="interactive-card" {...interactiveProps(onClick)}>
       <Box className="media-tile" mb="3">
         {imageUrl ? (
-          <img src={imageUrl} alt={`Capa de ${album.name}`} />
+          <img src={imageUrl} alt={`Capa de ${album.name}`} loading="lazy" />
         ) : (
           <Flex height="100%" align="center" justify="center">
             <Text size="6" color="gray" weight="bold">
@@ -29,7 +32,7 @@ export const AlbumCard: React.FC<AlbumCardProps> = ({ album }) => {
         {artists}
       </Text>
       {album.release_date && (
-        <Badge color="green" variant="soft" mt="3">
+        <Badge color="amber" variant="soft" radius="full" mt="3">
           {album.release_date}
         </Badge>
       )}

@@ -1,32 +1,37 @@
-import { Box, Grid } from "@radix-ui/themes";
-import { useEffect, useState } from "react";
+import { Grid } from "@radix-ui/themes";
 import { useNavigate } from "react-router-dom";
-import { getTopAlbums } from "../../provider/spotfy";
-import { LoadingState } from "../Layout/LoadingState";
+import { useTopAlbums } from "../../shared/api/queries";
+import { EmptyState } from "../Layout/EmptyState";
+import { ErrorState } from "../Layout/ErrorState";
+import { Reveal } from "../Layout/Reveal";
+import { CardGridSkeleton } from "../Layout/Skeleton";
 import { Section } from "../Layout/Section";
 import { AlbumCard } from "./AlbumCard";
 
-const TopAlbums = () => {
-  const [albums, setAlbums] = useState<any[] | null>(null);
-  const navigate = useNavigate();
+const columns = { initial: "2", xs: "2", sm: "3", lg: "5" };
 
-  useEffect(() => {
-    getTopAlbums().then((response) => setAlbums(response || []));
-  }, []);
+const TopAlbums = () => {
+  const { data, isLoading, isError, error, refetch } = useTopAlbums();
+  const navigate = useNavigate();
+  const albums = data ?? [];
 
   return (
-    <Section title="Albuns para investigar" eyebrow="Descoberta">
-      {!albums ? (
-        <LoadingState label="Carregando albuns" />
+    <Section title="Álbuns para investigar" eyebrow="Descoberta">
+      {isLoading ? (
+        <CardGridSkeleton count={5} columns={columns} />
+      ) : isError ? (
+        <ErrorState error={error} onRetry={refetch} />
+      ) : albums.length === 0 ? (
+        <EmptyState message="Nenhum álbum para descobrir por enquanto." />
       ) : (
-        <Grid columns={{ initial: "1", xs: "2", sm: "3", lg: "5" }} gap="4">
+        <Grid columns={columns} gap="4">
           {albums.map((album, index) => (
-            <Box
-              key={`${album.id}-${index}`}
-              onClick={() => navigate(`/albums/${album.id}`)}
-            >
-              <AlbumCard album={album} />
-            </Box>
+            <Reveal key={`${album.id}-${index}`} delay={Math.min(index, 10) * 0.035}>
+              <AlbumCard
+                album={album}
+                onClick={() => navigate(`/albums/${album.id}`)}
+              />
+            </Reveal>
           ))}
         </Grid>
       )}

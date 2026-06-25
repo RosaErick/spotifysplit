@@ -1,4 +1,5 @@
 import { Theme } from "@radix-ui/themes";
+import { MotionConfig } from "framer-motion";
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 
 type AppTheme = "light" | "dark";
@@ -39,15 +40,18 @@ export const AppThemeProvider = ({ children }: { children: React.ReactNode }) =>
 
   return (
     <ThemeContext.Provider value={value}>
-      <Theme
-        appearance={theme}
-        accentColor="green"
-        grayColor="slate"
-        radius="medium"
-        scaling="90%"
-      >
-        {children}
-      </Theme>
+      <MotionConfig reducedMotion="user">
+        <Theme
+          appearance={theme}
+          accentColor="amber"
+          grayColor="sand"
+          radius="large"
+          scaling="100%"
+        >
+          {children}
+          <div className="grain-overlay" aria-hidden="true" />
+        </Theme>
+      </MotionConfig>
     </ThemeContext.Provider>
   );
 };
