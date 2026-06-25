@@ -1,8 +1,8 @@
-import { ArrowLeftIcon } from "@radix-ui/react-icons";
-import { Badge, Box, Button, Card, Flex, Grid, Heading, Text } from "@radix-ui/themes";
+import { Badge, Box, Card, Flex, Grid, Heading, Text } from "@radix-ui/themes";
 import { useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AppShell } from "../components/Layout/AppShell";
+import { BackButton } from "../components/Layout/BackButton";
 import { ErrorState } from "../components/Layout/ErrorState";
 import { LoadingState } from "../components/Layout/LoadingState";
 import { Reveal } from "../components/Layout/Reveal";
@@ -41,11 +41,6 @@ const AlbumPage = () => {
 
   return (
     <AppShell>
-      <Button variant="soft" color="gray" mb="4" onClick={() => navigate(-1)}>
-        <ArrowLeftIcon />
-        Voltar
-      </Button>
-
       <Reveal>
       <Card className="hero-panel" size="3">
         <Grid columns={{ initial: "1", md: "280px 1fr" }} gap="5" align="center">
@@ -56,17 +51,21 @@ const AlbumPage = () => {
           </Box>
 
           <Box>
-            <Text as="p" size="1" weight="bold" color="amber" className="section-eyebrow">
-              Álbum
-            </Text>
-            <Heading size={{ initial: "6", sm: "8" }} mt="2">
-              {album.name}
-            </Heading>
+            <Flex align="start" justify="between" gap="3" wrap="wrap">
+              <Box minWidth="0" flexGrow="1">
+                <Text as="p" size="1" weight="bold" className="section-eyebrow">
+                  Álbum
+                </Text>
+                <Heading size={{ initial: "6", sm: "8" }} mt="2">
+                  {album.name}
+                </Heading>
+              </Box>
+              <BackButton />
+            </Flex>
             <Flex gap="2" wrap="wrap" mt="4">
               {album.artists?.map((artist) => (
                 <Badge
                   key={artist.id}
-                  color="amber"
                   variant="soft"
                   onClick={() => navigate(`/artists/${artist.id}`)}
                   style={{ cursor: "pointer" }}
@@ -87,7 +86,7 @@ const AlbumPage = () => {
       </Reveal>
 
       <Box py="5">
-        <Text as="p" size="1" weight="bold" color="amber" className="section-eyebrow">
+        <Text as="p" size="1" weight="bold" className="section-eyebrow">
           Tracklist
         </Text>
         <Heading size="6" mt="1" mb="4">
@@ -101,7 +100,7 @@ const AlbumPage = () => {
               onClick={() => navigate(`/tracks/${track.id}`)}
               className="track-row"
             >
-              <Text size="3" color="amber" className="track-index">
+              <Text size="3" className="track-index">
                 {index + 1}
               </Text>
               <Box>

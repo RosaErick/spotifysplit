@@ -1,8 +1,8 @@
-import { ArrowLeftIcon } from "@radix-ui/react-icons";
-import { Box, Button, Card, Flex, SegmentedControl, Text } from "@radix-ui/themes";
+import { Box, Card, Flex, SegmentedControl, Text } from "@radix-ui/themes";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppShell } from "../components/Layout/AppShell";
+import { BackButton } from "../components/Layout/BackButton";
 import { EmptyState } from "../components/Layout/EmptyState";
 import { ErrorState } from "../components/Layout/ErrorState";
 import { LoadingState } from "../components/Layout/LoadingState";
@@ -21,12 +21,7 @@ const TopTracksPage = () => {
 
   return (
     <AppShell>
-      <Button variant="soft" color="gray" mb="4" onClick={() => navigate(-1)}>
-        <ArrowLeftIcon />
-        Voltar
-      </Button>
-
-      <Section title="Top faixas" eyebrow="Mais ouvidas">
+      <Section title="Top faixas" eyebrow="Mais ouvidas" action={<BackButton />}>
         <Card className="filter-panel" mb="5">
           <Flex direction={{ initial: "column", sm: "row" }} gap="4" justify="between">
             <Box>

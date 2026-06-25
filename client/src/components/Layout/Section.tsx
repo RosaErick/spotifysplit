@@ -8,23 +8,31 @@ type SectionProps = {
   titleTo?: string;
   eyebrow?: string;
   action?: React.ReactNode;
+  withSeparator?: boolean;
   children: React.ReactNode;
 };
 
-export const Section = ({ title, titleTo, eyebrow, action, children }: SectionProps) => {
+export const Section = ({
+  title,
+  titleTo,
+  eyebrow,
+  action,
+  withSeparator = true,
+  children,
+}: SectionProps) => {
   return (
     <Box py={{ initial: "5", sm: "6" }}>
       <Reveal>
         <Flex
-          align={{ initial: "start", sm: "end" }}
+          align="end"
           justify="between"
           gap="3"
           mb="2"
-          direction={{ initial: "column", sm: "row" }}
+          wrap="wrap"
         >
-          <Box>
+          <Box minWidth="0" flexGrow="1">
             {eyebrow && (
-              <Text as="p" size="1" color="amber" className="section-eyebrow" mb="1">
+              <Text as="p" size="1" className="section-eyebrow" mb="1">
                 {eyebrow}
               </Text>
             )}
@@ -40,9 +48,9 @@ export const Section = ({ title, titleTo, eyebrow, action, children }: SectionPr
               </Heading>
             )}
           </Box>
-          {action}
+          {action && <Box flexShrink="0">{action}</Box>}
         </Flex>
-        <Separator size="4" mb="5" color="amber" style={{ opacity: 0.5 }} />
+        {withSeparator && <Separator size="4" mb="5" style={{ opacity: 0.5 }} />}
       </Reveal>
       {children}
     </Box>

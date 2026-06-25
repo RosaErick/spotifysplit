@@ -1,7 +1,6 @@
-import { ArrowLeftIcon, MagnifyingGlassIcon } from "@radix-ui/react-icons";
+import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
 import {
   Box,
-  Button,
   Card,
   CheckboxCards,
   Flex,
@@ -15,6 +14,7 @@ import { useNavigate } from "react-router-dom";
 import { AlbumCard } from "../components/Album/AlbumCard";
 import { ArtistCard } from "../components/Artist/ArtistCard";
 import { AppShell } from "../components/Layout/AppShell";
+import { BackButton } from "../components/Layout/BackButton";
 import { EmptyState } from "../components/Layout/EmptyState";
 import { ErrorState } from "../components/Layout/ErrorState";
 import { LoadingState } from "../components/Layout/LoadingState";
@@ -78,12 +78,7 @@ const SearchPage = () => {
 
   return (
     <AppShell>
-      <Button variant="soft" color="gray" mb="4" onClick={() => navigate(-1)}>
-        <ArrowLeftIcon />
-        Voltar
-      </Button>
-
-      <Section title="Busca global" eyebrow="Catálogo Spotify">
+      <Section title="Busca global" eyebrow="Catálogo Spotify" action={<BackButton />}>
         <Card className="filter-panel" mb="5">
           <Flex direction="column" gap="4">
             <Box>

@@ -44,28 +44,33 @@ export const CardGridSkeleton = ({
 
 export const ProfileSkeleton = () => (
   <Card className="hero-panel profile-card" mb="2">
-    <Flex direction="column" gap="6">
-      <Flex
-        gap={{ initial: "4", sm: "6" }}
-        align={{ initial: "start", sm: "center" }}
-        direction={{ initial: "column", sm: "row" }}
-      >
-        <Skeleton width="104px" height="104px" radius="999px" />
-        <Flex direction="column" gap="3" width="100%">
-          <Skeleton width="30%" height="0.7rem" />
-          <Skeleton width="65%" height="2.4rem" />
-          <Skeleton width="35%" height="1.4rem" radius="999px" />
+    <Flex
+      className="profile-layout"
+      align="center"
+      gap={{ initial: "4", sm: "6" }}
+      direction={{ initial: "column", sm: "row" }}
+    >
+      <Flex className="profile-identity" align="center" gap="4">
+        <Box className="avatar-ring">
+          <Skeleton width="80px" height="80px" radius="999px" />
+        </Box>
+
+        <Flex direction="column" gap="2" style={{ minWidth: 0, flex: "1 1 auto" }}>
+          <Skeleton width="8rem" height="0.55rem" />
+          <Skeleton width="min(18rem, 70vw)" height="1.65rem" />
+          <Flex align="center" gap="3" wrap="wrap">
+            <Skeleton width="4.4rem" height="1.25rem" radius="999px" />
+            <Skeleton width="7rem" height="1.75rem" radius="999px" />
+          </Flex>
         </Flex>
       </Flex>
-
-      <Skeleton height="1px" />
 
       <Box className="stat-strip">
         {Array.from({ length: 3 }).map((_, index) => (
           <Box className="stat-cell" key={index}>
-            <Skeleton width="60%" height="1.8rem" />
-            <Box mt="2">
-              <Skeleton width="80%" height="0.7rem" />
+            <Skeleton width="56%" height="1rem" />
+            <Box mt="1">
+              <Skeleton width="72%" height="0.58rem" />
             </Box>
           </Box>
         ))}

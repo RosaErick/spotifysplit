@@ -1,0 +1,377 @@
+/*
+ * Poster exportavel — paleta FIXA e propria (nao herda o tema claro/escuro do
+ * app). Espirito "Liner Notes": ambar quente + neutros torrados.
+ * Todas as medidas sao em px na largura logica de 1080 (largura final do PNG).
+ */
+
+.poster {
+  /* Tokens default (tema ambar). ShareCardPoster sobrescreve via inline style. */
+  --p-bg:
+    radial-gradient(120% 80% at 18% 0%, #3a2414 0%, rgba(58, 36, 20, 0) 55%),
+    radial-gradient(120% 90% at 100% 100%, #2a1a0e 0%, rgba(42, 26, 14, 0) 60%),
+    linear-gradient(160deg, #211710 0%, #1b120b 55%, #170f09 100%);
+  --p-surface: #2c1c10;
+  --p-text: #f5e9d8;
+  --p-name: #fbf3e6;
+  --p-accent: #f4b860;
+  --p-accent-strong: #c8761f;
+  --p-accent-soft: #f6deb0;
+  --p-eyebrow: #eaa94b;
+
+  position: relative;
+  box-sizing: border-box;
+  width: 1080px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  color: var(--p-text);
+  font-family: "Hanken Grotesk", ui-sans-serif, system-ui, sans-serif;
+  background: var(--p-bg);
+  isolation: isolate;
+}
+
+/* Textura sutil de "papel" sobre o gradiente. */
+.poster::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.05;
+  z-index: 0;
+  background-image: radial-gradient(
+    rgba(245, 233, 216, 0.6) 1px,
+    transparent 1px
+  );
+  background-size: 7px 7px;
+}
+
+.story {
+  height: 1920px;
+  padding: 96px 84px 80px;
+}
+
+.post {
+  height: 1350px;
+  padding: 72px 76px 64px;
+}
+
+.content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* ---------- Cabecalho ---------- */
+.header {
+  display: flex;
+  align-items: center;
+  gap: 40px;
+}
+
+.avatar {
+  position: relative;
+  flex: none;
+  border-radius: 50%;
+  background: linear-gradient(145deg, var(--p-accent), var(--p-accent-strong));
+  padding: 6px;
+  box-shadow: 0 18px 48px rgba(0, 0, 0, 0.45);
+}
+
+.story .avatar {
+  width: 200px;
+  height: 200px;
+}
+
+.post .avatar {
+  width: 168px;
+  height: 168px;
+}
+
+.avatarInner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--p-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.avatarInitials {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  color: var(--p-accent);
+}
+
+.story .avatarInitials {
+  font-size: 76px;
+}
+
+.post .avatarInitials {
+  font-size: 64px;
+}
+
+.headerText {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.eyebrow {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.32em;
+  color: var(--p-eyebrow);
+  font-weight: 600;
+}
+
+.story .eyebrow {
+  font-size: 26px;
+}
+
+.post .eyebrow {
+  font-size: 22px;
+}
+
+.name {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  line-height: 1.02;
+  color: var(--p-name);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.story .name {
+  font-size: 78px;
+}
+
+.post .name {
+  font-size: 64px;
+}
+
+.badge {
+  align-self: flex-start;
+  margin-top: 4px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--p-accent) 50%, transparent);
+  background: color-mix(in srgb, var(--p-accent) 12%, transparent);
+  color: var(--p-accent-soft);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.story .badge {
+  font-size: 28px;
+  padding: 10px 26px;
+}
+
+.post .badge {
+  font-size: 24px;
+  padding: 8px 22px;
+}
+
+/* ---------- Lista de artistas ---------- */
+.list {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin: 56px 0;
+  gap: 8px;
+}
+
+.post .list {
+  margin: 48px 0;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  flex: 1 1 0;
+  min-height: 0;
+}
+
+.rank {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in srgb, var(--p-text) 45%, transparent);
+  text-align: right;
+  flex: none;
+}
+
+.story .rank {
+  font-size: 48px;
+  width: 78px;
+}
+
+.post .rank {
+  font-size: 56px;
+  width: 92px;
+}
+
+.thumb {
+  flex: none;
+  border-radius: 22px;
+  overflow: hidden;
+  background: var(--p-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.4);
+}
+
+.story .thumb {
+  width: 108px;
+  height: 108px;
+}
+
+.post .thumb {
+  width: 148px;
+  height: 148px;
+}
+
+.thumbImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.thumbInitials {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 600;
+  color: var(--p-accent);
+}
+
+.story .thumbInitials {
+  font-size: 40px;
+}
+
+.post .thumbInitials {
+  font-size: 52px;
+}
+
+.artistName {
+  font-family: "Hanken Grotesk", sans-serif;
+  font-weight: 700;
+  color: var(--p-name);
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.story .artistName {
+  font-size: 44px;
+}
+
+.post .artistName {
+  font-size: 54px;
+}
+
+.divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--p-accent) 35%, transparent),
+    transparent
+  );
+  border: 0;
+  margin: 0;
+}
+
+/* ---------- Rodape ---------- */
+.footer {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.wordmarkRow {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  color: var(--p-accent);
+}
+
+.wordmark {
+  font-family: "Fraunces", Georgia, serif;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: var(--p-accent-soft);
+}
+
+.story .wordmark {
+  font-size: 40px;
+}
+
+.post .wordmark {
+  font-size: 36px;
+}
+
+/*
+ * EqualizerMark (componente reusado) usa altura em rem (pequena na escala do
+ * poster, 1080px). Aqui ela e reservada num box fixo e ampliada via transform,
+ * mantendo o componente original como fonte da marca.
+ */
+.eqWrap {
+  position: relative;
+  flex: none;
+  color: var(--p-accent);
+}
+
+.story .eqWrap {
+  width: 58px;
+  height: 46px;
+}
+
+.post .eqWrap {
+  width: 50px;
+  height: 40px;
+}
+
+.eqScale {
+  position: absolute;
+  left: 0;
+  bottom: 2px;
+  transform-origin: left bottom;
+}
+
+.story .eqScale {
+  transform: scale(3);
+}
+
+.post .eqScale {
+  transform: scale(2.6);
+}
+
+.tagline {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  letter-spacing: 0.06em;
+  color: color-mix(in srgb, var(--p-text) 60%, transparent);
+}
+
+.story .tagline {
+  font-size: 26px;
+}
+
+.post .tagline {
+  font-size: 22px;
+}

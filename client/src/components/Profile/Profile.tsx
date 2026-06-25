@@ -1,6 +1,7 @@
 import { Avatar, Badge, Box, Card, Flex, Heading, Text } from "@radix-ui/themes";
 import { useProfileOverview } from "../../shared/api/queries";
 import { formatNumber } from "../../utils/format";
+import { ShareButton } from "../../features/share";
 import { ErrorState } from "../Layout/ErrorState";
 import { ProfileSkeleton } from "../Layout/Skeleton";
 import { Reveal } from "../Layout/Reveal";
@@ -42,9 +43,8 @@ export const Profile = () => {
               <Avatar
                 src={imageUrl}
                 fallback={initialsOf(profile.display_name)}
-                size={{ initial: "5", sm: "7" }}
+                size={{ initial: "5", sm: "6" }}
                 radius="full"
-                color="amber"
               />
             </Box>
 
@@ -55,18 +55,19 @@ export const Profile = () => {
               <Heading className="display-heading truncate-2 profile-name" size={{ initial: "5", sm: "6" }}>
                 {profile.display_name}
               </Heading>
-              <Box mt="2">
-                <Badge color="amber" variant="soft" radius="full" size="1">
+              <Flex mt="2" align="center" gap="3" wrap="wrap">
+                <Badge variant="soft" radius="full" size="1">
                   {profile.product || "spotify"}
                 </Badge>
-              </Box>
+                <ShareButton />
+              </Flex>
             </Box>
           </Flex>
 
           <Box className="stat-strip">
             {stats.map(([label, value]) => (
               <Box className="stat-cell" key={label}>
-                <Heading className="display-heading stat-value" size={{ initial: "3", sm: "4" }}>
+                <Heading className="display-heading stat-value" size={{ initial: "2", sm: "3" }}>
                   {value}
                 </Heading>
                 <Text as="p" size="1" color="gray" mt="1">

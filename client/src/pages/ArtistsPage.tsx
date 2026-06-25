@@ -1,8 +1,8 @@
-import { Avatar, Box, Button, Card, Flex, Grid, Heading, Text } from "@radix-ui/themes";
-import { ArrowLeftIcon } from "@radix-ui/react-icons";
+import { Avatar, Box, Card, Flex, Grid, Heading, Text } from "@radix-ui/themes";
 import { useNavigate, useParams } from "react-router-dom";
 import { ArtistCard } from "../components/Artist/ArtistCard";
 import { AppShell } from "../components/Layout/AppShell";
+import { BackButton } from "../components/Layout/BackButton";
 import { EmptyState } from "../components/Layout/EmptyState";
 import { ErrorState } from "../components/Layout/ErrorState";
 import { FeatureUnavailableState } from "../components/Layout/FeatureUnavailableState";
@@ -11,7 +11,7 @@ import { Reveal } from "../components/Layout/Reveal";
 import { Section } from "../components/Layout/Section";
 import { TrackRankingList } from "../components/Ranking/RankingLists";
 import { useArtist, useArtistTopTracks, useRelatedArtists } from "../shared/api/queries";
-import { formatNumber } from "../utils/format";
+import { formatGenresLabel, formatNumber } from "../utils/format";
 
 const ArtistPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -42,11 +42,6 @@ const ArtistPage = () => {
 
   return (
     <AppShell>
-      <Button variant="soft" color="gray" mb="4" onClick={() => navigate(-1)}>
-        <ArrowLeftIcon />
-        Voltar
-      </Button>
-
       <Reveal>
       <Card className="hero-panel" size="3">
         <Grid columns={{ initial: "1", md: "280px 1fr" }} gap="5" align="center">
@@ -55,21 +50,25 @@ const ArtistPage = () => {
             fallback="SS"
             size="9"
             radius="large"
-            color="amber"
           />
           <Box>
-            <Text as="p" size="1" weight="bold" color="amber" className="section-eyebrow">
-              Artista
-            </Text>
-            <Heading size={{ initial: "7", sm: "8" }} mt="2">
-              {artist.name}
-            </Heading>
+            <Flex align="start" justify="between" gap="3" wrap="wrap">
+              <Box minWidth="0" flexGrow="1">
+                <Text as="p" size="1" weight="bold" className="section-eyebrow">
+                  Artista
+                </Text>
+                <Heading size={{ initial: "7", sm: "8" }} mt="2">
+                  {artist.name}
+                </Heading>
+              </Box>
+              <BackButton />
+            </Flex>
             <Grid columns={{ initial: "1", sm: "3" }} gap="3" mt="5">
               <Stat label="Popularidade" value={artist.popularity ?? "-"} />
               <Stat label="Seguidores" value={formatNumber(artist.followers?.total)} />
               <Stat
                 label="Gêneros"
-                value={artist.genres?.slice(0, 2).join(", ") || "Não informado"}
+                value={formatGenresLabel(artist.genres, "Não informado")}
                 compact
               />
             </Grid>

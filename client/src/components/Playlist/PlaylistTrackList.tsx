@@ -40,7 +40,7 @@ export const PlaylistTrackList = ({ items, onTrackSelect }: PlaylistTrackListPro
             }
           }}
         >
-          <Text size="3" color="amber" className="track-index">
+          <Text size="3" className="track-index">
             {index + 1}
           </Text>
 

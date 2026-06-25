@@ -34,7 +34,7 @@ export const PlaylistCard = ({ playlist, onClick }: PlaylistCardProps) => {
       </Text>
 
       <Flex gap="2" wrap="wrap" mt="3">
-        <Badge color="amber" variant="soft" radius="full">
+        <Badge variant="soft" radius="full">
           {formatNumber(totalTracks)} faixas
         </Badge>
         {playlist.collaborative && (

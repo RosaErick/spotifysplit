@@ -1,5 +1,7 @@
-import { Box, Card, Container, Flex, Grid, Heading, Text } from "@radix-ui/themes";
+import { Box, Card, Container, Flex, Grid, Heading, Separator, Text } from "@radix-ui/themes";
 import { Navigate } from "react-router-dom";
+import { AccentPicker } from "../components/Layout/AccentPicker";
+import { useAppTheme } from "../components/Layout/AppThemeProvider";
 import { EqualizerMark } from "../components/Layout/EqualizerMark";
 import { Reveal } from "../components/Layout/Reveal";
 import { ThemeToggle } from "../components/Layout/ThemeToggle";
@@ -8,11 +10,13 @@ import { isAuthenticated } from "../features/auth/auth";
 
 const highlights: Array<[string, string]> = [
   ["Top artistas", "Seu ranking dos artistas mais ouvidos."],
-  ["Recentes", "O histórico de escuta como uma linha do tempo."],
-  ["Descoberta", "Álbuns e relacionados a partir do seu top."],
+  ["Top faixas", "As músicas que você mais repete."],
+  ["Biblioteca", "Suas faixas, álbuns e shows salvos."],
 ];
 
 export const Login = () => {
+  const { accent } = useAppTheme();
+
   if (isAuthenticated()) return <Navigate to="/" replace />;
 
   return (
@@ -24,10 +28,13 @@ export const Login = () => {
               <EqualizerMark />
             </Flex>
             <Text size="2" className="brand-title">
-              Spotifysplit
+              SpotfySplit
             </Text>
           </Flex>
-          <ThemeToggle />
+          <Flex align="center" gap="3">
+            <AccentPicker />
+            <ThemeToggle />
+          </Flex>
         </Flex>
 
         <Grid
@@ -69,13 +76,24 @@ export const Login = () => {
           </Box>
 
           <Reveal delay={0.2} y={28}>
-            <Card className="hero-panel" size="3">
-              <Grid gap="3">
+            <Card className="hero-panel" size="4">
+              <Text as="p" size="1" color="gray" className="section-eyebrow" mb="5">
+                O que você encontra
+              </Text>
+              <Flex direction="column">
                 {highlights.map(([title, subtitle], index) => (
-                  <Card key={title} variant="ghost" size="2" style={{ padding: "var(--space-3)" }}>
+                  <Box key={title}>
+                    {index > 0 && (
+                      <Separator size="4" my="4" style={{ opacity: 0.45 }} />
+                    )}
                     <Flex gap="4" align="center">
-                      <Heading className="display-heading" size="7" color="amber" style={{ minWidth: "2.5rem" }}>
-                        0{index + 1}
+                      <Heading
+                        className="display-heading serif-accent"
+                        size="8"
+                        color={accent}
+                        style={{ minWidth: "2.5rem", lineHeight: 1 }}
+                      >
+                        {index + 1}
                       </Heading>
                       <Box>
                         <Heading size="4">{title}</Heading>
@@ -84,9 +102,9 @@ export const Login = () => {
                         </Text>
                       </Box>
                     </Flex>
-                  </Card>
+                  </Box>
                 ))}
-              </Grid>
+              </Flex>
             </Card>
           </Reveal>
         </Grid>

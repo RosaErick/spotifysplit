@@ -1,7 +1,6 @@
-import { ArrowLeftIcon, MagnifyingGlassIcon } from "@radix-ui/react-icons";
+import { MagnifyingGlassIcon } from "@radix-ui/react-icons";
 import {
   Box,
-  Button,
   Card,
   Flex,
   Grid,
@@ -12,6 +11,7 @@ import {
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppShell } from "../components/Layout/AppShell";
+import { BackButton } from "../components/Layout/BackButton";
 import { EmptyState } from "../components/Layout/EmptyState";
 import { ErrorState } from "../components/Layout/ErrorState";
 import { LoadingState } from "../components/Layout/LoadingState";
@@ -80,12 +80,7 @@ const PlaylistsPage = () => {
 
   return (
     <AppShell>
-      <Button variant="soft" color="gray" mb="4" onClick={() => navigate(-1)}>
-        <ArrowLeftIcon />
-        Voltar
-      </Button>
-
-      <Section title="Playlists" eyebrow="Biblioteca">
+      <Section title="Playlists" eyebrow="Biblioteca" action={<BackButton />}>
         <Card className="filter-panel" mb="5">
           <Grid columns={{ initial: "1", md: "1.2fr 0.8fr 0.8fr 0.8fr" }} gap="3">
             <TextField.Root

@@ -1,7 +1,7 @@
 import { Badge, Box, Card, Flex, Text } from "@radix-ui/themes";
 import React from "react";
 import { SpotifyArtist } from "../../shared/types/spotify";
-import { formatNumber } from "../../utils/format";
+import { formatNumber, topGenres } from "../../utils/format";
 import { interactiveProps } from "../Layout/interactive";
 
 interface ArtistCardProps {
@@ -11,7 +11,7 @@ interface ArtistCardProps {
 
 export const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onClick }) => {
   const imageUrl = artist.images?.[0]?.url;
-  const genres = artist.genres?.slice(0, 2);
+  const genres = topGenres(artist.genres);
 
   return (
     <Card className="interactive-card" {...interactiveProps(onClick)}>
@@ -34,7 +34,7 @@ export const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onClick }) => {
       <Flex gap="2" wrap="wrap" mt="3">
         {genres?.length ? (
           genres.map((genre) => (
-            <Badge key={genre} color="amber" variant="soft" radius="full">
+            <Badge key={genre} variant="soft" radius="full">
               {genre}
             </Badge>
           ))
