@@ -1,35 +1,41 @@
-import React, { useState, useEffect } from "react";
-import { getTopTracks } from "../../provider/spotfy";
-import { TrackCard } from "./TrackCard";
+import { Grid } from "@radix-ui/themes";
 import { useNavigate } from "react-router-dom";
+import { useTopTracks } from "../../shared/api/queries";
+import { EmptyState } from "../Layout/EmptyState";
+import { ErrorState } from "../Layout/ErrorState";
+import { Reveal } from "../Layout/Reveal";
+import { CardGridSkeleton } from "../Layout/Skeleton";
+import { Section } from "../Layout/Section";
+import { TrackCard } from "./TrackCard";
 
-const TopTracks: React.FC = () => {
-  const [tracks, setTracks] = useState<any[] | null>(null);
+const columns = { initial: "2", xs: "2", sm: "3", lg: "5" };
+
+const TopTracks = () => {
+  const { data, isLoading, isError, error, refetch } = useTopTracks();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    getTopTracks().then((data) => {
-      setTracks(data.items);
-    });
-  }, []);
-
-  const handleTrackClick = (id: string) => {
-    navigate(`/tracks/${id}`);
-  };
-
-  if (!tracks) return null;
+  const tracks = data?.items ?? [];
 
   return (
-    <div className="pt-5">
-      <h2 className="text-white mb-4 text-2xl">Top Tracks</h2>
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
-        {tracks?.map((track: any) => (
-          <div key={track.id} onClick={() => handleTrackClick(track.id)}>
-            <TrackCard track={track} />
-          </div>
-        ))}
-      </div>
-    </div>
+    <Section title="Faixas que definem seu momento" eyebrow="Mais ouvidas">
+      {isLoading ? (
+        <CardGridSkeleton count={5} columns={columns} />
+      ) : isError ? (
+        <ErrorState error={error} onRetry={refetch} />
+      ) : tracks.length === 0 ? (
+        <EmptyState message="Nenhuma faixa em destaque por enquanto." />
+      ) : (
+        <Grid columns={columns} gap="4">
+          {tracks.map((track, index) => (
+            <Reveal key={track.id} delay={Math.min(index, 10) * 0.035}>
+              <TrackCard
+                track={track}
+                onClick={() => navigate(`/tracks/${track.id}`)}
+              />
+            </Reveal>
+          ))}
+        </Grid>
+      )}
+    </Section>
   );
 };
 

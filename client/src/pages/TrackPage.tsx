@@ -1,114 +1,235 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate, useParams, Link } from "react-router-dom";
-import {
-  getOneTrack,
-  getRecommendationsBasedOnTrack,
-} from "../provider/spotfy";
+import { ArrowLeftIcon, OpenInNewWindowIcon } from "@radix-ui/react-icons";
+import { Badge, Box, Button, Card, Flex, Grid, Heading, Link as RadixLink, Text } from "@radix-ui/themes";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { AppShell } from "../components/Layout/AppShell";
+import { EmptyState } from "../components/Layout/EmptyState";
+import { ErrorState } from "../components/Layout/ErrorState";
+import { LoadingState } from "../components/Layout/LoadingState";
+import { Reveal } from "../components/Layout/Reveal";
+import { Section } from "../components/Layout/Section";
+import { TrackRankingList } from "../components/Ranking/RankingLists";
 import { TrackCard } from "../components/Track/TrackCard";
+import {
+  useAlbumTracks,
+  useArtistTopTracks,
+  useTrack,
+} from "../shared/api/queries";
+import { SpotifyTrack } from "../shared/types/spotify";
+import { formatDuration } from "../utils/format";
 
 const TrackPage = () => {
-  const [track, setTrack] = useState<any>(null);
-  const [recommendations, setRecommendations] = useState<any[] | null>(null);
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const trackQuery = useTrack(id);
 
-  useEffect(() => {
-    const fetchTrack = async () => {
-      const response = await getOneTrack(id);
-      setTrack(response);
-    };
-    fetchTrack();
-  }, [id]);
+  if (trackQuery.isLoading) {
+    return (
+      <AppShell>
+        <LoadingState label="Carregando faixa" />
+      </AppShell>
+    );
+  }
 
-  useEffect(() => {
-    const fetchRelatedTracks = async () => {
-      const response = await getRecommendationsBasedOnTrack(id);
-      setRecommendations(response.tracks);
-    };
-    fetchRelatedTracks();
-  }, [id]);
+  if (trackQuery.isError || !trackQuery.data) {
+    return (
+      <AppShell>
+        <ErrorState error={trackQuery.error} onRetry={trackQuery.refetch} />
+      </AppShell>
+    );
+  }
 
-  const handleTrackClick = (id: string) => {
-    navigate(`/tracks/${id}`);
-  };
+  const track = trackQuery.data;
 
   return (
-    <div>
-      {track ? (
-        <div className="flex flex-col items-center">
-          <h1 className="text-3xl font-bold mb-4">{track.name}</h1>
-          <img
-            src={track.album.images[0]?.url}
-            alt={track.name}
-            className="rounded-full mb-4 w-64 h-64 object-cover"
-          />
-          <div className="flex flex-col items-center space-y-4">
-            <audio src={track.preview_url} controls className="mb-4" />
-            <div className="flex items-center space-x-4 mb-4">
-              <p className="text-gray-500 font-medium">Album:</p>
-              <p>{track.album.name}</p>
-            </div>
-            <div className="flex items-center space-x-4 mb-4">
-              <p className="text-gray-500 font-medium">Artists:</p>
-              <p>
-                {track.artists.map((artist: any) => (
-                  <Link
-                    to={`/artists/${artist.id}`}
-                    key={artist.id}
-                    className="text-blue-500 hover:underline"
-                  >
-                    {artist.name}
+    <AppShell>
+      <Button variant="soft" color="gray" mb="4" onClick={() => navigate(-1)}>
+        <ArrowLeftIcon />
+        Voltar
+      </Button>
+
+      <Reveal>
+      <Card className="hero-panel" size="3">
+        <Grid columns={{ initial: "1", md: "280px 1fr" }} gap="5" align="center">
+          <Box className="media-tile" style={{ borderRadius: "var(--radius-5)" }}>
+            {track.album?.images?.[0]?.url && (
+              <img src={track.album.images[0].url} alt={track.name} />
+            )}
+          </Box>
+
+          <Box>
+            <Text as="p" size="1" weight="bold" color="amber" className="section-eyebrow">
+              Faixa
+            </Text>
+            <Heading size={{ initial: "6", sm: "8" }} mt="2">
+              {track.name}
+            </Heading>
+            {track.album?.id && (
+              <RadixLink asChild>
+                <Link to={`/albums/${track.album.id}`}>
+                  <Badge color="gray" variant="surface" mt="3">
+                    {track.album.name}
+                  </Badge>
+                </Link>
+              </RadixLink>
+            )}
+
+            <Flex gap="2" wrap="wrap" mt="4">
+              {track.artists?.map((artist) => (
+                <RadixLink asChild key={artist.id}>
+                  <Link to={`/artists/${artist.id}`}>
+                    <Badge color="amber" variant="soft">
+                      {artist.name}
+                    </Badge>
                   </Link>
-                ))}
-              </p>
-            </div>
-            <div className="flex items-center space-x-4 mb-4">
-              <p className="text-gray-500 font-medium">Duration:</p>
-              <p>{(track.duration_ms / 1000 / 60).toFixed(2)} min</p>
-            </div>
-            <div className="flex items-center space-x-4 mb-4">
-              <p className="text-gray-500 font-medium">Popularity:</p>
-              <p>{track.popularity}</p>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="flex items-center justify-center h-screen">
-          <div role="status">
-            <svg
-              aria-hidden="true"
-              className="inline w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-green-500"
-              viewBox="0 0 100 101"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                fill="currentColor"
+                </RadixLink>
+              ))}
+            </Flex>
+
+            {track.external_urls?.spotify && (
+              <Flex mt="4">
+                <Button asChild variant="soft" color="amber">
+                  <a href={track.external_urls.spotify} target="_blank" rel="noreferrer">
+                    <OpenInNewWindowIcon />
+                    Ouvir no Spotify
+                  </a>
+                </Button>
+              </Flex>
+            )}
+
+            <Grid columns={{ initial: "2", sm: "3" }} gap="3" mt="5">
+              <Stat label="Duração" value={formatDuration(track.duration_ms)} />
+              <Stat label="Popularidade" value={track.popularity ?? "-"} />
+              <Stat
+                label="Preview"
+                value={track.preview_url ? "Disponível" : "Indisponível"}
+                compact
               />
-              <path
-                d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                fill="currentFill"
-              />
-            </svg>
-            <span className="sr-only">Loading...</span>
-          </div>
-        </div>
-      )}
-      {recommendations && (
-        <div className="mt-8">
-          <h2 className="text-2xl font-bold mb-4">Related Tracks</h2>
-          <div className="grid grid-cols-1 gap-10 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-6">
-            {recommendations.map((track) => (
-              <div onClick={() => handleTrackClick(track.id)}>
-                <TrackCard key={track.id} track={track} />
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
+            </Grid>
+
+            {track.preview_url && (
+              <Box mt="5">
+                <audio src={track.preview_url} controls style={{ width: "100%" }} />
+              </Box>
+            )}
+          </Box>
+        </Grid>
+      </Card>
+      </Reveal>
+
+      <TrackDiscovery track={track} currentTrackId={track.id} />
+    </AppShell>
   );
 };
+
+const TrackDiscovery = ({
+  track,
+  currentTrackId,
+}: {
+  track: SpotifyTrack;
+  currentTrackId: string;
+}) => {
+  const navigate = useNavigate();
+  const albumTracksQuery = useAlbumTracks(track.album?.id);
+  const primaryArtistId = track.artists?.[0]?.id;
+  const secondaryArtistId = track.artists?.[1]?.id;
+  const primaryArtistTracksQuery = useArtistTopTracks(primaryArtistId);
+  const secondaryArtistTracksQuery = useArtistTopTracks(secondaryArtistId);
+
+  const albumTracks = (albumTracksQuery.data?.items ?? [])
+    .filter((albumTrack) => albumTrack.id !== currentTrackId)
+    .map((albumTrack) => ({
+      ...albumTrack,
+      album: albumTrack.album ?? track.album,
+      artists: albumTrack.artists ?? track.artists,
+    }));
+
+  const artistTracks = dedupeTracks([
+    ...(primaryArtistTracksQuery.data?.tracks ?? []),
+    ...(secondaryArtistTracksQuery.data?.tracks ?? []),
+  ]).filter((artistTrack) => artistTrack.id !== currentTrackId);
+
+  const isArtistTracksLoading =
+    primaryArtistTracksQuery.isLoading || secondaryArtistTracksQuery.isLoading;
+  const isArtistTracksError =
+    primaryArtistTracksQuery.isError || secondaryArtistTracksQuery.isError;
+
+  return (
+    <>
+      <Section title="Mais do mesmo álbum" eyebrow="Mesmo contexto">
+        {albumTracksQuery.isLoading && <LoadingState label="Carregando faixas do álbum" />}
+        {albumTracksQuery.isError && (
+          <ErrorState error={albumTracksQuery.error} onRetry={albumTracksQuery.refetch} />
+        )}
+        {!albumTracksQuery.isLoading && !albumTracksQuery.isError && albumTracks.length === 0 && (
+          <EmptyState message="Nenhuma outra faixa disponível nesse álbum." />
+        )}
+        {albumTracks.length > 0 && (
+          <Grid columns={{ initial: "2", xs: "2", sm: "3", lg: "5" }} gap="4">
+            {albumTracks.slice(0, 5).map((albumTrack, index) => (
+              <Reveal key={albumTrack.id} delay={Math.min(index, 8) * 0.04}>
+                <TrackCard
+                  track={albumTrack}
+                  onClick={() => navigate(`/tracks/${albumTrack.id}`)}
+                />
+              </Reveal>
+            ))}
+          </Grid>
+        )}
+      </Section>
+
+      <Section title="Mais dos artistas" eyebrow="Top faixas">
+        {isArtistTracksLoading && <LoadingState label="Carregando faixas dos artistas" />}
+        {isArtistTracksError && (
+          <ErrorState
+            error={primaryArtistTracksQuery.error ?? secondaryArtistTracksQuery.error}
+            onRetry={() => {
+              primaryArtistTracksQuery.refetch();
+              secondaryArtistTracksQuery.refetch();
+            }}
+          />
+        )}
+        {!isArtistTracksLoading && !isArtistTracksError && artistTracks.length === 0 && (
+          <EmptyState message="Nenhuma faixa popular disponível para esses artistas." />
+        )}
+        {artistTracks.length > 0 && (
+          <TrackRankingList
+            tracks={artistTracks}
+            limit={10}
+            onSelect={(artistTrack) => navigate(`/tracks/${artistTrack.id}`)}
+          />
+        )}
+      </Section>
+    </>
+  );
+};
+
+const dedupeTracks = (tracks: SpotifyTrack[]) => {
+  const seen = new Set<string>();
+
+  return tracks.filter((track) => {
+    if (seen.has(track.id)) return false;
+    seen.add(track.id);
+    return true;
+  });
+};
+
+const Stat = ({
+  label,
+  value,
+  compact,
+}: {
+  label: string;
+  value: string | number;
+  compact?: boolean;
+}) => (
+  <Card variant="surface">
+    <Text as="p" size="1" color="gray">
+      {label}
+    </Text>
+    <Text as="p" size={compact ? "2" : "5"} weight="bold" mt="1">
+      {value}
+    </Text>
+  </Card>
+);
 
 export default TrackPage;

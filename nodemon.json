@@ -1,5 +1,8 @@
 {
-    "execMap":{
-        "js":"sucrase-node"
-    }
+  "watch": ["server"],
+  "ext": "js,json",
+  "ignore": ["client", "docs"],
+  "execMap": {
+    "js": "sucrase-node"
+  }
 }

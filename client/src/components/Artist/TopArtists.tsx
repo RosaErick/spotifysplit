@@ -1,38 +1,40 @@
-import { getTopArtists } from "../../provider/spotfy";
-import { ArtistCard } from "./ArtistCard";
+import { Grid } from "@radix-ui/themes";
 import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import { useTopArtists } from "../../shared/api/queries";
+import { EmptyState } from "../Layout/EmptyState";
+import { ErrorState } from "../Layout/ErrorState";
+import { Reveal } from "../Layout/Reveal";
+import { CardGridSkeleton } from "../Layout/Skeleton";
+import { Section } from "../Layout/Section";
+import { ArtistCard } from "./ArtistCard";
+
+const columns = { initial: "1", xs: "2", md: "3", lg: "4" };
 
 export const TopArtists = () => {
-  const [topArtists, setTopArtists] = useState<any[] | null>(null);
+  const { data, isLoading, isError, error, refetch } = useTopArtists();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    const fetchTopArtists = async () => {
-      const data = await getTopArtists();
-      setTopArtists(data?.items);
-    };
-    fetchTopArtists();
-  }, []);
-
-  const handleArtistClick = (artist: any) => {
-    navigate(`/artists/${artist.id}`);
-  };
-
-  if (!topArtists) return null;
+  const artists = data?.items ?? [];
 
   return (
-    <div>
-      <h2 className="text-white mb-4 text-2xl">Top Artists</h2>
-      <div className="grid gap-6 grid-cols-1 mx-5  sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2 xl:grid-cols-3">
-        {topArtists.map((artist: any) => (
-          <ArtistCard
-            key={artist.id}
-            artist={artist}
-            onClick={() => handleArtistClick(artist)}
-          />
-        ))}
-      </div>
-    </div>
+    <Section title="Artistas em alta para você" eyebrow="Top pessoal">
+      {isLoading ? (
+        <CardGridSkeleton count={4} columns={columns} />
+      ) : isError ? (
+        <ErrorState error={error} onRetry={refetch} />
+      ) : artists.length === 0 ? (
+        <EmptyState message="Nenhum artista em alta por enquanto." />
+      ) : (
+        <Grid columns={columns} gap="4">
+          {artists.map((artist, index) => (
+            <Reveal key={artist.id} delay={Math.min(index, 8) * 0.04}>
+              <ArtistCard
+                artist={artist}
+                onClick={() => navigate(`/artists/${artist.id}`)}
+              />
+            </Reveal>
+          ))}
+        </Grid>
+      )}
+    </Section>
   );
 };

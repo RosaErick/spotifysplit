@@ -1,49 +1,55 @@
+import { Badge, Box, Card, Flex, Text } from "@radix-ui/themes";
 import React from "react";
+import { SpotifyArtist } from "../../shared/types/spotify";
+import { formatNumber } from "../../utils/format";
+import { interactiveProps } from "../Layout/interactive";
 
 interface ArtistCardProps {
-  artist: {
-    id: string;
-    name: string;
-    images: { url: string }[];
-    genres: string[];
-    external_urls: { spotify: string };
-  };
-  onClick?: any;
+  artist: SpotifyArtist;
+  onClick?: () => void;
 }
 
 export const ArtistCard: React.FC<ArtistCardProps> = ({ artist, onClick }) => {
-  const { name, images, genres, external_urls } = artist;
+  const imageUrl = artist.images?.[0]?.url;
+  const genres = artist.genres?.slice(0, 2);
 
   return (
-    <div
-      className="bg-[#121212] text-white h-70 w-80 p-4 rounded-lg shadow-md cursor-pointer transform hover:scale-105 transition-all duration-200 ease-in-out "
-      onClick={onClick}
-    >
-      <div>
-        {images[0] && (
-          <img
-            src={images[0].url}
-            alt={name}
-            className="m-auto rounded-full  h-32 w-32 shadow-md border-2 border-green-600"
-          />
+    <Card className="interactive-card" {...interactiveProps(onClick)}>
+      <Box className="media-tile" mb="3">
+        {imageUrl ? (
+          <img src={imageUrl} alt={artist.name} loading="lazy" />
+        ) : (
+          <Flex height="100%" align="center" justify="center">
+            <Text size="6" color="gray" weight="bold">
+              SS
+            </Text>
+          </Flex>
         )}
-      </div>
-      <div className="flex flex-col justify-center w-full mt-4">
-        <h3 className="text-white font-semibold text-lg">{name}</h3>
-        <p className="text-gray-400 text-sm mt-2">
-          Genres: {genres.join(", ")}
-        </p>
-      </div>
-      <div className="artist-link mt-4">
-        <a
-          href={external_urls.spotify}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-green-600 hover:text-blue-800 transition-all duration-200"
-        >
-          View on Spotify
-        </a>
-      </div>
-    </div>
+      </Box>
+
+      <Text as="p" size="3" weight="bold" className="truncate-2">
+        {artist.name}
+      </Text>
+
+      <Flex gap="2" wrap="wrap" mt="3">
+        {genres?.length ? (
+          genres.map((genre) => (
+            <Badge key={genre} color="amber" variant="soft" radius="full">
+              {genre}
+            </Badge>
+          ))
+        ) : (
+          <Badge color="gray" variant="soft" radius="full">
+            artista
+          </Badge>
+        )}
+      </Flex>
+
+      {artist.followers?.total !== undefined && (
+        <Text as="p" size="1" color="gray" mt="3">
+          {formatNumber(artist.followers.total)} seguidores
+        </Text>
+      )}
+    </Card>
   );
 };

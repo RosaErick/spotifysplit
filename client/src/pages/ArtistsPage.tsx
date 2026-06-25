@@ -1,88 +1,146 @@
-import React, { useState, useEffect } from "react";
+import { Avatar, Box, Button, Card, Flex, Grid, Heading, Text } from "@radix-ui/themes";
+import { ArrowLeftIcon } from "@radix-ui/react-icons";
 import { useNavigate, useParams } from "react-router-dom";
-import { getOneArtist, getRelatedArtists } from "../provider/spotfy";
 import { ArtistCard } from "../components/Artist/ArtistCard";
+import { AppShell } from "../components/Layout/AppShell";
+import { EmptyState } from "../components/Layout/EmptyState";
+import { ErrorState } from "../components/Layout/ErrorState";
+import { FeatureUnavailableState } from "../components/Layout/FeatureUnavailableState";
+import { LoadingState } from "../components/Layout/LoadingState";
+import { Reveal } from "../components/Layout/Reveal";
+import { Section } from "../components/Layout/Section";
+import { TrackRankingList } from "../components/Ranking/RankingLists";
+import { useArtist, useArtistTopTracks, useRelatedArtists } from "../shared/api/queries";
+import { formatNumber } from "../utils/format";
 
 const ArtistPage = () => {
-  const [artist, setArtist] = useState<any>(null);
-  const [relatedArtists, setRelatedArtists] = useState<any[] | null>(null);
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const artistQuery = useArtist(id);
+  const topTracksQuery = useArtistTopTracks(id);
+  const relatedQuery = useRelatedArtists(id);
+  const relatedArtists = relatedQuery.data?.artists ?? [];
+  const topTracks = topTracksQuery.data?.tracks ?? [];
 
-  useEffect(() => {
-    const fetchArtist = async () => {
-      const response = await getOneArtist(id);
-      setArtist(response);
-    };
-    fetchArtist();
-  }, [id]);
+  if (artistQuery.isLoading) {
+    return (
+      <AppShell>
+        <LoadingState label="Carregando artista" />
+      </AppShell>
+    );
+  }
 
-  useEffect(() => {
-    const fetchRelatedArtists = async () => {
-      const response = await getRelatedArtists(id);
-      setRelatedArtists(response?.artists);
-    };
-    fetchRelatedArtists();
-  }, [id]);
+  if (artistQuery.isError || !artistQuery.data) {
+    return (
+      <AppShell>
+        <ErrorState error={artistQuery.error} onRetry={artistQuery.refetch} />
+      </AppShell>
+    );
+  }
 
-  const handleArtistClick = (id: string) => {
-    navigate(`/artists/${id}`);
-  };
-
-  if (!artist) return null;
+  const artist = artistQuery.data;
 
   return (
-    <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div className="flex flex-col items-center justify-center py-8">
-        <h1 className="text-3xl font-bold text-center mb-4">{artist?.name}</h1>
-        <div className="rounded-full overflow-hidden w-64 h-64 flex items-center justify-center mb-4">
-          {artist?.images[0] && (
-            <img
-              src={artist?.images[0].url}
-              alt={artist?.name}
-              className="w-full h-full object-cover rounded-full"
-            />
-          )}
-        </div>
-        <div className="flex flex-col space-y-4 mb-4">
-          <div className="flex items-center space-x-4">
-            <p className="text-gray-500 font-medium">Popularity:</p>
-            <p>{artist?.popularity}</p>
-          </div>
-          <div className="flex items-center space-x-4">
-            <p className="text-gray-500 font-medium">Genres:</p>
-            <p>{artist?.genres.join(", ")}</p>
-          </div>
-          <div className="flex items-center space-x-4">
-            <p className="text-gray-500 font-medium">Followers:</p>
-            <p>{artist?.followers.total}</p>
-          </div>
-        </div>
-        <button
-          className="bg-gray-900 text-white py-2 px-4 rounded-md shadow-lg hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900"
-          onClick={() => navigate(-1)}
-        >
-          Go Back
-        </button>
-      </div>
-      {relatedArtists && (
-        <div className="mt-8">
-          <h2 className="text-2xl font-bold text-center mb-4">
-            Related Artists
-          </h2>
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-            {relatedArtists.map((artist: any) => (
-              <ArtistCard
-                key={artist.id}
-                artist={artist}
-                onClick={() => handleArtistClick(artist.id)}
+    <AppShell>
+      <Button variant="soft" color="gray" mb="4" onClick={() => navigate(-1)}>
+        <ArrowLeftIcon />
+        Voltar
+      </Button>
+
+      <Reveal>
+      <Card className="hero-panel" size="3">
+        <Grid columns={{ initial: "1", md: "280px 1fr" }} gap="5" align="center">
+          <Avatar
+            src={artist.images?.[0]?.url}
+            fallback="SS"
+            size="9"
+            radius="large"
+            color="amber"
+          />
+          <Box>
+            <Text as="p" size="1" weight="bold" color="amber" className="section-eyebrow">
+              Artista
+            </Text>
+            <Heading size={{ initial: "7", sm: "8" }} mt="2">
+              {artist.name}
+            </Heading>
+            <Grid columns={{ initial: "1", sm: "3" }} gap="3" mt="5">
+              <Stat label="Popularidade" value={artist.popularity ?? "-"} />
+              <Stat label="Seguidores" value={formatNumber(artist.followers?.total)} />
+              <Stat
+                label="Gêneros"
+                value={artist.genres?.slice(0, 2).join(", ") || "Não informado"}
+                compact
               />
+            </Grid>
+          </Box>
+        </Grid>
+      </Card>
+      </Reveal>
+
+      <Section title="Faixas essenciais" eyebrow="Top do artista">
+        {topTracksQuery.isLoading && <LoadingState label="Carregando faixas do artista" />}
+        {topTracksQuery.isError && (
+          <ErrorState error={topTracksQuery.error} onRetry={topTracksQuery.refetch} />
+        )}
+        {!topTracksQuery.isLoading && !topTracksQuery.isError && topTracks.length === 0 && (
+          <EmptyState message="Nenhuma faixa principal disponível para este artista." />
+        )}
+        {topTracks.length > 0 && (
+          <TrackRankingList
+            tracks={topTracks}
+            onSelect={(track) => navigate(`/tracks/${track.id}`)}
+            limit={10}
+          />
+        )}
+      </Section>
+
+      <Section title="Artistas relacionados" eyebrow="Continue explorando">
+        {relatedQuery.isLoading && <LoadingState label="Carregando artistas relacionados" />}
+        {relatedQuery.isError && (
+          <FeatureUnavailableState
+            title="Artistas relacionados indisponíveis"
+            description="O Spotify não retornou dados confiáveis para este artista ou não liberou esse endpoint para este app. Para evitar relações musicais erradas, esta seção não usa fallback."
+            onRetry={relatedQuery.refetch}
+          />
+        )}
+        {!relatedQuery.isLoading && !relatedQuery.isError && relatedArtists.length === 0 && (
+          <EmptyState message="Nenhum artista relacionado disponível agora." />
+        )}
+        {relatedArtists.length > 0 && (
+          <Grid columns={{ initial: "1", xs: "2", md: "3", lg: "4" }} gap="4">
+            {relatedArtists.map((relatedArtist, index) => (
+              <Reveal key={relatedArtist.id} delay={Math.min(index, 8) * 0.04}>
+              <ArtistCard
+                artist={relatedArtist}
+                onClick={() => navigate(`/artists/${relatedArtist.id}`)}
+              />
+              </Reveal>
             ))}
-          </div>
-        </div>
-      )}
-    </div>
+          </Grid>
+        )}
+      </Section>
+    </AppShell>
   );
 };
+
+const Stat = ({
+  label,
+  value,
+  compact,
+}: {
+  label: string;
+  value: string | number;
+  compact?: boolean;
+}) => (
+  <Card variant="surface">
+    <Text as="p" size="1" color="gray">
+      {label}
+    </Text>
+    <Text as="p" size={compact ? "2" : "5"} weight="bold" mt="1" className="truncate-2">
+      {value}
+    </Text>
+  </Card>
+);
 
 export default ArtistPage;

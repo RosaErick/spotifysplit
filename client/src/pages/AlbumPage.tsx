@@ -1,148 +1,145 @@
-import React, { useState, useEffect } from "react";
+import { ArrowLeftIcon } from "@radix-ui/react-icons";
+import { Badge, Box, Button, Card, Flex, Grid, Heading, Text } from "@radix-ui/themes";
+import { useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getAlbumById, getAlbumTracks } from "../provider/spotfy";
-import { TrackCard } from "../components/Track/TrackCard";
-import { ArtistCard } from "../components/Artist/ArtistCard";
+import { AppShell } from "../components/Layout/AppShell";
+import { ErrorState } from "../components/Layout/ErrorState";
+import { LoadingState } from "../components/Layout/LoadingState";
+import { Reveal } from "../components/Layout/Reveal";
+import { useAlbum, useAlbumTracks } from "../shared/api/queries";
+import { formatDuration } from "../utils/format";
 
 const AlbumPage = () => {
-  const [album, setAlbum] = useState<any>(null);
-  const [tracks, setTracks] = useState<any[]>([]);
-  const [artists, setArtists] = useState<any[]>([]);
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const albumQuery = useAlbum(id);
+  const tracksQuery = useAlbumTracks(id);
+  const tracks = tracksQuery.data?.items ?? [];
 
-  useEffect(() => {
-    const fetchAlbum = async () => {
-      const response = await getAlbumById(id);
-      setAlbum(response);
-      setArtists(response.artists);
-    };
-    fetchAlbum();
-  }, [id]);
+  const totalDuration = useMemo(
+    () => tracks.reduce((acc, track) => acc + (track.duration_ms ?? 0), 0),
+    [tracks]
+  );
 
-  useEffect(() => {
-    const fetchAlbumTracks = async () => {
-      const response = await getAlbumTracks(id);
-      setTracks(response.items);
-    };
-    fetchAlbumTracks();
-  }, [id]);
+  if (albumQuery.isLoading) {
+    return (
+      <AppShell>
+        <LoadingState label="Carregando álbum" />
+      </AppShell>
+    );
+  }
 
-  const handleTrackClick = (id: string) => {
-    navigate(`/tracks/${id}`);
-  };
+  if (albumQuery.isError || !albumQuery.data) {
+    return (
+      <AppShell>
+        <ErrorState error={albumQuery.error} onRetry={albumQuery.refetch} />
+      </AppShell>
+    );
+  }
 
-  const handleArtistClick = (id: string) => {
-    navigate(`/artists/${id}`);
-  };
-
-  
+  const album = albumQuery.data;
 
   return (
-    <div>
-      {album ? (
-        <div className="flex flex-col items-center">
-          <h1 className="text-3xl font-bold mb-4">{album.name}</h1>
-          <img
-            src={album.images[0]?.url}
-            alt={album.name}
-            className="rounded-full mb-4 w-64 h-64 object-cover"
-          />
-          <div className="flex flex-col items-center space-y-4">
-            <div className="flex items-center space-x-4 mb-4">
-              <p className="text-gray-500 font-medium">Artists:</p>
-              {artists.map((artist: any) => (
-                <p key={artist.id} onClick={() => handleArtistClick(artist.id)}>
+    <AppShell>
+      <Button variant="soft" color="gray" mb="4" onClick={() => navigate(-1)}>
+        <ArrowLeftIcon />
+        Voltar
+      </Button>
+
+      <Reveal>
+      <Card className="hero-panel" size="3">
+        <Grid columns={{ initial: "1", md: "280px 1fr" }} gap="5" align="center">
+          <Box className="media-tile" style={{ borderRadius: "var(--radius-5)" }}>
+            {album.images?.[0]?.url && (
+              <img src={album.images[0].url} alt={album.name} />
+            )}
+          </Box>
+
+          <Box>
+            <Text as="p" size="1" weight="bold" color="amber" className="section-eyebrow">
+              Álbum
+            </Text>
+            <Heading size={{ initial: "6", sm: "8" }} mt="2">
+              {album.name}
+            </Heading>
+            <Flex gap="2" wrap="wrap" mt="4">
+              {album.artists?.map((artist) => (
+                <Badge
+                  key={artist.id}
+                  color="amber"
+                  variant="soft"
+                  onClick={() => navigate(`/artists/${artist.id}`)}
+                  style={{ cursor: "pointer" }}
+                >
                   {artist.name}
-                </p>
+                </Badge>
               ))}
-            </div>
-            <div className="flex items-center space-x-4 mb-4">
-              <p className="text-gray-500 font-medium">Total Tracks:</p>
-              <p>{album.total_tracks}</p>
-            </div>
-            <div className="flex items-center space-x-4 mb-4">
-              <p className="text-gray-500 font-medium">Duration:</p>
-              <p>
-                {(
-                  tracks.reduce((acc, track) => acc + track.duration_ms, 0) /
-                  1000 /
-                  60
-                ).toFixed(2)}{" "}
-                min
-              </p>
-            </div>
-          </div>
-          <div className="mt-8">
-            <h2 className="text-2xl font-bold mb-4">Tracks</h2>
-            <ul className="space-y-4">
-              {tracks.map((track) => (
-                <li key={track.id}>
-                  <span
-                    className=" cursor-pointer
-                    font-bold
-                    text-white
-                    hover:text-green-400
-                    transition duration-200 ease-in-out
+            </Flex>
 
+            <Grid columns={{ initial: "2", sm: "3" }} gap="3" mt="5">
+              <Stat label="Faixas" value={album.total_tracks ?? tracks.length} />
+              <Stat label="Duração" value={formatDuration(totalDuration)} />
+              <Stat label="Lançamento" value={album.release_date ?? "-"} compact />
+            </Grid>
+          </Box>
+        </Grid>
+      </Card>
+      </Reveal>
 
-                    "
-                    onClick={() => handleTrackClick(track.id)}
-                  >
-                    {track.name}
-                  </span>
-                  <span className="text-gray-500">
-                    {" "}
-                    -{" "}
-                    {(track.duration_ms / 1000 / 60)
-                      .toFixed(2)
-                      .replace(".", ":")}{" "}
-                    min
-                  </span>
-
-                  <span className="font-bold">
-                    {" "}
-                    -{" "}
-                    {track.artists.map((artist: any) => (
-                      <span
-                        key={artist.id}
-                        onClick={() => handleArtistClick(artist.id)}
-                        className="cursor-pointer hover:text-green-400"
-                      >
-                        {artist.name}
-                      </span>
-                    ))}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      ) : (
-        <div className="flex items-center justify-center h-screen">
-          <div role="status">
-            <svg
-              aria-hidden="true"
-              className="inline w-8 h-8 mr-2 text-gray-200 animate-spin dark:text-gray-600 fill-green-500"
-              viewBox="0 0 100 101"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
+      <Box py="5">
+        <Text as="p" size="1" weight="bold" color="amber" className="section-eyebrow">
+          Tracklist
+        </Text>
+        <Heading size="6" mt="1" mb="4">
+          Faixas do álbum
+        </Heading>
+        <Card>
+          {tracks.map((track, index) => (
+            <button
+              key={track.id}
+              type="button"
+              onClick={() => navigate(`/tracks/${track.id}`)}
+              className="track-row"
             >
-              <path
-                d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z"
-                fill="currentColor"
-              />
-              <path
-                d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z"
-                fill="currentFill"
-              />
-            </svg>
-            <span className="sr-only">Loading...</span>
-          </div>
-        </div>
-      )}
-    </div>
+              <Text size="3" color="amber" className="track-index">
+                {index + 1}
+              </Text>
+              <Box>
+                <Text as="p" size="2" weight="bold">
+                  {track.name}
+                </Text>
+                <Text as="p" size="1" color="gray">
+                  {track.artists?.map((artist) => artist.name).join(", ")}
+                </Text>
+              </Box>
+              <Text size="2" color="gray" weight="medium">
+                {formatDuration(track.duration_ms)}
+              </Text>
+            </button>
+          ))}
+        </Card>
+      </Box>
+    </AppShell>
   );
 };
+
+const Stat = ({
+  label,
+  value,
+  compact,
+}: {
+  label: string;
+  value: string | number;
+  compact?: boolean;
+}) => (
+  <Card variant="surface">
+    <Text as="p" size="1" color="gray">
+      {label}
+    </Text>
+    <Text as="p" size={compact ? "2" : "5"} weight="bold" mt="1">
+      {value}
+    </Text>
+  </Card>
+);
 
 export default AlbumPage;
