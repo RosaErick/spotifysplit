@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "engines": {
+    "node": ">=20 <23"
+  },
   "scripts": {
     "start": "sucrase-node server/index.js",
     "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
