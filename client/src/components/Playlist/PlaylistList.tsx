@@ -44,7 +44,7 @@ export const PlaylistList = ({ playlists, onSelect }: PlaylistListProps) => (
           </Box>
 
           <Flex className="playlist-meta" align="center" justify="end" gap="2" wrap="wrap">
-            <Badge color="amber" variant="soft" radius="full">
+            <Badge variant="soft" radius="full">
               {formatNumber(totalTracks)} faixas
             </Badge>
             {playlist.public === false && (

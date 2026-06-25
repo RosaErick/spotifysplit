@@ -32,7 +32,7 @@ export const AlbumCard: React.FC<AlbumCardProps> = ({ album, onClick }) => {
         {artists}
       </Text>
       {album.release_date && (
-        <Badge color="amber" variant="soft" radius="full" mt="3">
+        <Badge variant="soft" radius="full" mt="3">
           {album.release_date}
         </Badge>
       )}

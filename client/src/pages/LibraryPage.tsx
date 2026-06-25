@@ -1,8 +1,8 @@
-import { ArrowLeftIcon } from "@radix-ui/react-icons";
-import { Button, Grid, Tabs } from "@radix-ui/themes";
+import { Grid, Tabs } from "@radix-ui/themes";
 import { useNavigate } from "react-router-dom";
 import { AlbumCard } from "../components/Album/AlbumCard";
 import { AppShell } from "../components/Layout/AppShell";
+import { BackButton } from "../components/Layout/BackButton";
 import { EmptyState } from "../components/Layout/EmptyState";
 import { ErrorState } from "../components/Layout/ErrorState";
 import { CardGridSkeleton } from "../components/Layout/Skeleton";
@@ -32,12 +32,12 @@ const LibraryPage = () => {
 
   return (
     <AppShell>
-      <Button variant="soft" color="gray" mb="4" onClick={() => navigate(-1)}>
-        <ArrowLeftIcon />
-        Voltar
-      </Button>
-
-      <Section title="Biblioteca salva" eyebrow="Sua coleção">
+      <Section
+        title="Biblioteca salva"
+        eyebrow="Sua coleção"
+        action={<BackButton />}
+        withSeparator={false}
+      >
         <Tabs.Root defaultValue="tracks">
           <Tabs.List mb="5">
             <Tabs.Trigger value="tracks">Músicas Curtidas</Tabs.Trigger>

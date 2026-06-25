@@ -23,7 +23,7 @@ export const MiniPlayer = () => {
       <Card className="mini-player" mb="5">
         <Flex align="center" justify="between" gap="3">
           <Box>
-            <Text as="p" size="1" color="amber" className="section-eyebrow">
+            <Text as="p" size="1" className="section-eyebrow">
               Player
             </Text>
             <Text as="p" size="2" color="gray">
@@ -44,7 +44,7 @@ export const MiniPlayer = () => {
       <Card className="mini-player" mb="5">
         <Flex align="center" justify="between" gap="3">
           <Box>
-            <Text as="p" size="1" color="amber" className="section-eyebrow">
+            <Text as="p" size="1" className="section-eyebrow">
               Player
             </Text>
             <Text as="p" size="2" color="gray">
@@ -74,7 +74,7 @@ export const MiniPlayer = () => {
             {imageUrl && <img src={imageUrl} alt={item.name} loading="lazy" />}
           </Box>
           <Box minWidth="0">
-            <Text as="p" size="1" color="amber" className="section-eyebrow">
+            <Text as="p" size="1" className="section-eyebrow">
               {playback?.is_playing ? "Tocando agora" : "Pausado"}
             </Text>
             <Text as="p" size="3" weight="bold" className="truncate-2">
@@ -93,7 +93,7 @@ export const MiniPlayer = () => {
             </Text>
           )}
           {spotifyUrl && (
-            <Button asChild size="1" variant="soft" color="amber">
+            <Button asChild size="1" variant="soft">
               <a href={spotifyUrl} target="_blank" rel="noreferrer">
                 <OpenInNewWindowIcon />
                 Abrir

@@ -1,7 +1,13 @@
-import { BackpackIcon, ExitIcon, MagnifyingGlassIcon } from "@radix-ui/react-icons";
-import { Box, Button, Container, Flex, Text } from "@radix-ui/themes";
+import {
+  BackpackIcon,
+  ExitIcon,
+  GitHubLogoIcon,
+  MagnifyingGlassIcon,
+} from "@radix-ui/react-icons";
+import { Box, Button, Container, Flex, IconButton, Text, Tooltip } from "@radix-ui/themes";
 import { Link, NavLink } from "react-router-dom";
 import React from "react";
+import { AccentPicker } from "./AccentPicker";
 import { EqualizerMark } from "./EqualizerMark";
 import { ThemeToggle } from "./ThemeToggle";
 import { MiniPlayer } from "../Player/MiniPlayer";
@@ -24,7 +30,7 @@ export const AppShell = ({ children, onLogout }: AppShellProps) => {
                 </Flex>
                 <Box display={{ initial: "none", xs: "block" }}>
                   <Text as="p" size="2" className="brand-title">
-                    Spotifysplit
+                    SpotfySplit
                   </Text>
                   <Text as="p" size="1" color="gray">
                     Seus stats do Spotify
@@ -54,9 +60,34 @@ export const AppShell = ({ children, onLogout }: AppShellProps) => {
                   <span>Biblioteca</span>
                 </NavLink>
               </Flex>
+              <Tooltip content="GitHub do projeto">
+                <IconButton
+                  asChild
+                  variant="ghost"
+                  color="gray"
+                  highContrast
+                  className="github-nav-action clickable-control"
+                >
+                  <a
+                    href="https://github.com/RosaErick/spotifysplit"
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label="GitHub do projeto"
+                  >
+                    <GitHubLogoIcon />
+                  </a>
+                </IconButton>
+              </Tooltip>
+              <AccentPicker />
               <ThemeToggle />
               {onLogout && (
-                <Button type="button" variant="soft" color="gray" onClick={onLogout}>
+                <Button
+                  type="button"
+                  variant="soft"
+                  color="gray"
+                  className="clickable-control"
+                  onClick={onLogout}
+                >
                   <ExitIcon />
                   <Box asChild display={{ initial: "none", xs: "inline" }}>
                     <span>Sair</span>

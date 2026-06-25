@@ -1,7 +1,8 @@
-import { ArrowLeftIcon, OpenInNewWindowIcon } from "@radix-ui/react-icons";
+import { OpenInNewWindowIcon } from "@radix-ui/react-icons";
 import { Badge, Box, Button, Card, Flex, Grid, Heading, Text } from "@radix-ui/themes";
 import { useNavigate, useParams } from "react-router-dom";
 import { AppShell } from "../components/Layout/AppShell";
+import { BackButton } from "../components/Layout/BackButton";
 import { EmptyState } from "../components/Layout/EmptyState";
 import { ErrorState } from "../components/Layout/ErrorState";
 import { LoadingState } from "../components/Layout/LoadingState";
@@ -38,11 +39,6 @@ const PlaylistPage = () => {
 
   return (
     <AppShell>
-      <Button variant="soft" color="gray" mb="4" onClick={() => navigate(-1)}>
-        <ArrowLeftIcon />
-        Voltar
-      </Button>
-
       <Reveal>
         <Card className="hero-panel" size="3">
           <Grid columns={{ initial: "1", md: "260px 1fr" }} gap="5" align="center">
@@ -53,12 +49,17 @@ const PlaylistPage = () => {
             </Box>
 
             <Box>
-              <Text as="p" size="1" weight="bold" color="amber" className="section-eyebrow">
-                Playlist
-              </Text>
-              <Heading size={{ initial: "6", sm: "8" }} mt="2">
-                {playlist.name}
-              </Heading>
+              <Flex align="start" justify="between" gap="3" wrap="wrap">
+                <Box minWidth="0" flexGrow="1">
+                  <Text as="p" size="1" weight="bold" className="section-eyebrow">
+                    Playlist
+                  </Text>
+                  <Heading size={{ initial: "6", sm: "8" }} mt="2">
+                    {playlist.name}
+                  </Heading>
+                </Box>
+                <BackButton />
+              </Flex>
               {playlist.description && (
                 <Text as="p" size="2" color="gray" mt="3" className="truncate-2">
                   {playlist.description}
@@ -66,7 +67,7 @@ const PlaylistPage = () => {
               )}
 
               <Flex gap="2" wrap="wrap" mt="4">
-                <Badge color="amber" variant="soft" radius="full">
+                <Badge variant="soft" radius="full">
                   {formatNumber(totalTracks)} faixas
                 </Badge>
                 <Badge color="gray" variant="soft" radius="full">
@@ -86,7 +87,7 @@ const PlaylistPage = () => {
 
               {playlist.external_urls?.spotify && (
                 <Flex mt="5">
-                  <Button asChild variant="soft" color="amber">
+                  <Button asChild variant="soft">
                     <a href={playlist.external_urls.spotify} target="_blank" rel="noreferrer">
                       <OpenInNewWindowIcon />
                       Abrir no Spotify

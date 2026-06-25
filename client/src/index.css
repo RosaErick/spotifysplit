@@ -38,8 +38,38 @@
   }
 
   ::selection {
-    background: var(--amber-a5);
+    background: var(--accent-a5);
   }
+}
+
+.radix-themes :is(
+  a[href],
+  button,
+  select,
+  summary,
+  label,
+  [role="button"],
+  .rt-Button,
+  .rt-IconButton,
+  .clickable-control
+) {
+  cursor: pointer !important;
+}
+
+.radix-themes :is(
+  button:disabled,
+  select:disabled,
+  [aria-disabled="true"],
+  [data-disabled],
+  .rt-Button:disabled,
+  .rt-IconButton:disabled
+) {
+  cursor: not-allowed !important;
+}
+
+.clickable-control,
+.clickable-control * {
+  cursor: pointer !important;
 }
 
 /* ---------- Tipografia editorial ---------- */
@@ -69,8 +99,8 @@
   position: relative;
   isolation: isolate;
   background:
-    radial-gradient(115% 75% at 100% -5%, var(--amber-a4), transparent 58%),
-    radial-gradient(95% 70% at -10% 105%, var(--amber-a3), transparent 55%),
+    radial-gradient(115% 75% at 100% -5%, var(--accent-a4), transparent 58%),
+    radial-gradient(95% 70% at -10% 105%, var(--accent-a3), transparent 55%),
     linear-gradient(177deg, var(--sand-1) 0%, var(--sand-2) 60%, var(--sand-1) 100%);
 }
 
@@ -122,10 +152,10 @@
   flex-shrink: 0;
   border-radius: 999px;
   background:
-    radial-gradient(circle at 32% 28%, var(--amber-7), var(--amber-9) 70%);
-  color: var(--amber-contrast);
+    radial-gradient(circle at 32% 28%, var(--accent-7), var(--accent-9) 70%);
+  color: var(--accent-contrast);
   box-shadow:
-    0 6px 20px var(--amber-a6),
+    0 6px 20px var(--accent-a6),
     inset 0 1px 1px color-mix(in srgb, #fff 40%, transparent);
   transition: transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -162,17 +192,26 @@ a:hover > .brand-mark {
 }
 
 .nav-action:hover {
-  color: var(--amber-12);
-  background: var(--amber-a3);
+  color: var(--accent-12);
+  background: var(--accent-a3);
   transform: translateY(-1px);
 }
 
 .nav-action-active {
-  color: var(--amber-12);
-  background: var(--amber-a4);
+  color: var(--accent-12);
+  background: var(--accent-a4);
   box-shadow:
-    inset 0 0 0 1px var(--amber-a5),
-    0 8px 20px -18px var(--amber-a9);
+    inset 0 0 0 1px var(--accent-a5),
+    0 8px 20px -18px var(--accent-a9);
+}
+
+.github-nav-action {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.github-nav-action:hover {
+  background: var(--gray-a3) !important;
 }
 
 @media (max-width: 640px) {
@@ -242,7 +281,7 @@ a:hover > .brand-mark {
   align-items: flex-end;
   gap: 3px;
   height: 1.55rem;
-  color: var(--amber-9);
+  color: var(--accent-9);
 }
 
 .loading-eq > span {
@@ -276,6 +315,60 @@ a:hover > .brand-mark {
   font-weight: 700;
 }
 
+/* ---------- Seletor de cor do tema ---------- */
+
+.accent-dot {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 999px;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, #000 18%, transparent),
+    0 1px 3px -1px rgba(0, 0, 0, 0.4);
+}
+
+.accent-option {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.4rem 0.5rem;
+  border: 0;
+  border-radius: var(--radius-2);
+  background: transparent;
+  color: var(--gray-12);
+  font: inherit;
+  font-size: var(--font-size-2);
+  cursor: pointer;
+  transition: background 160ms ease;
+}
+
+.accent-option:hover {
+  background: var(--gray-a3);
+}
+
+.accent-option-active {
+  background: var(--accent-a3);
+}
+
+.accent-option-label {
+  flex: 1;
+  text-align: left;
+}
+
+.accent-option-check {
+  color: var(--accent-11);
+}
+
+.accent-swatch {
+  width: 1.05rem;
+  height: 1.05rem;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, #000 18%, transparent),
+    0 1px 3px -1px rgba(0, 0, 0, 0.4);
+}
+
 .section-eyebrow {
   text-transform: uppercase;
   letter-spacing: 0.22em;
@@ -291,7 +384,7 @@ a:hover > .brand-mark {
 }
 
 .section-title-link:hover {
-  color: var(--amber-11);
+  color: var(--accent-11);
   text-decoration: underline;
 }
 
@@ -299,28 +392,36 @@ a:hover > .brand-mark {
 
 .hero-panel {
   position: relative;
+  isolation: isolate;
   overflow: hidden;
   border: 1px solid var(--sand-a5);
   background:
-    linear-gradient(150deg, var(--amber-a2), transparent 42%),
+    linear-gradient(150deg, var(--accent-a1), transparent 36%),
     color-mix(in srgb, var(--color-panel-solid) 86%, transparent);
   box-shadow:
-    0 1px 0 color-mix(in srgb, #fff 30%, transparent) inset,
-    0 28px 70px -32px var(--sand-a8);
-  backdrop-filter: blur(16px);
+    0 1px 0 color-mix(in srgb, #fff 18%, transparent) inset,
+    0 20px 54px -36px var(--sand-a8);
+  backdrop-filter: blur(12px);
+}
+
+.hero-panel > * {
+  position: relative;
+  z-index: 1;
 }
 
 .hero-panel::after {
   content: "";
   position: absolute;
-  top: -40%;
-  right: -10%;
-  width: 22rem;
-  height: 22rem;
+  z-index: 0;
+  top: -16%;
+  right: -4%;
+  width: clamp(8rem, 16vw, 13rem);
+  height: clamp(8rem, 16vw, 13rem);
   border-radius: 999px;
-  background: radial-gradient(circle, var(--amber-a4), transparent 65%);
+  background: radial-gradient(circle, var(--accent-a3), transparent 72%);
   pointer-events: none;
-  filter: blur(8px);
+  opacity: 0.36;
+  filter: blur(18px);
 }
 
 .feature-icon {
@@ -328,18 +429,18 @@ a:hover > .brand-mark {
   height: 2.4rem;
   flex: 0 0 auto;
   border-radius: 999px;
-  color: var(--amber-11);
-  background: var(--amber-a3);
-  box-shadow: inset 0 0 0 1px var(--amber-a5);
+  color: var(--accent-11);
+  background: var(--accent-a3);
+  box-shadow: inset 0 0 0 1px var(--accent-a5);
 }
 
 /* ---------- Card de perfil unificado ---------- */
 
 .profile-card {
-  padding: clamp(var(--space-3), 1.8vw, var(--space-4));
+  padding: clamp(var(--space-3), 1.4vw, var(--space-4));
   box-shadow:
-    0 1px 0 color-mix(in srgb, #fff 16%, transparent) inset,
-    0 18px 46px -34px var(--sand-a9);
+    0 1px 0 color-mix(in srgb, #fff 12%, transparent) inset,
+    0 14px 38px -34px var(--sand-a9);
 }
 
 .profile-eyebrow {
@@ -349,15 +450,15 @@ a:hover > .brand-mark {
 }
 
 .profile-card::after {
-  top: clamp(3.75rem, 7vw, 5.5rem);
+  top: clamp(3rem, 5vw, 4.6rem);
   right: auto;
-  left: clamp(3.75rem, 6vw, 5.25rem);
-  width: clamp(6.5rem, 14vw, 10rem);
-  height: clamp(6.5rem, 14vw, 10rem);
+  left: clamp(3rem, 5vw, 4.4rem);
+  width: clamp(5.2rem, 10vw, 7.5rem);
+  height: clamp(5.2rem, 10vw, 7.5rem);
   transform: translate(-50%, -50%);
-  background: radial-gradient(circle, var(--amber-a3), transparent 70%);
-  opacity: 0.58;
-  filter: blur(14px);
+  background: radial-gradient(circle, var(--accent-a3), transparent 70%);
+  opacity: 0.34;
+  filter: blur(16px);
 }
 
 .profile-layout {
@@ -377,11 +478,11 @@ a:hover > .brand-mark {
 .avatar-ring {
   position: relative;
   display: inline-flex;
-  padding: 3px;
+  padding: 2px;
   flex: 0 0 auto;
   border-radius: 999px;
-  background: linear-gradient(150deg, var(--amber-a6), var(--amber-a3));
-  box-shadow: 0 10px 24px -18px var(--amber-a8);
+  background: linear-gradient(150deg, var(--accent-a6), var(--accent-a3));
+  box-shadow: 0 8px 20px -18px var(--accent-a8);
 }
 
 .avatar-ring .rt-AvatarRoot {
@@ -391,20 +492,32 @@ a:hover > .brand-mark {
     0 10px 26px -20px var(--sand-a11);
 }
 
+.avatar-ring .skeleton {
+  width: 64px !important;
+  height: 64px !important;
+}
+
+@media (min-width: 640px) {
+  .avatar-ring .skeleton {
+    width: 80px !important;
+    height: 80px !important;
+  }
+}
+
 .stat-strip {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  flex: 1 1 0;
-  align-self: stretch;
+  flex: 0 1 20rem;
+  align-self: center;
   min-width: 0;
-  max-width: 30rem;
+  max-width: 21rem;
   overflow: hidden;
   border: 1px solid var(--sand-a5);
-  border-radius: var(--radius-4);
+  border-radius: var(--radius-3);
   background:
-    linear-gradient(180deg, var(--amber-a2), transparent),
-    color-mix(in srgb, var(--color-panel-solid) 74%, transparent);
-  box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 30%, transparent);
+    linear-gradient(180deg, var(--accent-a1), transparent),
+    color-mix(in srgb, var(--color-panel-solid) 80%, transparent);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 18%, transparent);
 }
 
 .stat-cell {
@@ -413,7 +526,7 @@ a:hover > .brand-mark {
   flex-direction: column;
   justify-content: center;
   min-width: 0;
-  padding: clamp(var(--space-3), 1.8vw, var(--space-4));
+  padding: clamp(var(--space-2), 1.2vw, var(--space-3));
 }
 
 .stat-cell + .stat-cell {
@@ -435,12 +548,12 @@ a:hover > .brand-mark {
   }
 
   .profile-card::after {
-    top: 4rem;
-    left: 4rem;
-    width: 7rem;
-    height: 7rem;
-    opacity: 0.48;
-    filter: blur(12px);
+    top: 3.4rem;
+    left: 3.4rem;
+    width: 5.8rem;
+    height: 5.8rem;
+    opacity: 0.28;
+    filter: blur(14px);
   }
 
   .profile-identity {
@@ -453,11 +566,11 @@ a:hover > .brand-mark {
   }
 
   .stat-cell {
-    padding: var(--space-3);
+    padding: var(--space-2);
   }
 
   .stat-cell .stat-value {
-    font-size: clamp(0.95rem, 4.5vw, 1.2rem);
+    font-size: clamp(0.8rem, 3.6vw, 1rem);
   }
 }
 
@@ -496,8 +609,8 @@ a:hover > .brand-mark {
 
 .interactive-card:hover {
   transform: translateY(-4px);
-  border-color: var(--amber-a7);
-  box-shadow: 0 22px 40px -22px var(--amber-a8);
+  border-color: var(--accent-a7);
+  box-shadow: 0 22px 40px -22px var(--accent-a8);
 }
 
 .interactive-card:hover .media-tile img {
@@ -550,14 +663,14 @@ a:hover > .brand-mark {
 
 .ranking-row:hover,
 .playlist-row:hover {
-  background: var(--amber-a3);
+  background: var(--accent-a3);
   transform: translateX(3px);
 }
 
 .ranking-index {
   font-family: "Fraunces", serif;
   font-variation-settings: "opsz" 90, "WONK" 1;
-  color: var(--amber-11);
+  color: var(--accent-11);
 }
 
 .ranking-copy {
@@ -639,7 +752,7 @@ a:hover > .brand-mark {
 .mini-player {
   border: 1px solid var(--sand-a5);
   background:
-    linear-gradient(120deg, var(--amber-a2), transparent 55%),
+    linear-gradient(120deg, var(--accent-a2), transparent 55%),
     color-mix(in srgb, var(--color-panel-solid) 88%, transparent);
 }
 
@@ -653,7 +766,7 @@ a:hover > .brand-mark {
 .filter-panel {
   border: 1px solid var(--sand-a5);
   background:
-    linear-gradient(150deg, var(--amber-a2), transparent 52%),
+    linear-gradient(150deg, var(--accent-a2), transparent 52%),
     color-mix(in srgb, var(--color-panel-solid) 88%, transparent);
 }
 
@@ -698,7 +811,7 @@ a:hover > .brand-mark {
 /* Carrossel horizontal com afterglow nas bordas. */
 .scroll-row {
   scrollbar-width: thin;
-  scrollbar-color: var(--amber-a7) transparent;
+  scrollbar-color: var(--accent-a7) transparent;
   -webkit-mask-image: linear-gradient(
     90deg,
     transparent,
@@ -748,7 +861,7 @@ a:hover > .brand-mark {
 }
 
 .track-row:hover {
-  background: var(--amber-a3);
+  background: var(--accent-a3);
   padding-left: var(--space-4);
 }
 
@@ -795,7 +908,7 @@ a:hover > .brand-mark {
 /* ---------- Acessibilidade e foco ---------- */
 
 :where(a, button, [role="button"], [tabindex]):focus-visible {
-  outline: 2px solid var(--amber-8);
+  outline: 2px solid var(--accent-8);
   outline-offset: 3px;
   border-radius: var(--radius-2);
 }

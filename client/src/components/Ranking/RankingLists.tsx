@@ -2,7 +2,7 @@ import { OpenInNewWindowIcon } from "@radix-ui/react-icons";
 import { Badge, Box, Card, Flex, IconButton, Text, Tooltip } from "@radix-ui/themes";
 import { KeyboardEvent } from "react";
 import { SpotifyArtist, SpotifyTrack } from "../../shared/types/spotify";
-import { formatDuration, formatNumber } from "../../utils/format";
+import { formatDuration, formatGenresLabel, formatNumber } from "../../utils/format";
 
 type ArtistRankingListProps = {
   artists: SpotifyArtist[];
@@ -17,7 +17,7 @@ type TrackRankingListProps = {
 };
 
 const artistGenresLabel = (artist: SpotifyArtist) =>
-  artist.genres?.slice(0, 2).join(", ") || "Sem gênero informado";
+  formatGenresLabel(artist.genres);
 
 const handleSelectableKeyDown = <T,>(
   event: KeyboardEvent<HTMLDivElement>,
@@ -79,7 +79,7 @@ export const ArtistRankingList = ({
             align="end"
             gap="1"
           >
-            <Badge color="amber" variant="soft" radius="full">
+            <Badge variant="soft" radius="full">
               {artist.popularity ?? "-"} pop.
             </Badge>
             {artist.followers?.total !== undefined && (
@@ -134,7 +134,7 @@ export const TrackRankingList = ({
             </Box>
 
             <Flex className="ranking-meta" direction="column" align="end" gap="1">
-              <Badge className="ranking-secondary" color="amber" variant="soft" radius="full">
+              <Badge className="ranking-secondary" variant="soft" radius="full">
                 {track.popularity ?? "-"} pop.
               </Badge>
               <Flex className="ranking-meta-row" align="center" justify="end" gap="2">

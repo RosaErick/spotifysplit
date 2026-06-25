@@ -1,7 +1,8 @@
-import { ArrowLeftIcon, OpenInNewWindowIcon } from "@radix-ui/react-icons";
+import { OpenInNewWindowIcon } from "@radix-ui/react-icons";
 import { Badge, Box, Button, Card, Flex, Grid, Heading, Link as RadixLink, Text } from "@radix-ui/themes";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { AppShell } from "../components/Layout/AppShell";
+import { BackButton } from "../components/Layout/BackButton";
 import { EmptyState } from "../components/Layout/EmptyState";
 import { ErrorState } from "../components/Layout/ErrorState";
 import { LoadingState } from "../components/Layout/LoadingState";
@@ -42,11 +43,6 @@ const TrackPage = () => {
 
   return (
     <AppShell>
-      <Button variant="soft" color="gray" mb="4" onClick={() => navigate(-1)}>
-        <ArrowLeftIcon />
-        Voltar
-      </Button>
-
       <Reveal>
       <Card className="hero-panel" size="3">
         <Grid columns={{ initial: "1", md: "280px 1fr" }} gap="5" align="center">
@@ -57,12 +53,17 @@ const TrackPage = () => {
           </Box>
 
           <Box>
-            <Text as="p" size="1" weight="bold" color="amber" className="section-eyebrow">
-              Faixa
-            </Text>
-            <Heading size={{ initial: "6", sm: "8" }} mt="2">
-              {track.name}
-            </Heading>
+            <Flex align="start" justify="between" gap="3" wrap="wrap">
+              <Box minWidth="0" flexGrow="1">
+                <Text as="p" size="1" weight="bold" className="section-eyebrow">
+                  Faixa
+                </Text>
+                <Heading size={{ initial: "6", sm: "8" }} mt="2">
+                  {track.name}
+                </Heading>
+              </Box>
+              <BackButton />
+            </Flex>
             {track.album?.id && (
               <RadixLink asChild>
                 <Link to={`/albums/${track.album.id}`}>
@@ -77,7 +78,7 @@ const TrackPage = () => {
               {track.artists?.map((artist) => (
                 <RadixLink asChild key={artist.id}>
                   <Link to={`/artists/${artist.id}`}>
-                    <Badge color="amber" variant="soft">
+                    <Badge variant="soft">
                       {artist.name}
                     </Badge>
                   </Link>
@@ -87,7 +88,7 @@ const TrackPage = () => {
 
             {track.external_urls?.spotify && (
               <Flex mt="4">
-                <Button asChild variant="soft" color="amber">
+                <Button asChild variant="soft">
                   <a href={track.external_urls.spotify} target="_blank" rel="noreferrer">
                     <OpenInNewWindowIcon />
                     Ouvir no Spotify
