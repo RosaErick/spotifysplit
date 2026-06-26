@@ -4,4 +4,4 @@
 export { ShareButton } from "./ShareButton";
 export { ShareCardDialog } from "./ShareCardDialog";
 export { ShareCardPoster } from "./ShareCardPoster";
-export type { ShareCardPosterProps, PosterArtist } from "./ShareCardPoster";
+export type { ShareCardPosterProps, PosterItem } from "./ShareCardPoster";

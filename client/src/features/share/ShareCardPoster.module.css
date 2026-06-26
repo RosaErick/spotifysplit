@@ -267,22 +267,46 @@
   font-size: 52px;
 }
 
-.artistName {
+.rowText {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-width: 0;
+  gap: 4px;
+}
+
+.itemName {
   font-family: "Hanken Grotesk", sans-serif;
   font-weight: 700;
   color: var(--p-name);
-  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.story .artistName {
+.itemSubtitle {
+  font-family: "Hanken Grotesk", sans-serif;
+  font-weight: 500;
+  color: color-mix(in srgb, var(--p-text) 58%, transparent);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.story .itemName {
   font-size: 44px;
 }
 
-.post .artistName {
+.post .itemName {
   font-size: 54px;
+}
+
+.story .itemSubtitle {
+  font-size: 26px;
+}
+
+.post .itemSubtitle {
+  font-size: 30px;
 }
 
 .divider {
@@ -327,39 +351,68 @@
 }
 
 /*
- * EqualizerMark (componente reusado) usa altura em rem (pequena na escala do
- * poster, 1080px). Aqui ela e reservada num box fixo e ampliada via transform,
- * mantendo o componente original como fonte da marca.
+ * Equalizador ESTATICO (sem animacao/transform) para nao cortar no PNG. Alturas
+ * fixas por barra dao o mesmo "look" da marca animada do app.
  */
-.eqWrap {
-  position: relative;
+.eqMark {
+  display: inline-flex;
+  align-items: flex-end;
   flex: none;
   color: var(--p-accent);
 }
 
-.story .eqWrap {
-  width: 58px;
+.eqMark > span {
+  display: block;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.story .eqMark {
+  gap: 7px;
   height: 46px;
 }
 
-.post .eqWrap {
-  width: 50px;
+.story .eqMark > span {
+  width: 9px;
+}
+
+.post .eqMark {
+  gap: 6px;
   height: 40px;
 }
 
-.eqScale {
-  position: absolute;
-  left: 0;
-  bottom: 2px;
-  transform-origin: left bottom;
+.post .eqMark > span {
+  width: 8px;
 }
 
-.story .eqScale {
-  transform: scale(3);
+.eqMark > span:nth-child(1) {
+  height: 46%;
 }
 
-.post .eqScale {
-  transform: scale(2.6);
+.eqMark > span:nth-child(2) {
+  height: 100%;
+}
+
+.eqMark > span:nth-child(3) {
+  height: 68%;
+}
+
+.eqMark > span:nth-child(4) {
+  height: 86%;
+}
+
+.url {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  letter-spacing: 0.04em;
+  color: color-mix(in srgb, var(--p-text) 48%, transparent);
+}
+
+.story .url {
+  font-size: 24px;
+}
+
+.post .url {
+  font-size: 20px;
 }
 
 .tagline {
