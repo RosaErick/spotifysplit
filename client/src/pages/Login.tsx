@@ -1,5 +1,5 @@
-import { Box, Card, Container, Flex, Grid, Heading, Separator, Text } from "@radix-ui/themes";
-import { Navigate } from "react-router-dom";
+import { Box, Card, Container, Flex, Grid, Heading, Link as RadixLink, Separator, Text } from "@radix-ui/themes";
+import { Link, Navigate } from "react-router-dom";
 import { AccentPicker } from "../components/Layout/AccentPicker";
 import { useAppTheme } from "../components/Layout/AppThemeProvider";
 import { EqualizerMark } from "../components/Layout/EqualizerMark";
@@ -66,12 +66,19 @@ export const Login = () => {
               </Text>
             </Reveal>
             <Reveal delay={0.24}>
-              <Flex mt="6" align="center" gap="4">
+              <Flex mt="6" align="center" gap="4" wrap="wrap">
                 <LoginButton />
                 <Text size="1" color="gray" className="serif-accent">
                   leva poucos segundos
                 </Text>
               </Flex>
+            </Reveal>
+            <Reveal delay={0.3}>
+              <Text as="p" size="2" color="gray" mt="4">
+                <RadixLink asChild color="gray" highContrast>
+                  <Link to="/sobre">Sobre o projeto e a sua privacidade →</Link>
+                </RadixLink>
+              </Text>
             </Reveal>
           </Box>
 

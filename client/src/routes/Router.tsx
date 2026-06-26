@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { RequireAuth } from "../features/auth/RequireAuth";
 import { Home, Login } from "../pages";
+import AboutPage from "../pages/AboutPage";
 import AlbumPage from "../pages/AlbumPage";
 import ArtistPage from "../pages/ArtistsPage";
 import LibraryPage from "../pages/LibraryPage";
@@ -16,6 +17,7 @@ function Router() {
     <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/sobre" element={<AboutPage />} />
         <Route
           path="/"
           element={

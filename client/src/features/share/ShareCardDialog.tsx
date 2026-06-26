@@ -3,7 +3,8 @@
 // download / compartilhamento. Componente autossuficiente (sem props):
 // usa os hooks de dados internamente. O outro dev monta <ShareButton /> no
 // card de perfil (ShareButton apenas reexporta este componente).
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { HexColorInput, HexColorPicker } from "react-colorful";
 import {
   Box,
   Button,
@@ -19,7 +20,11 @@ import {
   ExclamationTriangleIcon,
   Share2Icon,
 } from "@radix-ui/react-icons";
-import { useProfileOverview, useTopArtists } from "../../shared/api/queries";
+import {
+  useProfileOverview,
+  useTopArtists,
+  useTopTracks,
+} from "../../shared/api/queries";
 import { SpotifyTopTimeRange } from "../../shared/types/spotify";
 import {
   defaultShareFormat,
@@ -33,76 +38,114 @@ import {
   sharePeriodOptions,
 } from "./periods";
 import { pickImageUrl, useImageDataUrls } from "./images";
-import { ShareCardPoster, PosterArtist } from "./ShareCardPoster";
-import {
-  defaultShareAccent,
-  ShareAccent,
-  shareAccentThemes,
-} from "./posterThemes";
+import { ShareCardPoster, PosterItem } from "./ShareCardPoster";
+import { defaultPosterColor, posterColorPresets } from "./posterThemes";
 import { canShareFiles, useShareCardImage } from "./useShareCardImage";
 
 // Sempre buscamos os 10 primeiros; o formato apenas fatia (evita refetch ao
 // trocar Story/Post).
-const MAX_ARTISTS = 10;
+const MAX_ITEMS = 10;
 const PREVIEW_HEIGHT = 440;
+
+type ShareContent = "artists" | "tracks";
+
+const shareContentOptions: { value: ShareContent; label: string }[] = [
+  { value: "artists", label: "Artistas" },
+  { value: "tracks", label: "Faixas" },
+];
+
+const POSTER_COLOR_KEY = "spotifysplit_poster_color";
+
+const getInitialPosterColor = (): string => {
+  if (typeof window === "undefined") return defaultPosterColor;
+  const stored = window.localStorage.getItem(POSTER_COLOR_KEY);
+  return stored && /^#[0-9a-fA-F]{6}$/.test(stored) ? stored : defaultPosterColor;
+};
 
 export const ShareCardDialog = () => {
   const [open, setOpen] = useState(false);
   const [timeRange, setTimeRange] =
     useState<SpotifyTopTimeRange>(defaultSharePeriod);
   const [format, setFormat] = useState<ShareFormat>(defaultShareFormat);
+  const [accentColor, setAccentColor] = useState<string>(getInitialPosterColor);
+  const [content, setContent] = useState<ShareContent>("artists");
 
   const posterRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    window.localStorage.setItem(POSTER_COLOR_KEY, accentColor);
+  }, [accentColor]);
+
   const overview = useProfileOverview();
-  const topArtists = useTopArtists(timeRange, MAX_ARTISTS);
+  const topArtists = useTopArtists(timeRange, MAX_ITEMS);
+  const topTracks = useTopTracks(timeRange, MAX_ITEMS);
   const { status, error, download, share, reset } = useShareCardImage();
 
   const formatConfig = shareFormats[format];
   const periodOption = getSharePeriodOption(timeRange);
+  const activeQuery = content === "artists" ? topArtists : topTracks;
 
   const profile = overview.data?.profile;
   const displayName = profile?.display_name ?? "Você";
   const avatarUrl = pickImageUrl(profile?.images);
 
-  const artists = useMemo(
-    () => topArtists.data?.items ?? [],
-    [topArtists.data]
-  );
+  const contentLabel = content === "artists" ? "Top artistas" : "Top faixas";
+  const contentNoun = content === "artists" ? "artistas" : "faixas";
+  const tagline =
+    content === "artists"
+      ? "Seus top artistas · dados via Spotify"
+      : "Suas top faixas · dados via Spotify";
 
-  // URLs (avatar + artistas) que precisam virar data URL antes da captura.
+  // Lista unificada (artistas ou faixas) com a url de imagem ainda crua.
+  const sourceItems = useMemo(() => {
+    if (content === "artists") {
+      return (topArtists.data?.items ?? [])
+        .slice(0, MAX_ITEMS)
+        .map((artist) => ({
+          id: artist.id,
+          name: artist.name,
+          subtitle: undefined as string | undefined,
+          imageUrl: pickImageUrl(artist.images),
+        }));
+    }
+    return (topTracks.data?.items ?? []).slice(0, MAX_ITEMS).map((track) => ({
+      id: track.id,
+      name: track.name,
+      subtitle: track.artists?.map((artist) => artist.name).join(", "),
+      imageUrl: pickImageUrl(track.album?.images),
+    }));
+  }, [content, topArtists.data, topTracks.data]);
+
+  // URLs (avatar + itens) que precisam virar data URL antes da captura.
   const imageUrls = useMemo(() => {
     const urls: string[] = [];
     if (avatarUrl) urls.push(avatarUrl);
-    for (const artist of artists.slice(0, MAX_ARTISTS)) {
-      const url = pickImageUrl(artist.images);
-      if (url) urls.push(url);
+    for (const item of sourceItems) {
+      if (item.imageUrl) urls.push(item.imageUrl);
     }
     return urls;
-  }, [avatarUrl, artists]);
+  }, [avatarUrl, sourceItems]);
 
   const { dataUrls, isLoading: imagesLoading } = useImageDataUrls(
     open ? imageUrls : []
   );
 
-  const posterArtists: PosterArtist[] = useMemo(
+  const posterItems: PosterItem[] = useMemo(
     () =>
-      artists.slice(0, MAX_ARTISTS).map((artist) => {
-        const url = pickImageUrl(artist.images);
-        return {
-          id: artist.id,
-          name: artist.name,
-          imageDataUrl: url ? dataUrls[url] : undefined,
-        };
-      }),
-    [artists, dataUrls]
+      sourceItems.map((item) => ({
+        id: item.id,
+        name: item.name,
+        subtitle: item.subtitle,
+        imageDataUrl: item.imageUrl ? dataUrls[item.imageUrl] : undefined,
+      })),
+    [sourceItems, dataUrls]
   );
 
   const avatarDataUrl = avatarUrl ? dataUrls[avatarUrl] : undefined;
 
-  const isLoadingData = overview.isLoading || topArtists.isLoading;
-  const isError = overview.isError || topArtists.isError;
-  const isEmpty = !isLoadingData && !isError && artists.length === 0;
+  const isLoadingData = overview.isLoading || activeQuery.isLoading;
+  const isError = overview.isError || activeQuery.isError;
+  const isEmpty = !isLoadingData && !isError && sourceItems.length === 0;
   const isWorking = status === "working";
   const assetsReady =
     !isLoadingData && !isError && !isEmpty && !imagesLoading;
@@ -111,8 +154,8 @@ export const ShareCardDialog = () => {
   const scale = PREVIEW_HEIGHT / formatConfig.height;
   const previewWidth = Math.round(formatConfig.width * scale);
 
-  const fileName = `spotifysplit-top-artists-${timeRange}.png`;
-  const shareText = `Meus top artistas no Spotify (${periodOption.label}) · via SpotfySplit`;
+  const fileName = `spotifysplit-top-${content}-${timeRange}.png`;
+  const shareText = `Meus top ${contentNoun} no Spotify (${periodOption.label}) · via SpotfySplit`;
 
   const handleDownload = () => download(posterRef.current, fileName);
   const handleShare = () =>
@@ -130,17 +173,35 @@ export const ShareCardDialog = () => {
       <Dialog.Trigger>
         <Button variant="soft">
           <Share2Icon />
-          Gerar imagem
+          Compartilhar stats em imagem
         </Button>
       </Dialog.Trigger>
 
       <Dialog.Content maxWidth="560px">
-        <Dialog.Title>Compartilhar top artistas</Dialog.Title>
+        <Dialog.Title>Compartilhar {contentLabel.toLowerCase()}</Dialog.Title>
         <Dialog.Description size="2" color="gray" mb="4">
-          Gere uma imagem com os seus artistas mais ouvidos para compartilhar.
+          Gere uma imagem com os seus {contentNoun} mais{" "}
+          {content === "artists" ? "ouvidos" : "ouvidas"} para compartilhar.
         </Dialog.Description>
 
         <Flex direction="column" gap="4">
+          <Box>
+            <Text as="p" size="1" weight="bold" mb="1" color="gray">
+              Conteúdo
+            </Text>
+            <SegmentedControl.Root
+              size="2"
+              value={content}
+              onValueChange={(value) => setContent(value as ShareContent)}
+            >
+              {shareContentOptions.map((option) => (
+                <SegmentedControl.Item key={option.value} value={option.value}>
+                  {option.label}
+                </SegmentedControl.Item>
+              ))}
+            </SegmentedControl.Root>
+          </Box>
+
           <Box>
             <Text as="p" size="1" weight="bold" mb="1" color="gray">
               Período
@@ -177,6 +238,52 @@ export const ShareCardDialog = () => {
             </SegmentedControl.Root>
           </Box>
 
+          <Box>
+            <Text as="p" size="1" weight="bold" mb="2" color="gray">
+              Cor
+            </Text>
+            <Flex direction="column" gap="3" className="poster-color-field">
+              <div className="poster-colorpicker">
+                <HexColorPicker color={accentColor} onChange={setAccentColor} />
+              </div>
+
+              <Flex align="center" justify="between" gap="3" wrap="wrap">
+                <Flex gap="2" align="center" wrap="wrap">
+                  {posterColorPresets.map((preset) => {
+                    const isActive =
+                      preset.value.toLowerCase() === accentColor.toLowerCase();
+                    return (
+                      <button
+                        key={preset.value}
+                        type="button"
+                        className={`poster-color-preset${
+                          isActive ? " poster-color-preset-active" : ""
+                        }`}
+                        style={{ background: preset.value }}
+                        aria-label={preset.label}
+                        aria-pressed={isActive}
+                        onClick={() => setAccentColor(preset.value)}
+                      />
+                    );
+                  })}
+                </Flex>
+
+                <Flex align="center" gap="2" className="poster-hex-field">
+                  <Text size="1" color="gray">
+                    Hex
+                  </Text>
+                  <HexColorInput
+                    color={accentColor}
+                    onChange={setAccentColor}
+                    prefixed
+                    className="poster-hex-input"
+                    aria-label="Código hexadecimal da cor"
+                  />
+                </Flex>
+              </Flex>
+            </Flex>
+          </Box>
+
           {/* Preview ao vivo */}
           <Flex
             justify="center"
@@ -194,18 +301,23 @@ export const ShareCardDialog = () => {
                   <ExclamationTriangleIcon />
                 </Callout.Icon>
                 <Callout.Text>
-                  Não foi possível carregar os seus artistas. Tente novamente.
+                  Não foi possível carregar{" "}
+                  {content === "artists" ? "os seus artistas" : "as suas faixas"}.
+                  Tente novamente.
                 </Callout.Text>
               </Callout.Root>
             ) : isEmpty ? (
               <Text size="2" color="gray">
-                Nenhum artista encontrado nesse período.
+                {content === "artists"
+                  ? "Nenhum artista encontrado"
+                  : "Nenhuma faixa encontrada"}{" "}
+                nesse período.
               </Text>
             ) : isLoadingData ? (
               <Flex direction="column" align="center" gap="2">
                 <Spinner size="3" />
                 <Text size="2" color="gray">
-                  Carregando artistas…
+                  Carregando {contentNoun}…
                 </Text>
               </Flex>
             ) : (
@@ -232,10 +344,12 @@ export const ShareCardDialog = () => {
                     ref={posterRef}
                     displayName={displayName}
                     avatarDataUrl={avatarDataUrl}
-                    artists={posterArtists}
+                    title={contentLabel}
+                    items={posterItems}
                     periodLabel={periodOption.posterLabel}
+                    tagline={tagline}
                     format={formatConfig}
-                    accent={defaultShareAccent}
+                    accentColor={accentColor}
                   />
                 </Box>
 

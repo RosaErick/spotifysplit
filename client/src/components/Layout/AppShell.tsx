@@ -2,6 +2,7 @@ import {
   BackpackIcon,
   ExitIcon,
   GitHubLogoIcon,
+  InfoCircledIcon,
   MagnifyingGlassIcon,
 } from "@radix-ui/react-icons";
 import { Box, Button, Container, Flex, IconButton, Text, Tooltip } from "@radix-ui/themes";
@@ -67,6 +68,15 @@ export const AppShell = ({ children, onLogout }: AppShellProps) => {
               >
                 <BackpackIcon />
                 <span>Biblioteca</span>
+              </NavLink>
+              <NavLink
+                to="/sobre"
+                className={({ isActive }) =>
+                  `nav-action ${isActive ? "nav-action-active" : ""}`
+                }
+              >
+                <InfoCircledIcon />
+                <span>Sobre</span>
               </NavLink>
             </Flex>
 
