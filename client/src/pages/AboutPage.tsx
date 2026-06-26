@@ -94,8 +94,7 @@ export const AboutPage = () => {
             >
               O SpotfySplit reúne os seus stats do Spotify num painel próprio. Por
               trás disso, é um exercício de desenvolvimento com a Web API do
-              Spotify e o fluxo OAuth 2.0 — sem fins comerciais, com transparência
-              sobre os seus dados.
+              Spotify e o fluxo OAuth 2.0.
             </Text>
           </Reveal>
 
