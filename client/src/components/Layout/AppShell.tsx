@@ -1,15 +1,15 @@
 import {
   BackpackIcon,
   ExitIcon,
-  GitHubLogoIcon,
   InfoCircledIcon,
   MagnifyingGlassIcon,
 } from "@radix-ui/react-icons";
-import { Box, Button, Container, Flex, IconButton, Text, Tooltip } from "@radix-ui/themes";
+import { Box, Button, Container, Flex, Text } from "@radix-ui/themes";
 import { Link, NavLink } from "react-router-dom";
 import React, { useState } from "react";
 import { AccentPicker } from "./AccentPicker";
 import { EqualizerMark } from "./EqualizerMark";
+import { GitHubNavButton } from "./GitHubNavButton";
 import { ThemeToggle } from "./ThemeToggle";
 import { useAuth } from "../../features/auth/useAuth";
 import { PlayerDock, PlayerNavControl, useNowPlaying } from "../Player/MiniPlayer";
@@ -90,24 +90,7 @@ export const AppShell = ({ children, onLogout }: AppShellProps) => {
                   />
                 </Box>
               )}
-              <Tooltip content="GitHub do projeto">
-                <IconButton
-                  asChild
-                  variant="ghost"
-                  color="gray"
-                  highContrast
-                  className="github-nav-action utility-icon-action clickable-control"
-                >
-                  <a
-                    href="https://github.com/RosaErick/spotifysplit"
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label="GitHub do projeto"
-                  >
-                    <GitHubLogoIcon />
-                  </a>
-                </IconButton>
-              </Tooltip>
+              <GitHubNavButton />
               <AccentPicker />
               <ThemeToggle />
               <Button

@@ -3,6 +3,7 @@ import { Link, Navigate } from "react-router-dom";
 import { AccentPicker } from "../components/Layout/AccentPicker";
 import { useAppTheme } from "../components/Layout/AppThemeProvider";
 import { EqualizerMark } from "../components/Layout/EqualizerMark";
+import { GitHubNavButton } from "../components/Layout/GitHubNavButton";
 import { Reveal } from "../components/Layout/Reveal";
 import { ThemeToggle } from "../components/Layout/ThemeToggle";
 import { LoginButton } from "../features/auth/LoginButton";
@@ -32,6 +33,7 @@ export const Login = () => {
             </Text>
           </Flex>
           <Flex align="center" gap="3">
+            <GitHubNavButton />
             <AccentPicker />
             <ThemeToggle />
           </Flex>

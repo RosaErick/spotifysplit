@@ -17,6 +17,7 @@ import {
 import { Link } from "react-router-dom";
 import { AccentPicker } from "../components/Layout/AccentPicker";
 import { EqualizerMark } from "../components/Layout/EqualizerMark";
+import { GitHubNavButton } from "../components/Layout/GitHubNavButton";
 import { Reveal } from "../components/Layout/Reveal";
 import { ThemeToggle } from "../components/Layout/ThemeToggle";
 
@@ -65,6 +66,7 @@ export const AboutPage = () => {
             </Link>
           </Flex>
           <Flex align="center" gap="3">
+            <GitHubNavButton />
             <AccentPicker />
             <ThemeToggle />
           </Flex>
