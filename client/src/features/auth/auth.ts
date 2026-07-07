@@ -16,10 +16,12 @@ export const isAuthenticated = (): boolean => getAccessToken() !== null;
 
 export const clearSession = () => clearTokens();
 
-// Le tokens da query string apos o callback OAuth, persiste e limpa a URL.
-// Deve rodar uma vez no bootstrap, antes da arvore React montar.
+// Le tokens do FRAGMENT (#) apos o callback OAuth, persiste e limpa a URL.
+// O backend devolve os tokens no fragment (nao na query) para nao vazar em
+// logs/Referer. Deve rodar uma vez no bootstrap, antes da arvore React montar.
 export const bootstrapAuthFromUrl = () => {
-  const params = new URLSearchParams(window.location.search);
+  const hash = window.location.hash.replace(/^#/, "");
+  const params = new URLSearchParams(hash);
   const accessToken = params.get("access_token");
   const refreshToken = params.get("refresh_token");
 
@@ -38,9 +40,13 @@ let inFlightRefresh: Promise<string | null> | null = null;
 
 const requestRefresh = async (refreshToken: string): Promise<string | null> => {
   try {
-    const response = await fetch(
-      getApiUrl(`/refresh_token?refresh_token=${encodeURIComponent(refreshToken)}`)
-    );
+    // POST com o refresh token no corpo (nao na query) para nao vazar em
+    // logs/URL/Referer. Espelha o endpoint POST /refresh_token do backend.
+    const response = await fetch(getApiUrl("/refresh_token"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ refresh_token: refreshToken }),
+    });
 
     if (!response.ok) {
       clearTokens();

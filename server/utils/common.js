@@ -1,12 +1,8 @@
-//generetes random string containg numbers and letters
+import { randomBytes } from "crypto";
 
-export const generateRandomString = (length) => {
-  let text = "";
-  const possible =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-  for (let i = 0; i < length; i++)
-    text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-  return text;
-};
+// Gera uma string aleatoria com seguranca criptografica (CSPRNG).
+// Usada como `state` anti-CSRF do fluxo OAuth — nao pode ser previsivel.
+export const generateRandomString = (length) =>
+  randomBytes(Math.ceil(length / 2))
+    .toString("hex")
+    .slice(0, length);
