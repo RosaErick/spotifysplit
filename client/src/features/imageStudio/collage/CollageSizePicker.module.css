@@ -1,0 +1,74 @@
+/* Seletor de tamanho da grade: passe o mouse (ou use as setas) para escolher
+   quantas celulas o mosaico tera. Segue o acento do tema do app. */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.readout {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+}
+
+.value {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  font-size: var(--font-size-2);
+  color: var(--accent-11);
+}
+
+.grid {
+  display: inline-grid;
+  gap: 4px;
+  width: max-content;
+  padding: 4px;
+  margin: -4px;
+  border-radius: var(--radius-3);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.grid:focus-visible {
+  outline: 2px solid var(--accent-9);
+  outline-offset: 2px;
+}
+
+.cell {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  background: var(--gray-a4);
+  transition:
+    background-color 160ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 160ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cellSelected {
+  background: var(--accent-9);
+}
+
+.cellPreview {
+  background: var(--accent-8);
+  transform: scale(1.06);
+}
+
+/* Fora do que os stats do periodo conseguem preencher. */
+.cellUnavailable {
+  background: var(--gray-a2);
+  cursor: not-allowed;
+}
+
+.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  .cell {
+    width: 18px;
+    height: 18px;
+  }
+}

@@ -1,11 +1,12 @@
 // Poster exportavel (capturado via ref). Estilo proprio e fixo — ver
-// ShareCardPoster.module.css. Recebe data URLs ja pre-carregadas (same-origin)
+// PosterCard.module.css. Recebe data URLs ja pre-carregadas (same-origin)
 // para que a captura nunca toque recurso cross-origin. Serve tanto para top
 // artistas quanto para top faixas (lista generica de itens).
 import { forwardRef } from "react";
+import { APP_DOMAIN } from "../../../shared/constants/app";
 import { ShareFormatConfig } from "./formats";
-import { buildPosterTheme } from "./posterThemes";
-import styles from "./ShareCardPoster.module.css";
+import { buildStudioTheme } from "../studioTheme";
+import styles from "./PosterCard.module.css";
 
 export interface PosterItem {
   id: string;
@@ -16,7 +17,7 @@ export interface PosterItem {
   imageDataUrl?: string;
 }
 
-export interface ShareCardPosterProps {
+export interface PosterCardProps {
   displayName: string;
   avatarDataUrl?: string;
   /** Eyebrow do poster (ex.: "Top artistas" / "Top faixas"). */
@@ -49,7 +50,7 @@ const EqualizerStatic = () => (
   </span>
 );
 
-export const ShareCardPoster = forwardRef<HTMLDivElement, ShareCardPosterProps>(
+export const PosterCard = forwardRef<HTMLDivElement, PosterCardProps>(
   (
     {
       displayName,
@@ -65,7 +66,7 @@ export const ShareCardPoster = forwardRef<HTMLDivElement, ShareCardPosterProps>(
   ) => {
     const visible = items.slice(0, format.artistCount);
     const formatClass = format.value === "story" ? styles.story : styles.post;
-    const themeVars = buildPosterTheme(accentColor);
+    const { vars: themeVars } = buildStudioTheme(accentColor);
 
     return (
       <div
@@ -130,7 +131,7 @@ export const ShareCardPoster = forwardRef<HTMLDivElement, ShareCardPosterProps>(
               <EqualizerStatic />
             </div>
             <span className={styles.tagline}>{tagline}</span>
-            <span className={styles.url}>spotifysplit.onrender.com</span>
+            <span className={styles.url}>{APP_DOMAIN}</span>
           </footer>
         </div>
       </div>
@@ -138,4 +139,4 @@ export const ShareCardPoster = forwardRef<HTMLDivElement, ShareCardPosterProps>(
   }
 );
 
-ShareCardPoster.displayName = "ShareCardPoster";
+PosterCard.displayName = "PosterCard";

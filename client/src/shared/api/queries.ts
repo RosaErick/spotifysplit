@@ -66,20 +66,31 @@ export const useProfileOverview = () =>
 
 export const useUserProfile = () => useQuery(queryKeys.userProfile, getUserProfile);
 
+/** Permite que a tela desligue a busca sem duplicar a definicao da query. */
+interface QueryToggle {
+  enabled?: boolean;
+}
+
 export const useTopArtists = (
   timeRange: SpotifyTopTimeRange = "long_term",
-  limit = 20
+  limit = 20,
+  options: QueryToggle = {}
 ) =>
-  useQuery(queryKeys.topArtists(timeRange, limit), () =>
-    getTopArtists(timeRange, limit)
+  useQuery(
+    queryKeys.topArtists(timeRange, limit),
+    () => getTopArtists(timeRange, limit),
+    options
   );
 
 export const useTopTracks = (
   timeRange: SpotifyTopTimeRange = "long_term",
-  limit = 20
+  limit = 20,
+  options: QueryToggle = {}
 ) =>
-  useQuery(queryKeys.topTracks(timeRange, limit), () =>
-    getTopTracks(timeRange, limit)
+  useQuery(
+    queryKeys.topTracks(timeRange, limit),
+    () => getTopTracks(timeRange, limit),
+    options
   );
 
 export const useRecentlyPlayed = () =>
