@@ -1,7 +1,7 @@
 import { Avatar, Badge, Box, Card, Flex, Heading, Text } from "@radix-ui/themes";
 import { useProfileOverview } from "../../shared/api/queries";
 import { formatNumber } from "../../utils/format";
-import { ShareButton } from "../../features/share";
+import { ImageStudioDialog } from "../../features/imageStudio";
 import { ErrorState } from "../Layout/ErrorState";
 import { ProfileSkeleton } from "../Layout/Skeleton";
 import { Reveal } from "../Layout/Reveal";
@@ -59,7 +59,7 @@ export const Profile = () => {
                 <Badge variant="soft" radius="full" size="1">
                   {profile.product || "spotify"}
                 </Badge>
-                <ShareButton />
+                <ImageStudioDialog />
               </Flex>
             </Box>
           </Flex>
