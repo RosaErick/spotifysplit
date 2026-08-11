@@ -137,6 +137,8 @@
 /* ---------- Cabecalho ---------- */
 
 .app-header {
+  --nav-target: 2.15rem;
+
   position: sticky;
   top: 0;
   z-index: 40;
@@ -144,6 +146,28 @@
   background: color-mix(in srgb, var(--sand-1) 72%, transparent);
   backdrop-filter: blur(20px) saturate(140%);
   -webkit-backdrop-filter: blur(20px) saturate(140%);
+}
+
+/*
+ * Elevacao progressiva ao rolar, sem JS: a animacao e conduzida pelo scroll da
+ * pagina. Onde `animation-timeline` nao existe (Firefox, Safari antigo) o header
+ * simplesmente fica como esta — nada quebra.
+ */
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .app-header {
+      animation: header-elevate linear both;
+      animation-timeline: scroll(root block);
+      animation-range: 0 5rem;
+    }
+  }
+}
+
+@keyframes header-elevate {
+  to {
+    background: color-mix(in srgb, var(--sand-1) 90%, transparent);
+    box-shadow: 0 12px 30px -26px var(--sand-a12);
+  }
 }
 
 .app-header-row {
@@ -198,7 +222,7 @@ a:hover > .brand-mark {
   align-items: center;
   justify-content: center;
   gap: 0.42rem;
-  min-height: 2.1rem;
+  min-height: var(--nav-target);
   padding: 0 0.85rem;
   border-radius: 999px;
   color: var(--gray-11);
@@ -226,6 +250,26 @@ a:hover > .brand-mark {
     0 8px 20px -18px var(--accent-a9);
 }
 
+/*
+ * Feedback de toque. O `-webkit-tap-highlight-color: transparent` global remove
+ * o realce nativo do mobile, entao sem isto o header nao responde visualmente a
+ * nenhum toque — so a estados de hover, que no celular nao existem.
+ */
+.app-header :is(.nav-action, .brand-mark, .rt-IconButton, .rt-Button):active {
+  transform: scale(0.94);
+}
+
+.app-header :is(.rt-IconButton, .rt-Button) {
+  transition:
+    background 180ms ease,
+    color 180ms ease,
+    transform 140ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.nav-action:active {
+  transform: scale(0.96);
+}
+
 .utility-actions {
   justify-self: end;
   flex: 0 0 auto;
@@ -240,23 +284,28 @@ a:hover > .brand-mark {
   box-shadow: none;
 }
 
+/*
+ * Um tamanho so para todos os alvos do header (`--nav-target`), porque no mobile
+ * eles precisam crescer juntos: no toque, 2.15rem colados eram alvo pequeno e
+ * dificil de acertar.
+ */
 .utility-actions .utility-icon-action {
-  width: 2.15rem;
-  min-width: 2.15rem;
-  height: 2.15rem;
+  width: var(--nav-target);
+  min-width: var(--nav-target);
+  height: var(--nav-target);
 }
 
 .logout-action {
-  min-height: 2.15rem;
+  min-height: var(--nav-target);
   padding-inline: 0.72rem;
   gap: 0.38rem;
 }
 
 .player-nav-slot {
   display: inline-flex;
-  width: 2.15rem;
-  height: 2.15rem;
-  flex: 0 0 2.15rem;
+  width: var(--nav-target);
+  height: var(--nav-target);
+  flex: 0 0 var(--nav-target);
   align-items: center;
   justify-content: center;
 }
@@ -305,8 +354,18 @@ a:hover > .brand-mark {
 }
 
 @media (max-width: 640px) {
+  /*
+   * No toque os alvos crescem (~38px) e o header encolhe: sem hover, o que vale
+   * e acertar o botao com o dedo, e o cabecalho e sticky — cada pixel dele fica
+   * ocupando a tela o tempo todo.
+   */
+  .app-header {
+    --nav-target: 2.4rem;
+  }
+
   .app-header-row {
-    row-gap: var(--space-2);
+    row-gap: var(--space-1);
+    padding-block: var(--space-2);
   }
 
   .brand-mark {
@@ -316,6 +375,7 @@ a:hover > .brand-mark {
 
   .nav-actions {
     gap: 0;
+    padding: 0.15rem;
     justify-content: space-between;
   }
 
@@ -327,12 +387,12 @@ a:hover > .brand-mark {
 
   .utility-actions {
     flex: 0 0 auto;
-    gap: 0.35rem;
+    gap: 0.3rem;
   }
 
   .logout-action {
-    width: 2.15rem;
-    min-width: 2.15rem;
+    width: var(--nav-target);
+    min-width: var(--nav-target);
     padding: 0;
   }
 }
@@ -717,13 +777,16 @@ a:hover > .brand-mark {
   }
 }
 
+/*
+ * Base = card empilhado (mobile). Aqui a faixa NAO pode ter `flex-basis`: o eixo
+ * principal do `.profile-layout` e vertical, entao um basis viraria altura fixa
+ * e a caixa ficaria alta e vazia, com os numeros boiando no meio.
+ */
 .stat-strip {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  flex: 0 1 20rem;
-  align-self: center;
+  width: 100%;
   min-width: 0;
-  max-width: 21rem;
   overflow: hidden;
   border: 1px solid var(--sand-a5);
   border-radius: var(--radius-3);
@@ -755,7 +818,23 @@ a:hover > .brand-mark {
   letter-spacing: -0.03em;
 }
 
-@media (max-width: 640px) {
+/*
+ * A partir daqui o card vira linha. 768px e o breakpoint `sm` do Radix, usado no
+ * `direction={{ initial: "column", sm: "row" }}` do Profile — os dois precisam
+ * bater, senao existe uma faixa de larguras com o layout empilhado e o CSS de
+ * desktop valendo ao mesmo tempo.
+ */
+@media (min-width: 768px) {
+  .stat-strip {
+    flex: 0 1 20rem;
+    align-self: center;
+    width: auto;
+    max-width: 21rem;
+  }
+}
+
+/* Card empilhado: tudo que so faz sentido antes do layout virar linha. */
+@media (max-width: 767px) {
   .profile-card {
     padding: var(--space-4);
   }
@@ -773,17 +852,12 @@ a:hover > .brand-mark {
     align-items: flex-start;
   }
 
-  .stat-strip {
-    width: 100%;
-    min-width: 0;
-  }
-
   .stat-cell {
-    padding: var(--space-2);
+    padding: var(--space-3) var(--space-2);
   }
 
   .stat-cell .stat-value {
-    font-size: clamp(0.8rem, 3.6vw, 1rem);
+    font-size: clamp(0.9rem, 3.6vw, 1.05rem);
   }
 }
 
