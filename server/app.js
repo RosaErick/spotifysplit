@@ -11,6 +11,10 @@ app.use((req, res, next) => {
   res.header("Vary", "Origin");
   res.header("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
   res.header("Access-Control-Allow-Headers", "Content-Type");
+  // O refresh token viaja em cookie HttpOnly. No dev local cliente e API estao
+  // em portas diferentes, entao o browser so envia o cookie com este header.
+  // Em producao (same-origin) nada disso e usado.
+  res.header("Access-Control-Allow-Credentials", "true");
 
   if (req.method === "OPTIONS") return res.sendStatus(204);
   return next();

@@ -11,40 +11,68 @@ import {
 } from "../utils/common";
 
 const stateKey = "spotify_auth_state";
+const refreshTokenKey = "spotify_refresh_token";
+
 const stateMaxAgeSeconds = 10 * 60;
 
-const json = (data, status = 200) =>
+// O refresh token do Spotify nao expira sozinho: vale ate ser revogado. Limitar
+// o cookie a 30 dias da a sessao um prazo de validade real, ao custo de pedir
+// login de novo para quem some por um mes.
+const refreshTokenMaxAgeSeconds = 30 * 24 * 60 * 60;
+
+// O cookie fica restrito a /api: nao acompanha requisicao de asset estatico.
+const refreshTokenPath = "/api";
+
+const isSecure = (env) => env.redirectUri.startsWith("https");
+
+const withCookies = (headers, cookies) => {
+  // `append` em vez de objeto literal: um Response pode carregar mais de um
+  // Set-Cookie, e um objeto so guardaria o ultimo.
+  cookies.forEach((cookie) => headers.append("Set-Cookie", cookie));
+
+  return headers;
+};
+
+const json = (data, status = 200, cookies = []) =>
   new Response(JSON.stringify(data), {
     status,
-    headers: { "Content-Type": "application/json" },
+    headers: withCookies(
+      new Headers({ "Content-Type": "application/json" }),
+      cookies
+    ),
   });
 
-const redirect = (location, setCookie) => {
-  const headers = { Location: location };
-  if (setCookie) headers["Set-Cookie"] = setCookie;
-
-  return new Response(null, { status: 302, headers });
-};
+const redirect = (location, cookies = []) =>
+  new Response(null, {
+    status: 302,
+    headers: withCookies(new Headers({ Location: location }), cookies),
+  });
 
 // Redireciona ao cliente passando dados no FRAGMENT (#) em vez de query (?):
 // o fragment nao e enviado a servidores, nao entra em logs de acesso nem no
-// header Referer. Evita vazamento de access/refresh token.
-const redirectToClient = (env, params, setCookie) => {
+// header Referer.
+const redirectToClient = (env, params, cookies) => {
   const base = env.clientUrl.replace(/\/+$/, "");
 
-  return redirect(`${base}/#${new URLSearchParams(params).toString()}`, setCookie);
+  return redirect(`${base}/#${new URLSearchParams(params).toString()}`, cookies);
 };
+
+const buildStateCookie = (env, value, maxAge) =>
+  buildSetCookie(stateKey, value, { maxAge, secure: isSecure(env) });
+
+const buildRefreshTokenCookie = (env, value, maxAge) =>
+  buildSetCookie(refreshTokenKey, value, {
+    maxAge,
+    secure: isSecure(env),
+    path: refreshTokenPath,
+  });
 
 const handleLogin = (env) => {
   const state = generateRandomString(16);
 
-  return redirect(
-    getSpotifyAuthorizationUrl(env, state),
-    buildSetCookie(stateKey, state, {
-      maxAge: stateMaxAgeSeconds,
-      secure: env.redirectUri.startsWith("https"),
-    })
-  );
+  return redirect(getSpotifyAuthorizationUrl(env, state), [
+    buildStateCookie(env, state, stateMaxAgeSeconds),
+  ]);
 };
 
 const handleCallback = async (request, env) => {
@@ -54,19 +82,16 @@ const handleCallback = async (request, env) => {
   const storedState = readCookie(request.headers.get("Cookie"), stateKey);
 
   // O cookie de state vale so para esta troca: expira em qualquer desfecho.
-  const clearState = buildSetCookie(stateKey, "", {
-    maxAge: 0,
-    secure: env.redirectUri.startsWith("https"),
-  });
+  const clearState = buildStateCookie(env, "", 0);
 
   // Anti-CSRF: o state devolvido pelo Spotify precisa bater com o cookie
-  // setado no /login. Sem isso, a protecao de state do OAuth e inutil.
+  // setado no /api/login. Sem isso, a protecao de state do OAuth e inutil.
   if (!state || !storedState || state !== storedState) {
-    return redirectToClient(env, { error: "state_mismatch" }, clearState);
+    return redirectToClient(env, { error: "state_mismatch" }, [clearState]);
   }
 
   if (!code) {
-    return redirectToClient(env, { error: "missing_code" }, clearState);
+    return redirectToClient(env, { error: "missing_code" }, [clearState]);
   }
 
   try {
@@ -75,38 +100,68 @@ const handleCallback = async (request, env) => {
       code
     );
 
-    return redirectToClient(
-      env,
-      { access_token, refresh_token, expires_in },
-      clearState
-    );
+    // O refresh token nao vai para o browser: ele nao expira sozinho, entao no
+    // localStorage um XSS renderia acesso permanente. Fica num cookie HttpOnly,
+    // fora do alcance de JavaScript. Para o cliente vai so o access token, que
+    // dura cerca de uma hora.
+    const cookies = [clearState];
+
+    if (refresh_token) {
+      cookies.push(
+        buildRefreshTokenCookie(env, refresh_token, refreshTokenMaxAgeSeconds)
+      );
+    }
+
+    return redirectToClient(env, { access_token, expires_in }, cookies);
   } catch (error) {
-    return redirectToClient(env, { error: "invalid_token" }, clearState);
+    return redirectToClient(env, { error: "invalid_token" }, [clearState]);
   }
 };
 
-// POST com o refresh token no corpo (nao na query) para nao vazar em logs/URL.
+// Sem corpo na requisicao: o refresh token vem do cookie HttpOnly.
 const handleRefreshToken = async (request, env) => {
-  let body = null;
-
-  try {
-    body = await request.json();
-  } catch (error) {
-    return json({ error: "missing_refresh_token" }, 400);
-  }
-
-  const refreshToken = body?.refresh_token;
+  const refreshToken = readCookie(
+    request.headers.get("Cookie"),
+    refreshTokenKey
+  );
 
   if (!refreshToken) {
-    return json({ error: "missing_refresh_token" }, 400);
+    return json({ error: "missing_refresh_token" }, 401);
   }
 
   try {
-    return json(await requestRefreshedToken(env, refreshToken));
+    const data = await requestRefreshedToken(env, refreshToken);
+
+    // O Spotify pode devolver um refresh token novo na renovacao. Quando
+    // devolve, o cookie e atualizado — e o valor nunca chega ao browser.
+    const cookies = data.refresh_token
+      ? [
+          buildRefreshTokenCookie(
+            env,
+            data.refresh_token,
+            refreshTokenMaxAgeSeconds
+          ),
+        ]
+      : [];
+
+    return json(
+      { access_token: data.access_token, expires_in: data.expires_in },
+      200,
+      cookies
+    );
   } catch (error) {
-    return json({ error: "spotify_refresh_failed" }, 502);
+    // Token revogado ou invalido: derruba o cookie para nao ficar tentando
+    // renovar em loop a cada 401.
+    return json({ error: "spotify_refresh_failed" }, 502, [
+      buildRefreshTokenCookie(env, "", 0),
+    ]);
   }
 };
+
+// Logout precisa de endpoint porque o cookie e HttpOnly: o cliente nao
+// consegue apaga-lo sozinho.
+const handleLogout = (env) =>
+  json({ ok: true }, 200, [buildRefreshTokenCookie(env, "", 0)]);
 
 // Prefixo /api porque cliente e API dividem a mesma origem: o React Router ja
 // usa /login, entao a rota do OAuth nao pode morar na raiz.
@@ -129,6 +184,10 @@ export const handleAuthRequest = async (request, env) => {
 
   if (pathname === "/api/refresh_token" && request.method === "POST") {
     return handleRefreshToken(request, config);
+  }
+
+  if (pathname === "/api/logout" && request.method === "POST") {
+    return handleLogout(config);
   }
 
   return json({ error: "not_found" }, 404);
