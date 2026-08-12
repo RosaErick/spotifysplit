@@ -1,5 +1,12 @@
 [build]
-  command = "npm run build"
+  # O campo "Base directory" na UI da Netlify precisa ficar VAZIO. Se apontar
+  # para `client`, todos os caminhos abaixo passam a resolver a partir dali
+  # (`client/client/dist`) e o diretorio de functions some.
+  #
+  # A instalacao de dependencias roda na raiz, mas o build e do `client/`, que
+  # tem package.json proprio. Por isso o install explicito com --prefix: sem
+  # ele o build quebra com "vite: not found".
+  command = "npm install --prefix client && npm run build"
   publish = "client/dist"
 
 [build.environment]
