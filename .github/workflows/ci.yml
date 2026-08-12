@@ -1,0 +1,72 @@
+# CI: build e a suite de testes inteira.
+#
+# Um job so, sequencial, porque a suite leva ~87s medidos. Cada job extra
+# custaria boot de runner e um `npm ci` proprio nas duas arvores — mais caro que
+# o paralelismo economizaria. Dividir passa a valer se isto ultrapassar uns 5
+# minutos.
+#
+# Nao publica nada: o deploy e da Netlify, a partir do `main`. No plano free por
+# creditos cada deploy de producao custa 15 de 300 mensais, entao um workflow que
+# dispare deploy extra consome a cota do mes em silencio.
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+# Push novo no mesmo PR cancela a execucao anterior: evita fila e minuto gasto
+# em commit ja superado.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  build-e-testes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # A versao sai do .nvmrc para nao virar mais uma copia que envelhece
+      # sozinha — o netlify.toml ja repete a mesma.
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            client/package-lock.json
+
+      # As duas arvores: `@playwright/test` esta na raiz e o resto do
+      # ferramental de teste em `client/`. Instalar so um lado quebra o E2E com
+      # "playwright: not found".
+      - name: Instalar dependencias
+        run: |
+          npm ci
+          npm ci --prefix client
+
+      - name: Build
+        run: npm run build
+
+      # Inclui os limiares de cobertura configurados no vitest.
+      - name: Testes e cobertura
+        run: npm run test:coverage
+
+      - name: Instalar o Chromium
+        run: npx playwright install --with-deps chromium
+
+      # Roda contra o build de producao via `vite preview`: e la que a base da
+      # API e o `/api` same-origin, que e o caso que ja quebrou.
+      - name: Testes E2E
+        run: npm run test:e2e
+
+      # `break threshold: 90`, score atual 94,95%. Se ficar instavel no runner,
+      # a correcao e um `if: github.event_name == 'push'` aqui.
+      - name: Mutation testing
+        run: npm run test:mutation
