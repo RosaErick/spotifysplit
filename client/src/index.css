@@ -1369,7 +1369,78 @@ a:hover > .brand-mark {
     0 20px 60px -34px var(--sand-a12),
     inset 0 1px 0 color-mix(in srgb, #fff 18%, transparent);
   backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
   pointer-events: auto;
+}
+
+.player-dock-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+/* A faixa inteira e o link para o Spotify — o alvo grande do dock. */
+.player-dock-link {
+  display: block;
+  min-width: 0;
+  flex: 1 1 16rem;
+  border-radius: var(--radius-3);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    background 180ms ease,
+    transform 140ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.player-dock-link:not(.is-static):hover {
+  background: var(--accent-a3);
+}
+
+.player-dock-link:not(.is-static):active {
+  transform: scale(0.985);
+}
+
+.player-dock-actions {
+  flex: 0 0 auto;
+}
+
+/*
+ * Os dois utilitarios ganham caixa propria: no `ghost` do Radix o botao e so o
+ * icone com 4px de respiro (e uma margem negativa para compensar), alvo pequeno
+ * demais para o dedo. Aqui o alvo cresce sem o icone crescer junto.
+ */
+.player-dock-actions .player-dock-action {
+  width: 2rem;
+  min-width: 2rem;
+  height: 2rem;
+  margin: 0;
+  border-radius: 999px;
+  color: var(--gray-11);
+}
+
+.player-dock-actions .player-dock-action:active {
+  transform: scale(0.94);
+}
+
+/*
+ * O unico uso de acento no dock: o progresso. Vale o destaque porque e o unico
+ * dado que muda sozinho enquanto a barra fica na tela.
+ */
+.player-dock-progress {
+  overflow: hidden;
+  height: 3px;
+  margin-top: var(--space-2);
+  border-radius: 999px;
+  background: var(--sand-a4);
+}
+
+.player-dock-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent-9);
+  transition: width 600ms ease;
 }
 
 .mini-player-next {
@@ -1427,8 +1498,69 @@ a:hover > .brand-mark {
     left: var(--space-3);
   }
 
+  /*
+   * Abaixo de 640px o dock para de ser a versao desktop encolhida. Ele vira uma
+   * barra de uma linha: capa, titulo e artista (uma linha cada), dois
+   * utilitarios de 44px e o progresso como filete no rodape. Altura e o recurso
+   * escasso aqui — o dock divide a base da tela com a barra de navegacao.
+   */
   .player-dock-card {
-    padding: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .player-dock-row {
+    flex-wrap: nowrap;
+    gap: var(--space-2);
+  }
+
+  .player-dock-link {
+    flex: 1 1 auto;
+  }
+
+  /* O botao "Abrir" sai: no toque o alvo passa a ser a barra inteira. */
+  .player-dock-open {
+    display: none;
+  }
+
+  /* "Tocando agora" e redundante: o dock so existe quando esta tocando. */
+  .player-dock-card .section-eyebrow {
+    display: none;
+  }
+
+  .player-dock-card .truncate-2 {
+    -webkit-line-clamp: 1;
+  }
+
+  .player-dock-card .mini-player-thumb {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  .player-dock-actions .player-dock-action {
+    width: 2.75rem;
+    min-width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  /*
+   * Dispensar precisa ser facil de proposito e dificil por acidente: alvo cheio
+   * de 44px, mas separado do atualizar por um filete e afastado dele. O resto da
+   * barra e link, entao o toque que erra cai no Spotify, nao no X.
+   */
+  .player-dock-actions .player-dock-dismiss {
+    position: relative;
+    margin-left: var(--space-2);
+    background: var(--sand-a3);
+  }
+
+  .player-dock-actions .player-dock-dismiss::before {
+    content: "";
+    position: absolute;
+    top: 25%;
+    bottom: 25%;
+    left: calc(var(--space-2) * -0.5);
+    width: 1px;
+    background: var(--sand-a5);
   }
 }
 
