@@ -25,10 +25,10 @@ export const readCookie = (cookieHeader, name) => {
 
 // Monta o valor de `Set-Cookie`. `maxAge` em segundos (o header usa segundos;
 // o `res.cookie` do Express usava milissegundos).
-export const buildSetCookie = (name, value, { maxAge, secure }) => {
+export const buildSetCookie = (name, value, { maxAge, secure, path = "/" }) => {
   const attributes = [
     `${name}=${encodeURIComponent(value)}`,
-    "Path=/",
+    `Path=${path}`,
     "HttpOnly",
     "SameSite=Lax",
     `Max-Age=${maxAge}`,
