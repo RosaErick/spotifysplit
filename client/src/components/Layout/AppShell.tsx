@@ -6,7 +6,7 @@ import {
 } from "@radix-ui/react-icons";
 import { Box, Button, Container, Flex, Text } from "@radix-ui/themes";
 import { Link, NavLink } from "react-router-dom";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { AccentPicker } from "./AccentPicker";
 import { EqualizerMark } from "./EqualizerMark";
 import { GitHubNavButton } from "./GitHubNavButton";
@@ -26,6 +26,17 @@ export const AppShell = ({ children, onLogout }: AppShellProps) => {
   const playerState = useNowPlaying();
   const showPlayerDock = playerState.isPlaying && !isPlayerDockHidden;
   const handleLogout = onLogout ?? logout;
+
+  /*
+   * A dispensa vale ate a reproducao parar, nao ate a proxima faixa. Trocar de
+   * musica nao e intencao do usuario — a fila anda sozinha —, entao reabrir o
+   * dock a cada faixa viraria uma interrupcao a cada tres minutos, bem em cima
+   * da barra de navegacao. Voltar a tocar depois de parado, sim, e intencao: ai
+   * o player volta. Enquanto isso o icone do header e o caminho de volta.
+   */
+  useEffect(() => {
+    if (playerState.isPlaying) setIsPlayerDockHidden(false);
+  }, [playerState.isPlaying]);
 
   return (
     <Box
@@ -114,7 +125,9 @@ export const AppShell = ({ children, onLogout }: AppShellProps) => {
       <Container size="4" px={{ initial: "4", sm: "5" }} py={{ initial: "5", sm: "6" }}>
         {children}
       </Container>
-      <PlayerDock state={playerState} onDismiss={() => setIsPlayerDockHidden(true)} />
+      {showPlayerDock && (
+        <PlayerDock state={playerState} onDismiss={() => setIsPlayerDockHidden(true)} />
+      )}
       <MobileTabBar onLogout={handleLogout} />
     </Box>
   );
