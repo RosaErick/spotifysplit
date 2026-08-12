@@ -939,9 +939,9 @@ a:hover > .brand-mark {
     0 14px 38px -34px var(--sand-a9);
 }
 
-/* O brilho acompanha o avatar, que agora comeca abaixo da linha do topo. */
+/* O brilho acompanha o avatar, que volta ao topo do card. */
 .profile-card::after {
-  top: 6.4rem;
+  top: 3.7rem;
   right: auto;
   left: 3.2rem;
   width: 5.8rem;
@@ -952,21 +952,12 @@ a:hover > .brand-mark {
   filter: blur(14px);
 }
 
-/* Cabecalho, identidade e numeros: um bloco por linha, na ordem de leitura. */
+/* Identidade e numeros: um bloco por linha, na ordem de leitura. */
 .profile-layout {
   position: relative;
   z-index: 1;
   display: grid;
-  gap: var(--space-3);
-}
-
-/* Linha de topo do encarte: procedencia a esquerda, ferramenta a direita. */
-.profile-topline {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-3);
-  min-width: 0;
+  gap: var(--space-4);
 }
 
 .profile-identity {
@@ -976,6 +967,20 @@ a:hover > .brand-mark {
   min-width: 0;
 }
 
+/*
+ * Coluna de texto ao lado do avatar: plano, nome e acao empilhados e alinhados
+ * a esquerda. Empilhar em vez de espalhar mantem os tres como um bloco so — era
+ * isso que faltava quando o plano e a acao dividiam uma linha de largura total,
+ * cada um grudado numa borda do card.
+ */
+.profile-heading {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+}
+
 /* Nomes longos quebram em duas linhas (`truncate-2`); o break evita que um
  * nome sem espacos empurre a largura do card. */
 .profile-name {
@@ -983,14 +988,17 @@ a:hover > .brand-mark {
   overflow-wrap: break-word;
 }
 
-/* Some antes de espremer o botao ao lado: e reforco, nao dado unico. */
+/*
+ * Eyebrow da identidade. Sobe de 0.62 para 0.68rem com menos entreletra: a 10px
+ * e 0.16em ele lia como ruido acima do nome, nao como informacao.
+ */
 .profile-meta {
-  min-width: 0;
+  max-width: 100%;
   overflow: hidden;
   color: var(--accent-11);
-  font-size: 0.62rem;
+  font-size: 0.68rem;
   font-weight: 700;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.13em;
   text-overflow: ellipsis;
   text-transform: uppercase;
   white-space: nowrap;
@@ -1073,23 +1081,27 @@ a:hover > .brand-mark {
 }
 
 /*
- * Unica acao do card, no canto do cabecalho. Largura natural com fonte contida
- * mantem o peso visual baixo, e a altura de 2.75rem (44px) garante o alvo de
- * toque sem virar bloco. O `:active` e obrigatorio porque o reset global apaga
- * o realce nativo e no celular nao existe `:hover`.
+ * Unica acao do card, logo abaixo do nome e na mesma coluna: assim ela pertence
+ * ao bloco de identidade em vez de flutuar num canto.
+ *
+ * Mantem 2.75rem (44px) de alvo no toque, mas com o rotulo em `font-size-2`. A
+ * 44px de altura com fonte de 12px a pilula parecia inflada — o problema de
+ * tamanho era proporcao entre caixa e texto, nao a altura em si. O `:active` e
+ * obrigatorio porque o reset global apaga o realce nativo e no celular nao
+ * existe `:hover`.
  */
 .profile-action {
   display: flex;
-  flex: none;
+  margin-top: 0.15rem;
 }
 
 .profile-action .rt-Button {
   --base-button-height: 2.75rem;
-  gap: var(--space-1);
-  padding-inline: var(--space-3);
+  gap: var(--space-2);
+  padding-inline: var(--space-4);
   border-radius: 999px;
-  font-size: var(--font-size-1);
-  letter-spacing: 0.02em;
+  font-size: var(--font-size-2);
+  letter-spacing: 0.01em;
   transition:
     background 180ms ease,
     transform 140ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -1115,7 +1127,7 @@ a:hover > .brand-mark {
   }
 
   .profile-card::after {
-    top: clamp(5.4rem, 8vw, 7rem);
+    top: clamp(3.4rem, 6vw, 4.8rem);
     left: clamp(3rem, 5vw, 4.4rem);
     width: clamp(5.2rem, 10vw, 7.5rem);
     height: clamp(5.2rem, 10vw, 7.5rem);
@@ -1123,27 +1135,23 @@ a:hover > .brand-mark {
     filter: blur(16px);
   }
 
+  /*
+   * Duas colunas na mesma linha: identidade a esquerda, numeros a direita. Sao
+   * dois filhos, entao o auto-placement do grid ja resolve — sem areas
+   * nomeadas. Uma faixa de largura total aqui em cima jogava o rotulo numa
+   * borda e a acao na outra, com um vao enorme no meio.
+   */
   .profile-layout {
     grid-template-columns: minmax(0, 1fr) minmax(0, 20rem);
-    grid-template-areas:
-      "topline topline"
-      "identity stats";
-    align-content: center;
+    align-items: center;
     column-gap: var(--space-6);
-    row-gap: var(--space-4);
-  }
-
-  .profile-topline {
-    grid-area: topline;
   }
 
   .profile-identity {
-    grid-area: identity;
     gap: var(--space-4);
   }
 
   .stat-strip {
-    grid-area: stats;
     align-self: center;
     margin-inline: 0;
     padding-inline: 0;

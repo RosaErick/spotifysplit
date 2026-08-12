@@ -39,21 +39,15 @@ export const Profile = () => {
     <Reveal>
       <Card className="hero-panel profile-card" mb="2">
         {/*
-         * Cabecalho (procedencia + acao) -> quem e voce -> seus numeros.
-         * A acao mora na linha do topo, e nao no rodape do card: ali ela e uma
-         * ferramenta de canto, em largura natural, sem disputar atencao com o
-         * nome nem virar um bloco de rodape do tamanho do card.
+         * Identidade (procedencia, nome e a acao do card) -> numeros.
+         *
+         * Os tres ficam na mesma coluna, ao lado do avatar: o plano descreve a
+         * conta e a acao age sobre ela, entao eles pertencem ao bloco de
+         * identidade. Espalhar isso numa linha de topo de largura total abria um
+         * vao enorme no desktop e deixava o rotulo pequeno pareado com um botao
+         * grande, sem relacao visual entre os dois.
          */}
         <Box className="profile-layout">
-          <Box className="profile-topline">
-            <Text as="p" className="profile-meta">
-              {connectionLabel(profile.product)}
-            </Text>
-            <Box className="profile-action">
-              <ImageStudioDialog />
-            </Box>
-          </Box>
-
           <Box className="profile-identity">
             <Box className="avatar-ring">
               <Avatar
@@ -64,9 +58,19 @@ export const Profile = () => {
               />
             </Box>
 
-            <Heading className="display-heading truncate-2 profile-name" size="6">
-              {profile.display_name}
-            </Heading>
+            <Box className="profile-heading">
+              <Text as="p" className="profile-meta">
+                {connectionLabel(profile.product)}
+              </Text>
+
+              <Heading className="display-heading truncate-2 profile-name" size="6">
+                {profile.display_name}
+              </Heading>
+
+              <Box className="profile-action">
+                <ImageStudioDialog />
+              </Box>
+            </Box>
           </Box>
 
           <Box className="stat-strip">

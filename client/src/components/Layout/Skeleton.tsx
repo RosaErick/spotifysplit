@@ -47,20 +47,17 @@ export const CardGridSkeleton = ({
 export const ProfileSkeleton = () => (
   <Card className="hero-panel profile-card" mb="2">
     <Box className="profile-layout">
-      <Box className="profile-topline">
-        <Skeleton width="7rem" height="0.6rem" />
-        <Box className="profile-action">
-          <Skeleton radius="999px" />
-        </Box>
-      </Box>
-
       <Box className="profile-identity">
         <Box className="avatar-ring">
           <Skeleton width="64px" height="64px" radius="999px" />
         </Box>
 
-        <Box style={{ flex: "1 1 auto", minWidth: 0 }}>
+        <Box className="profile-heading" style={{ flex: "1 1 auto", minWidth: 0 }}>
+          <Skeleton width="7rem" height="0.68rem" />
           <Skeleton width="min(15rem, 62%)" height="1.65rem" />
+          <Box className="profile-action">
+            <Skeleton width="9.5rem" height="2.75rem" radius="999px" />
+          </Box>
         </Box>
       </Box>
 
