@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="SonarStats">
+  <title>SonarStats</title>
+  <!--
+    Mesma marca da navbar: quadrado arredondado (raio 28%) com gradiente radial
+    ambar e as barras do equalizador na cor de contraste.
+
+    O acento do app e dinamico (ambar/verde/vermelho), mas favicon e estatico:
+    fica no ambar, que e o padrao.
+
+    As barras sao mais grossas e com menos vao do que no app. Em 16x16 a
+    proporcao original vira uma mancha; aqui a legibilidade vem antes da
+    fidelidade. A base fica em y=24 e nao no centro: equalizador cresce para
+    cima, entao um pouco mais de folga embaixo e o que parece equilibrado.
+  -->
+  <defs>
+    <radialGradient id="mark" cx="32%" cy="28%" r="78%">
+      <stop offset="0%" stop-color="#FFE1A0" />
+      <stop offset="70%" stop-color="#FFC53D" />
+      <stop offset="100%" stop-color="#F2AC22" />
+    </radialGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fff" stop-opacity="0.38" />
+      <stop offset="45%" stop-color="#fff" stop-opacity="0" />
+    </linearGradient>
+  </defs>
+
+  <rect width="32" height="32" rx="9" fill="url(#mark)" />
+  <rect width="32" height="32" rx="9" fill="url(#sheen)" />
+
+  <g fill="#2A2113">
+    <rect x="5.65" y="15" width="3.9" height="9" rx="1.9" />
+    <rect x="11.25" y="7" width="3.9" height="17" rx="1.9" />
+    <rect x="16.85" y="12" width="3.9" height="12" rx="1.9" />
+    <rect x="22.45" y="9" width="3.9" height="15" rx="1.9" />
+  </g>
+</svg>
