@@ -926,43 +926,63 @@ a:hover > .brand-mark {
 
 /* ---------- Card de perfil unificado ---------- */
 
+/*
+ * Base = coluna estreita (mobile); o bloco de 768px reconstroi a versao larga.
+ * `--profile-pad` guarda o padding do Card porque a faixa de numeros precisa da
+ * mesma medida em negativo para sangrar ate a borda.
+ */
 .profile-card {
-  padding: clamp(var(--space-3), 1.4vw, var(--space-4));
+  --profile-pad: var(--space-4);
+  padding: var(--profile-pad);
   box-shadow:
     0 1px 0 color-mix(in srgb, #fff 12%, transparent) inset,
     0 14px 38px -34px var(--sand-a9);
 }
 
-.profile-eyebrow {
-  font-size: 0.62rem;
-  letter-spacing: 0.16em;
-  opacity: 0.75;
-}
-
 .profile-card::after {
-  top: clamp(3rem, 5vw, 4.6rem);
+  top: 3.4rem;
   right: auto;
-  left: clamp(3rem, 5vw, 4.4rem);
-  width: clamp(5.2rem, 10vw, 7.5rem);
-  height: clamp(5.2rem, 10vw, 7.5rem);
+  left: 3.4rem;
+  width: 5.8rem;
+  height: 5.8rem;
   transform: translate(-50%, -50%);
   background: radial-gradient(circle, var(--accent-a3), transparent 70%);
-  opacity: 0.34;
-  filter: blur(16px);
+  opacity: 0.28;
+  filter: blur(14px);
 }
 
+/* Identidade, numeros e acao: um bloco por linha, na ordem de leitura. */
 .profile-layout {
   position: relative;
   z-index: 1;
+  display: grid;
+  gap: var(--space-4);
 }
 
 .profile-identity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
   min-width: 0;
-  flex: 1 1 auto;
 }
 
+.profile-heading {
+  min-width: 0;
+}
+
+/* Nomes longos quebram em duas linhas (`truncate-2`); o break evita que um
+ * nome sem espacos empurre a largura do card. */
 .profile-name {
-  max-width: 22ch;
+  overflow-wrap: break-word;
+}
+
+.profile-meta {
+  margin-top: 0.3rem;
+  color: var(--accent-11);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
 }
 
 .avatar-ring {
@@ -987,26 +1007,19 @@ a:hover > .brand-mark {
   height: 64px !important;
 }
 
-@media (min-width: 640px) {
-  .avatar-ring .skeleton {
-    width: 80px !important;
-    height: 80px !important;
-  }
-}
-
 /*
- * Base = card empilhado (mobile). Aqui a faixa NAO pode ter `flex-basis`: o eixo
- * principal do `.profile-layout` e vertical, entao um basis viraria altura fixa
- * e a caixa ficaria alta e vazia, com os numeros boiando no meio.
+ * Faixa de numeros. No mobile ela sangra ate a borda do card: sem as laterais,
+ * a moldura da faixa para de repetir a moldura do card e a linha vira uma
+ * secao do encarte em vez de uma caixa dentro de outra. O padding devolvido
+ * mantem o primeiro numero alinhado com o nome.
  */
 .stat-strip {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  width: 100%;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   min-width: 0;
-  overflow: hidden;
-  border: 1px solid var(--sand-a5);
-  border-radius: var(--radius-3);
+  margin-inline: calc(var(--profile-pad) * -1);
+  padding-inline: calc(var(--profile-pad) - var(--space-2));
+  border-block: 1px solid var(--sand-a5);
   background:
     linear-gradient(180deg, var(--accent-a1), transparent),
     color-mix(in srgb, var(--color-panel-solid) 80%, transparent);
@@ -1019,62 +1032,124 @@ a:hover > .brand-mark {
   flex-direction: column;
   justify-content: center;
   min-width: 0;
-  padding: clamp(var(--space-2), 1.2vw, var(--space-3));
+  padding: var(--space-3) var(--space-2);
 }
 
 .stat-cell + .stat-cell {
   border-left: 1px solid var(--sand-a5);
 }
 
+/* O numero e o conteudo da celula; o rotulo e legenda. */
 .stat-cell .stat-value {
   font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
   font-variation-settings: normal;
   font-feature-settings: "tnum" 1;
   font-weight: 600;
+  font-size: clamp(1.05rem, 4.4vw, 1.35rem);
   line-height: 1;
   letter-spacing: -0.03em;
 }
 
-/*
- * A partir daqui o card vira linha. 768px e o breakpoint `sm` do Radix, usado no
- * `direction={{ initial: "column", sm: "row" }}` do Profile — os dois precisam
- * bater, senao existe uma faixa de larguras com o layout empilhado e o CSS de
- * desktop valendo ao mesmo tempo.
- */
-@media (min-width: 768px) {
-  .stat-strip {
-    flex: 0 1 20rem;
-    align-self: center;
-    width: auto;
-    max-width: 21rem;
-  }
+.stat-cell .stat-label {
+  margin-top: 0.4rem;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  line-height: 1.1;
+  text-transform: uppercase;
 }
 
-/* Card empilhado: tudo que so faz sentido antes do layout virar linha. */
-@media (max-width: 767px) {
+/*
+ * Unica acao do card. No toque ela vale a largura inteira e a altura minima de
+ * alvo (44px); o `:active` e obrigatorio porque o reset global apaga o realce
+ * nativo e no celular nao existe `:hover`.
+ */
+.profile-action {
+  display: flex;
+}
+
+.profile-action .rt-Button {
+  --base-button-height: 2.75rem;
+  width: 100%;
+  font-size: var(--font-size-3);
+  transition:
+    background 180ms ease,
+    transform 140ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.profile-action .rt-Button:active {
+  transform: scale(0.97);
+}
+
+.profile-action .skeleton {
+  width: 100% !important;
+}
+
+/*
+ * A partir daqui o card vira linha: identidade e acao empilhadas a esquerda,
+ * faixa de numeros a direita ocupando as duas linhas.
+ */
+@media (min-width: 768px) {
   .profile-card {
-    padding: var(--space-4);
+    --profile-pad: clamp(var(--space-3), 1.4vw, var(--space-4));
   }
 
   .profile-card::after {
-    top: 3.4rem;
-    left: 3.4rem;
-    width: 5.8rem;
-    height: 5.8rem;
-    opacity: 0.28;
-    filter: blur(14px);
+    top: clamp(3rem, 5vw, 4.6rem);
+    left: clamp(3rem, 5vw, 4.4rem);
+    width: clamp(5.2rem, 10vw, 7.5rem);
+    height: clamp(5.2rem, 10vw, 7.5rem);
+    opacity: 0.34;
+    filter: blur(16px);
+  }
+
+  .profile-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 20rem);
+    grid-template-areas:
+      "identity stats"
+      "action stats";
+    align-content: center;
+    column-gap: var(--space-6);
+    row-gap: var(--space-3);
   }
 
   .profile-identity {
-    align-items: flex-start;
+    grid-area: identity;
+    gap: var(--space-4);
+  }
+
+  .profile-action {
+    grid-area: action;
+    justify-self: start;
+  }
+
+  .stat-strip {
+    grid-area: stats;
+    align-self: center;
+    margin-inline: 0;
+    padding-inline: 0;
+    overflow: hidden;
+    border: 1px solid var(--sand-a5);
+    border-radius: var(--radius-3);
   }
 
   .stat-cell {
-    padding: var(--space-3) var(--space-2);
+    padding: clamp(var(--space-2), 1.2vw, var(--space-3));
   }
 
-  .stat-cell .stat-value {
-    font-size: clamp(0.9rem, 3.6vw, 1.05rem);
+  .avatar-ring .skeleton {
+    width: 80px !important;
+    height: 80px !important;
+  }
+
+  .profile-action .rt-Button {
+    --base-button-height: var(--space-6);
+    width: auto;
+    font-size: var(--font-size-2);
+  }
+
+  .profile-action .skeleton {
+    width: 9.5rem !important;
   }
 }
 
