@@ -45,6 +45,7 @@ export const ArtistRankingList = ({
           role="button"
           tabIndex={0}
           className="ranking-row artist-ranking-row"
+          data-tour-id={index === 0 ? "ranking-row" : undefined}
           onClick={() => onSelect(artist)}
           onKeyDown={(event) => handleSelectableKeyDown(event, artist, onSelect)}
         >
@@ -79,7 +80,11 @@ export const ArtistRankingList = ({
             align="end"
             gap="1"
           >
-            <Badge variant="soft" radius="full">
+            <Badge
+              variant="soft"
+              radius="full"
+              data-tour-id={index === 0 ? "popularity" : undefined}
+            >
               {artist.popularity ?? "-"} pop.
             </Badge>
             {artist.followers?.total !== undefined && (

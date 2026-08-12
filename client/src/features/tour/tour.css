@@ -1,0 +1,194 @@
+/*
+ * Estilos do tour.
+ *
+ * Arquivo proprio e uma quebra consciente do padrao do projeto (estilo
+ * concentrado em `index.css`): o tour e autocontido e opcional, e deixa-lo fora
+ * do arquivo de 1500 linhas o torna removivel de uma vez.
+ *
+ * Empilhamento dentro de `.app-background` (que e um contexto proprio, por causa
+ * do `isolation: isolate`): header 40, tab bar 45, tour 60-62.
+ */
+
+/* Invisivel: existe so para engolir cliques no app durante os passos passivos.
+   Nao escurece nada — quem escurece e a sombra do spotlight. */
+.tour-blocker {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+}
+
+/* Usado apenas quando nao ha ancora e, portanto, nao ha spotlight. */
+.tour-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: color-mix(in srgb, var(--sand-1) 78%, transparent);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+}
+
+/*
+ * O spotlight nao usa mascara SVG nem quatro divs: uma sombra de 9999px pinta a
+ * tela toda menos este retangulo, e o proprio `border-radius` recorta o buraco.
+ * Por isso nao pode haver um scrim junto — ele cobriria o buraco e o alvo
+ * destacado ficaria escuro tambem.
+ *
+ * O anel em `--accent-8` e o mesmo token do `:focus-visible` global: e o que faz
+ * o recorte ler como parte do app, e nao como overlay de plugin.
+ */
+.tour-spotlight {
+  position: fixed;
+  z-index: 61;
+  border-radius: var(--radius-4);
+  box-shadow:
+    0 0 0 9999px color-mix(in srgb, var(--sand-1) 78%, transparent),
+    0 0 0 2px var(--accent-8),
+    0 0 44px -8px var(--accent-a6);
+  pointer-events: none;
+  transition:
+    top 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    left 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    width 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    height 320ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.tour-card-shell {
+  position: fixed;
+  z-index: 62;
+  width: min(24rem, calc(100vw - 2rem));
+}
+
+.tour-card-centered {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/*
+ * Folha ancorada numa borda, largura total. A de baixo fica acima da barra de
+ * navegacao; a de cima entra quando o proprio alvo esta na metade inferior,
+ * senao a folha cobriria o alvo.
+ */
+.tour-card-sheet-bottom,
+.tour-card-sheet-top {
+  right: var(--space-3);
+  left: var(--space-3);
+  width: auto;
+  max-width: 34rem;
+  margin-inline: auto;
+}
+
+.tour-card-sheet-bottom {
+  bottom: calc(5.4rem + env(safe-area-inset-bottom));
+}
+
+.tour-card-sheet-top {
+  top: calc(4.5rem + env(safe-area-inset-top));
+}
+
+/*
+ * Mais opaco que o `.hero-panel`: o card fica sobre area escurecida, e vidro
+ * fosco em cima de vidro fosco derruba a legibilidade do texto.
+ */
+.tour-card {
+  background: var(--color-panel-solid);
+  border: 1px solid var(--sand-a6);
+  box-shadow:
+    0 28px 60px -30px var(--sand-a12),
+    inset 0 1px 0 color-mix(in srgb, #fff 14%, transparent);
+  outline: none;
+}
+
+/* Numeracao de tracklist, nao fileira de bolinhas. */
+.tour-progress {
+  display: flex;
+  gap: 0.55rem;
+  margin: 0 0 var(--space-3);
+  font-family: "Fraunces", serif;
+  font-size: 0.7rem;
+  font-variation-settings: "opsz" 90, "WONK" 1;
+  letter-spacing: 0.06em;
+  color: var(--gray-9);
+}
+
+.tour-progress-current {
+  color: var(--accent-11);
+}
+
+.tour-title {
+  margin-bottom: var(--space-2);
+}
+
+.tour-body {
+  line-height: 1.65;
+}
+
+/*
+ * A "letra miuda" do encarte: a ressalva honesta sobre o dado, em Fraunces
+ * italico, atras de um filete na cor do acento.
+ */
+.tour-note {
+  margin: var(--space-3) 0 0;
+  padding-left: var(--space-3);
+  border-left: 2px solid var(--accent-a7);
+  color: var(--gray-11);
+  font-size: var(--font-size-1);
+  line-height: 1.6;
+}
+
+.tour-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.tour-footer-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.tour-exit {
+  margin-right: auto;
+}
+
+/* Alvos de toque no mobile; sem `:hover`, o `:active` e o unico retorno. */
+@media (max-width: 820px) {
+  .tour-footer .rt-Button {
+    --base-button-height: 2.75rem;
+    padding-inline: var(--space-3);
+  }
+
+  .tour-card .rt-Button:active {
+    transform: scale(0.96);
+  }
+}
+
+/* ---------- Convite ---------- */
+
+.tour-invite-body {
+  margin-top: var(--space-1);
+  line-height: 1.6;
+  max-width: 42rem;
+}
+
+.tour-invite-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+@media (max-width: 820px) {
+  /* Recusar tem que ser tao facil quanto aceitar: mesma altura, mesma linha. */
+  .tour-invite-actions .rt-Button {
+    --base-button-height: 2.75rem;
+    flex: 1 1 auto;
+  }
+
+  .tour-invite-actions .rt-Button:active {
+    transform: scale(0.96);
+  }
+}

@@ -13,6 +13,7 @@ import { GitHubNavButton } from "./GitHubNavButton";
 import { MobileTabBar } from "./MobileTabBar";
 import { ThemeToggle } from "./ThemeToggle";
 import { useAuth } from "../../features/auth/useAuth";
+import { TourHelpButton, TourOverlay, TourProvider } from "../../features/tour";
 import { PlayerDock, PlayerNavControl, useNowPlaying } from "../Player/MiniPlayer";
 
 type AppShellProps = {
@@ -39,6 +40,7 @@ export const AppShell = ({ children, onLogout }: AppShellProps) => {
   }, [playerState.isPlaying]);
 
   return (
+    <TourProvider>
     <Box
       className={`app-background ${showPlayerDock ? "has-player-dock" : ""}`}
       minHeight="100vh"
@@ -102,6 +104,7 @@ export const AppShell = ({ children, onLogout }: AppShellProps) => {
                   />
                 </Box>
               )}
+              <TourHelpButton />
               <GitHubNavButton />
               <AccentPicker />
               <ThemeToggle />
@@ -129,6 +132,8 @@ export const AppShell = ({ children, onLogout }: AppShellProps) => {
         <PlayerDock state={playerState} onDismiss={() => setIsPlayerDockHidden(true)} />
       )}
       <MobileTabBar onLogout={handleLogout} />
+      <TourOverlay />
     </Box>
+    </TourProvider>
   );
 };
