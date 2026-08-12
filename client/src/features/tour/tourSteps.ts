@@ -1,8 +1,9 @@
 // Conteudo do tour: so dados e texto, sem JSX e sem DOM.
 //
-// Os dois primeiros passos sao interativos: o tour pede para abrir o estudio de
-// imagem e so avanca quando o modal abre de fato. Os quatro seguintes rodam na
-// home, na ordem de leitura da propria pagina.
+// Todos os passos apontam para algo que ja esta na home. O tour nao abre nem
+// controla o modal do estudio de imagem: overlay convivendo com overlay
+// significa disputar foco, `pointer-events` e contexto de empilhamento com o
+// Dialog do Radix, e nao vale o risco por um passo.
 
 export type TourStep = {
   id: string;
@@ -12,14 +13,6 @@ export type TourStep = {
   note?: string;
   /** Seletores em ordem de prioridade; vence o primeiro que estiver visivel. */
   anchors: string[];
-  /**
-   * O passo espera o usuario abrir o estudio. O tour nao bloqueia cliques aqui,
-   * avanca sozinho quando o modal aparece, e "Avancar" pula o passo de dentro
-   * do modal (que nao teria ancora).
-   */
-  opensStudio?: boolean;
-  /** O passo vive dentro do modal; sai sozinho quando o modal fecha. */
-  insideStudio?: boolean;
 };
 
 /*
@@ -31,18 +24,10 @@ export const TOUR_VERSION = 1;
 
 export const TOUR_STEPS: TourStep[] = [
   {
-    id: "studio-open",
+    id: "studio",
     title: "Uma imagem com os seus stats",
-    body: "Esse botão monta uma imagem pronta pra baixar a partir do que você mais ouve. Abre ele pra ver os dois formatos.",
+    body: "Esse botão monta um pôster do seu ranking de artistas ou faixas, ou um mosaico de capas — com período e cor à sua escolha, pra baixar em PNG ou JPG.",
     anchors: [".profile-action"],
-    opensStudio: true,
-  },
-  {
-    id: "studio-formats",
-    title: "Pôster ou mosaico",
-    body: "O pôster lista o seu ranking de artistas ou de faixas. O mosaico monta uma grade de capas de álbum ou de fotos de artista. Nos dois dá pra escolher o período e a cor, e exportar em PNG ou JPG.",
-    anchors: ['[data-tour-id="studio-formats"]'],
-    insideStudio: true,
   },
   {
     id: "rankings",
@@ -71,26 +56,3 @@ export const TOUR_STEPS: TourStep[] = [
     anchors: [".mobile-tab-more", ".utility-actions"],
   },
 ];
-
-/**
- * Proximo indice na direcao dada, pulando os passos que so existem com o modal
- * do estudio aberto. Funcao pura para poder ser testada sem DOM.
- */
-export const resolveStepIndex = (
-  from: number,
-  direction: 1 | -1,
-  studioOpen: boolean
-): number => {
-  let target = from + direction;
-
-  while (
-    target >= 0 &&
-    target < TOUR_STEPS.length &&
-    TOUR_STEPS[target].insideStudio &&
-    !studioOpen
-  ) {
-    target += direction;
-  }
-
-  return target;
-};

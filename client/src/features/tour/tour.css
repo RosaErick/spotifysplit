@@ -2,58 +2,26 @@
  * Estilos do tour.
  *
  * Arquivo proprio e uma quebra consciente do padrao do projeto (estilo
- * concentrado em `index.css`): o tour e autocontido e opcional, e manter ~170
- * linhas dele fora do arquivo de 1500 linhas deixa a feature removivel de uma
- * vez. Precedente: o estudio de imagem ja gera tokens proprios em
- * `studioTheme.ts`.
+ * concentrado em `index.css`): o tour e autocontido e opcional, e deixa-lo fora
+ * do arquivo de 1500 linhas o torna removivel de uma vez.
  *
- * Empilhamento: o overlay e portalizado no `body` e usa 9000+. Precisa passar do
- * modal do Radix, cujo overlay nao declara z-index (fica em `auto`) e ganharia
- * so por ordem de DOM. Fica abaixo do grao global (9999), que nao intercepta
- * clique.
+ * Empilhamento dentro de `.app-background` (que e um contexto proprio, por causa
+ * do `isolation: isolate`): header 40, tab bar 45, tour 60-62.
  */
-
-/*
- * Raiz do portal. Precisa ser um `<Theme>` do Radix, e nao uma div qualquer:
- * TODOS os tokens (--color-panel-solid, --sand-*, --accent-*, --space-*) sao
- * escopados em `:where(.radix-themes)`. Portalizado no body sem isso, o card
- * ficava sem fundo e o spotlight sem escurecimento — a "UI transparente".
- *
- * `pointer-events: none` aqui, `auto` em cada camada interativa: o Radix Dialog
- * usa react-remove-scroll, que poe `pointer-events: none` no body enquanto o
- * modal esta aberto. Como o tour e filho do body, ele herdava isso e nada
- * respondia a clique.
- *
- * `position: fixed` + z-index cria o contexto de empilhamento do tour inteiro
- * acima do modal, que nao declara z-index proprio.
- */
-.tour-theme {
-  position: fixed;
-  inset: 0;
-  z-index: 9000;
-  pointer-events: none;
-  background: none;
-}
-
-.tour-blocker,
-.tour-scrim,
-.tour-card-shell {
-  pointer-events: auto;
-}
 
 /* Invisivel: existe so para engolir cliques no app durante os passos passivos.
    Nao escurece nada — quem escurece e a sombra do spotlight. */
 .tour-blocker {
   position: fixed;
   inset: 0;
-  z-index: 1;
+  z-index: 60;
 }
 
 /* Usado apenas quando nao ha ancora e, portanto, nao ha spotlight. */
 .tour-scrim {
   position: fixed;
   inset: 0;
-  z-index: 1;
+  z-index: 60;
   background: color-mix(in srgb, var(--sand-1) 78%, transparent);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
@@ -70,7 +38,7 @@
  */
 .tour-spotlight {
   position: fixed;
-  z-index: 2;
+  z-index: 61;
   border-radius: var(--radius-4);
   box-shadow:
     0 0 0 9999px color-mix(in srgb, var(--sand-1) 78%, transparent),
@@ -84,17 +52,9 @@
     height 320ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Dentro do estudio quem escurece e o overlay do proprio modal; aqui sobra so
-   o anel, senao o modal levaria duas camadas de escuro. */
-.tour-spotlight-ring {
-  box-shadow:
-    0 0 0 2px var(--accent-8),
-    0 0 44px -8px var(--accent-a6);
-}
-
 .tour-card-shell {
   position: fixed;
-  z-index: 3;
+  z-index: 62;
   width: min(24rem, calc(100vw - 2rem));
 }
 

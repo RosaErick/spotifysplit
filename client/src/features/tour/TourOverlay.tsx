@@ -1,21 +1,14 @@
-// Scrim, spotlight e o card do passo.
+// Spotlight e o card do passo.
 //
-// Vai para um portal no `body` porque `.app-background` tem `isolation:
-// isolate`, ou seja, e um contexto de empilhamento proprio: de dentro dele
-// nenhum z-index alcanca o modal do Radix, que e irmao no `body`. E o passo de
-// dentro do estudio precisa ficar acima do modal.
+// Renderiza dentro da arvore do AppShell, sem portal. Portalizar para o `body`
+// so seria necessario para ficar acima do modal do Radix, e o tour deixou de
+// conviver com ele: de dentro do body o overlay perdia os tokens do tema (todos
+// escopados em `.radix-themes`) e herdava o `pointer-events: none` que o Dialog
+// poe no body.
 
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
-import { createPortal } from "react-dom";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Button, Card, Heading, Text, Theme } from "@radix-ui/themes";
-import { useAppTheme } from "../../components/Layout/AppThemeProvider";
+import { Button, Card, Heading, Text } from "@radix-ui/themes";
 import { useAnchorRect } from "./useAnchorRect";
 import { useTour } from "./TourProvider";
 import "./tour.css";
@@ -48,11 +41,7 @@ const formatStepNumber = (index: number) => String(index + 1).padStart(2, "0");
 
 export const TourOverlay = () => {
   const tour = useTour();
-  const { theme, accent } = useAppTheme();
   const step = tour?.step ?? null;
-  // Precisa vir antes dos hooks de foco: dentro do modal o tour nao pode
-  // disputar o foco com o focus trap do Radix.
-  const stepInsideStudio = Boolean(step?.insideStudio);
   const rect = useAnchorRect(step?.anchors ?? null);
 
   const cardRef = useRef<HTMLDivElement>(null);
@@ -93,18 +82,15 @@ export const TourOverlay = () => {
   // `preventScroll` importa: sem ele o navegador rola ate o card e briga com o
   // `scrollIntoView` que ja levou o alvo para o centro.
   useLayoutEffect(() => {
-    if (!isRunning || stepInsideStudio) return;
+    if (!isRunning) return;
     cardRef.current?.focus({ preventScroll: true });
-  }, [isRunning, tour?.stepIndex, stepInsideStudio]);
+  }, [isRunning, tour?.stepIndex]);
 
   const handleWindowKey = useCallback(
     (event: KeyboardEvent) => {
       if (!tour) return;
 
-      // Dentro do estudio o Esc pertence ao modal: ele fecha, e o tour avanca
-      // sozinho por causa disso.
       if (event.key === "Escape") {
-        if (stepInsideStudio) return;
         event.stopPropagation();
         tour.dismiss();
         return;
@@ -112,7 +98,7 @@ export const TourOverlay = () => {
       if (event.key === "ArrowRight") tour.next();
       if (event.key === "ArrowLeft") tour.back();
     },
-    [tour, stepInsideStudio]
+    [tour]
   );
 
   useEffect(() => {
@@ -121,6 +107,8 @@ export const TourOverlay = () => {
     return () => window.removeEventListener("keydown", handleWindowKey);
   }, [isRunning, handleWindowKey]);
 
+  // Trap manual: o card e filho do mesmo root da app, entao `inert` no resto da
+  // arvore nao serve. Sao tres ou quatro botoes, o ciclo e barato.
   const trapTab = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key !== "Tab") return;
 
@@ -148,21 +136,6 @@ export const TourOverlay = () => {
   const isFirst = stepIndex === 0;
   const isLast = stepIndex === stepCount - 1;
 
-  const insideStudio = Boolean(step.insideStudio);
-  const opensStudio = Boolean(step.opensStudio);
-
-  /*
-   * O escurecimento vem da sombra de 9999px do spotlight, nunca de um scrim por
-   * cima: um scrim de tela cheia cobriria o proprio buraco e o alvo destacado
-   * ficaria escuro tambem. O scrim solido so entra quando nao ha ancora.
-   *
-   * Dentro do estudio quem escurece e o overlay do proprio modal; aqui fica so
-   * o anel.
-   */
-  const spotlightClass = insideStudio
-    ? "tour-spotlight tour-spotlight-ring"
-    : "tour-spotlight";
-
   const spotlightStyle = rect
     ? {
         top: rect.top - 6,
@@ -172,18 +145,12 @@ export const TourOverlay = () => {
       }
     : undefined;
 
-  // O bloqueio de clique sai quando o passo espera uma acao do usuario: no
-  // passo que pede para abrir o estudio, o clique precisa chegar no botao.
-  const blocksClicks = !opensStudio && !insideStudio;
-
   let cardStyle: React.CSSProperties | undefined;
   let placement = "floating";
 
-  if (insideStudio) {
-    // Folha na base em qualquer largura: o modal ocupa o centro da tela, e um
-    // card ancorado nas abas cobriria justamente a previa que ele descreve.
-    placement = "sheet-bottom";
-  } else if (isMobile) {
+  if (isMobile) {
+    // A folha iria cobrir o alvo quando ele mesmo esta embaixo (os passos que
+    // apontam para a tab bar); nesse caso ela sobe para o topo.
     placement =
       rect && rect.top > window.innerHeight * 0.55 ? "sheet-top" : "sheet-bottom";
   } else if (rect) {
@@ -202,7 +169,10 @@ export const TourOverlay = () => {
       top = (viewportHeight - cardHeight) / 2;
     }
 
-    const maxTop = Math.max(VIEWPORT_MARGIN, viewportHeight - cardHeight - VIEWPORT_MARGIN);
+    const maxTop = Math.max(
+      VIEWPORT_MARGIN,
+      viewportHeight - cardHeight - VIEWPORT_MARGIN
+    );
     top = Math.min(Math.max(VIEWPORT_MARGIN, top), maxTop);
 
     const left = Math.min(
@@ -215,23 +185,18 @@ export const TourOverlay = () => {
     placement = "centered";
   }
 
-  return createPortal(
-    <Theme
-      appearance={theme}
-      accentColor={accent}
-      grayColor="sand"
-      radius="large"
-      scaling="100%"
-      hasBackground={false}
-      className="tour-theme"
-    >
-      {blocksClicks && <div className="tour-blocker" aria-hidden="true" />}
+  return (
+    <div className="tour-root">
+      {/* Transparente: engole cliques no app sem escurecer nada. Quem escurece
+          e a sombra do spotlight — um scrim por cima cobriria o proprio buraco
+          e o alvo destacado ficaria escuro tambem. */}
+      <div className="tour-blocker" aria-hidden="true" />
 
-      {/* Sem ancora nao ha spotlight, entao o escurecimento precisa vir daqui. */}
-      {!rect && !insideStudio && <div className="tour-scrim" aria-hidden="true" />}
+      {/* Sem ancora nao ha spotlight, entao o escurecimento vem daqui. */}
+      {!rect && <div className="tour-scrim" aria-hidden="true" />}
 
       {rect && (
-        <div className={spotlightClass} style={spotlightStyle} aria-hidden="true" />
+        <div className="tour-spotlight" style={spotlightStyle} aria-hidden="true" />
       )}
 
       <AnimatePresence mode="wait">
@@ -250,10 +215,10 @@ export const TourOverlay = () => {
             ref={cardRef}
             tabIndex={-1}
             role="dialog"
-            aria-modal={insideStudio ? undefined : true}
+            aria-modal="true"
             aria-labelledby={`tour-title-${step.id}`}
             aria-describedby={`tour-body-${step.id}`}
-            onKeyDown={insideStudio ? undefined : trapTab}
+            onKeyDown={trapTab}
           >
             <p className="tour-progress" aria-hidden="true">
               {Array.from({ length: stepCount }).map((_, index) => (
@@ -308,14 +273,13 @@ export const TourOverlay = () => {
                   </Button>
                 )}
                 <Button variant="soft" className="clickable-control" onClick={next}>
-                  {isLast ? "Concluir" : opensStudio ? "Pular" : "Avançar"}
+                  {isLast ? "Concluir" : "Avançar"}
                 </Button>
               </div>
             </div>
           </Card>
         </motion.div>
       </AnimatePresence>
-    </Theme>,
-    document.body
+    </div>
   );
 };
