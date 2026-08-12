@@ -42,7 +42,8 @@ export const CardGridSkeleton = ({
   </Grid>
 );
 
-// Espelha o layout do card de perfil: identidade, faixa de numeros e acao.
+// Espelha o layout do card de perfil: cabecalho com acao, identidade e faixa
+// de numeros.
 export const ProfileSkeleton = () => (
   <Card className="hero-panel profile-card" mb="2">
     <Box className="profile-layout">
@@ -51,27 +52,25 @@ export const ProfileSkeleton = () => (
           <Skeleton width="64px" height="64px" radius="999px" />
         </Box>
 
-        <Box className="profile-heading" style={{ flex: "1 1 auto" }}>
-          <Skeleton width="min(15rem, 62%)" height="1.65rem" />
-          <Box mt="2">
-            <Skeleton width="7rem" height="0.6rem" />
-          </Box>
+        <Box className="profile-heading">
+          <Skeleton width="7rem" height="0.68rem" />
+          <Skeleton width="min(15rem, 80%)" height="1.65rem" />
+        </Box>
+
+        <Box className="profile-action">
+          <Skeleton width="9.5rem" height="2.75rem" radius="999px" />
         </Box>
       </Box>
 
       <Box className="stat-strip">
         {Array.from({ length: 3 }).map((_, index) => (
           <Box className="stat-cell" key={index}>
-            <Skeleton width="60%" height="1.2rem" />
+            <Skeleton width="60%" height="1rem" />
             <Box mt="2">
-              <Skeleton width="78%" height="0.58rem" />
+              <Skeleton width="78%" height="0.62rem" />
             </Box>
           </Box>
         ))}
-      </Box>
-
-      <Box className="profile-action">
-        <Skeleton height="2.75rem" />
       </Box>
     </Box>
   </Card>

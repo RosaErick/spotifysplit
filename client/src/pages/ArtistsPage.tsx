@@ -10,6 +10,7 @@ import { LoadingState } from "../components/Layout/LoadingState";
 import { Reveal } from "../components/Layout/Reveal";
 import { Section } from "../components/Layout/Section";
 import { TrackRankingList } from "../components/Ranking/RankingLists";
+import { isFeatureGoneError } from "../shared/api/errors";
 import { useArtist, useArtistTopTracks, useRelatedArtists } from "../shared/api/queries";
 import { formatGenresLabel, formatNumber } from "../utils/format";
 
@@ -20,6 +21,7 @@ const ArtistPage = () => {
   const topTracksQuery = useArtistTopTracks(id);
   const relatedQuery = useRelatedArtists(id);
   const relatedArtists = relatedQuery.data?.artists ?? [];
+  const relatedUnavailable = isFeatureGoneError(relatedQuery.error);
   const topTracks = topTracksQuery.data?.tracks ?? [];
 
   if (artistQuery.isLoading) {
@@ -44,7 +46,12 @@ const ArtistPage = () => {
     <AppShell>
       <Reveal>
       <Card className="hero-panel" size="3">
-        <Grid columns={{ initial: "1", md: "280px 1fr" }} gap="5" align="center">
+        {/*
+         * `auto` e nao uma largura fixa: a coluna era de 280px para um avatar
+         * que o Radix limita a 160px no `size="9"`, entao sobravam ~120px de
+         * coluna vazia entre a foto e o texto, alem do gap.
+         */}
+        <Grid columns={{ initial: "1", md: "auto 1fr" }} gap="5" align="center">
           <Avatar
             src={artist.images?.[0]?.url}
             fallback="SS"
@@ -94,12 +101,19 @@ const ArtistPage = () => {
         )}
       </Section>
 
+      {/*
+       * A secao some quando o endpoint esta indisponivel para o app, em vez de
+       * mostrar um erro permanente com "tentar novamente" que nunca vai dar
+       * certo: o Spotify descontinuou related-artists em 27/11/2024 e so apps
+       * com quota estendida aprovada antes disso mantiveram acesso.
+       */}
+      {!relatedUnavailable && (
       <Section title="Artistas relacionados" eyebrow="Continue explorando">
         {relatedQuery.isLoading && <LoadingState label="Carregando artistas relacionados" />}
         {relatedQuery.isError && (
           <FeatureUnavailableState
             title="Artistas relacionados indisponíveis"
-            description="O Spotify não retornou dados confiáveis para este artista ou não liberou esse endpoint para este app. Para evitar relações musicais erradas, esta seção não usa fallback."
+            description="O Spotify não retornou dados confiáveis para este artista. Para evitar relações musicais erradas, esta seção não usa fallback."
             onRetry={relatedQuery.refetch}
           />
         )}
@@ -119,6 +133,7 @@ const ArtistPage = () => {
           </Grid>
         )}
       </Section>
+      )}
     </AppShell>
   );
 };

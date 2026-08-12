@@ -939,10 +939,11 @@ a:hover > .brand-mark {
     0 14px 38px -34px var(--sand-a9);
 }
 
+/* O brilho acompanha o avatar, que volta ao topo do card. */
 .profile-card::after {
-  top: 3.4rem;
+  top: 3.7rem;
   right: auto;
-  left: 3.4rem;
+  left: 3.2rem;
   width: 5.8rem;
   height: 5.8rem;
   transform: translate(-50%, -50%);
@@ -951,7 +952,7 @@ a:hover > .brand-mark {
   filter: blur(14px);
 }
 
-/* Identidade, numeros e acao: um bloco por linha, na ordem de leitura. */
+/* Identidade e numeros: um bloco por linha, na ordem de leitura. */
 .profile-layout {
   position: relative;
   z-index: 1;
@@ -959,30 +960,80 @@ a:hover > .brand-mark {
   gap: var(--space-4);
 }
 
+/*
+ * Avatar, texto e acao. Em telas muito estreitas a acao desce para uma linha
+ * propria; a partir de 26rem ela cabe ao lado, encostada a direita e centrada
+ * com o avatar — que e onde o espaco vazio estava sobrando.
+ */
 .profile-identity {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    "avatar heading"
+    "action action";
   align-items: center;
-  gap: var(--space-3);
+  column-gap: var(--space-3);
+  row-gap: var(--space-3);
   min-width: 0;
 }
 
+.avatar-ring {
+  grid-area: avatar;
+}
+
 .profile-heading {
+  grid-area: heading;
+}
+
+.profile-action {
+  grid-area: action;
+}
+
+@media (min-width: 26rem) {
+  .profile-identity {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: "avatar heading action";
+  }
+}
+
+/*
+ * Plano e nome sao um par: o vao entre eles e o menor do card, para lerem como
+ * uma coisa so e nao como duas linhas soltas.
+ */
+.profile-heading {
+  display: flex;
   min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
 }
 
 /* Nomes longos quebram em duas linhas (`truncate-2`); o break evita que um
  * nome sem espacos empurre a largura do card. */
 .profile-name {
+  min-width: 0;
   overflow-wrap: break-word;
 }
 
+/*
+ * Eyebrow da identidade, em cinza. Ele estava em acento e disputava com o botao
+ * logo abaixo — dois elementos ambar num bloco de tres linhas. A direcao visual
+ * do projeto ja pede eyebrow em cinza, com o acento reservado para o que e
+ * acionavel.
+ *
+ * Sobe de 0.62 para 0.68rem com menos entreletra: a 10px e 0.16em ele lia como
+ * ruido acima do nome, nao como informacao.
+ */
 .profile-meta {
-  margin-top: 0.3rem;
-  color: var(--accent-11);
-  font-size: 0.62rem;
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--gray-11);
+  font-size: 0.68rem;
   font-weight: 700;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.13em;
+  text-overflow: ellipsis;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .avatar-ring {
@@ -1008,22 +1059,19 @@ a:hover > .brand-mark {
 }
 
 /*
- * Faixa de numeros. No mobile ela sangra ate a borda do card: sem as laterais,
- * a moldura da faixa para de repetir a moldura do card e a linha vira uma
- * secao do encarte em vez de uma caixa dentro de outra. O padding devolvido
- * mantem o primeiro numero alinhado com o nome.
+ * Faixa de numeros. No mobile so o fio de cima sangra ate a borda do card: sem
+ * fundo e sem moldura fechada, a faixa deixa de ser caixa dentro de caixa e
+ * vira o rodape do encarte. O padding devolvido mantem o primeiro numero
+ * alinhado com o avatar.
  */
 .stat-strip {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   min-width: 0;
   margin-inline: calc(var(--profile-pad) * -1);
-  padding-inline: calc(var(--profile-pad) - var(--space-2));
-  border-block: 1px solid var(--sand-a5);
-  background:
-    linear-gradient(180deg, var(--accent-a1), transparent),
-    color-mix(in srgb, var(--color-panel-solid) 80%, transparent);
-  box-shadow: inset 0 1px 0 color-mix(in srgb, #fff 18%, transparent);
+  padding-inline: calc(var(--profile-pad) - var(--space-3));
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--sand-a5);
 }
 
 .stat-cell {
@@ -1032,36 +1080,45 @@ a:hover > .brand-mark {
   flex-direction: column;
   justify-content: center;
   min-width: 0;
-  padding: var(--space-3) var(--space-2);
+  padding-inline: var(--space-3);
 }
 
 .stat-cell + .stat-cell {
   border-left: 1px solid var(--sand-a5);
 }
 
-/* O numero e o conteudo da celula; o rotulo e legenda. */
+/*
+ * O numero fica na mesma altura do texto de corpo: a monoespacada tabular e o
+ * peso 600 ja dao presenca, entao subir o corpo so faz a faixa pesar mais que
+ * o nome do usuario. O rotulo acompanha de perto para o par ler como uma
+ * unidade, e nao como numero + legenda perdida.
+ */
 .stat-cell .stat-value {
   font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
   font-variation-settings: normal;
   font-feature-settings: "tnum" 1;
   font-weight: 600;
-  font-size: clamp(1.05rem, 4.4vw, 1.35rem);
+  font-size: 1rem;
   line-height: 1;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.02em;
 }
 
 .stat-cell .stat-label {
-  margin-top: 0.4rem;
-  font-size: 0.58rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
+  margin-top: 0.35rem;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.09em;
   line-height: 1.1;
   text-transform: uppercase;
 }
 
 /*
- * Unica acao do card. No toque ela vale a largura inteira e a altura minima de
- * alvo (44px); o `:active` e obrigatorio porque o reset global apaga o realce
+ * Unica acao do card. Mantem 2.75rem (44px) de alvo no toque, com o rotulo em
+ * `font-size-2`: a 44px de altura com fonte de 12px a pilula parecia inflada.
+ *
+ * O anel interno da contorno a pilula. Sem ele, o fundo `soft` sobre o painel
+ * escuro do card fica quase invisivel e o botao le como texto solto, nao como
+ * controle. O `:active` e obrigatorio porque o reset global apaga o realce
  * nativo e no celular nao existe `:hover`.
  */
 .profile-action {
@@ -1070,24 +1127,30 @@ a:hover > .brand-mark {
 
 .profile-action .rt-Button {
   --base-button-height: 2.75rem;
-  width: 100%;
-  font-size: var(--font-size-3);
+  gap: var(--space-2);
+  padding-inline: var(--space-4);
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px var(--accent-a5);
+  font-size: var(--font-size-2);
+  letter-spacing: 0.01em;
   transition:
     background 180ms ease,
     transform 140ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .profile-action .rt-Button:active {
-  transform: scale(0.97);
+  transform: scale(0.94);
 }
 
+/* O esqueleto reserva a mesma pilula da acao (o Skeleton usa estilo inline). */
 .profile-action .skeleton {
-  width: 100% !important;
+  width: 9.5rem !important;
+  height: 2.75rem !important;
 }
 
 /*
- * A partir daqui o card vira linha: identidade e acao empilhadas a esquerda,
- * faixa de numeros a direita ocupando as duas linhas.
+ * A partir daqui o card vira linha: cabecalho cruzando o topo inteiro,
+ * identidade a esquerda e faixa de numeros a direita.
  */
 @media (min-width: 768px) {
   .profile-card {
@@ -1095,7 +1158,7 @@ a:hover > .brand-mark {
   }
 
   .profile-card::after {
-    top: clamp(3rem, 5vw, 4.6rem);
+    top: clamp(3.4rem, 6vw, 4.8rem);
     left: clamp(3rem, 5vw, 4.4rem);
     width: clamp(5.2rem, 10vw, 7.5rem);
     height: clamp(5.2rem, 10vw, 7.5rem);
@@ -1103,38 +1166,37 @@ a:hover > .brand-mark {
     filter: blur(16px);
   }
 
+  /*
+   * Duas colunas na mesma linha: identidade a esquerda, numeros a direita. Sao
+   * dois filhos, entao o auto-placement do grid ja resolve — sem areas
+   * nomeadas. Uma faixa de largura total aqui em cima jogava o rotulo numa
+   * borda e a acao na outra, com um vao enorme no meio.
+   */
   .profile-layout {
     grid-template-columns: minmax(0, 1fr) minmax(0, 20rem);
-    grid-template-areas:
-      "identity stats"
-      "action stats";
-    align-content: center;
+    align-items: center;
     column-gap: var(--space-6);
-    row-gap: var(--space-3);
   }
 
   .profile-identity {
-    grid-area: identity;
     gap: var(--space-4);
   }
 
-  .profile-action {
-    grid-area: action;
-    justify-self: start;
-  }
-
   .stat-strip {
-    grid-area: stats;
     align-self: center;
     margin-inline: 0;
     padding-inline: 0;
-    overflow: hidden;
+    padding-block: clamp(var(--space-2), 1.2vw, var(--space-3));
     border: 1px solid var(--sand-a5);
     border-radius: var(--radius-3);
   }
 
   .stat-cell {
-    padding: clamp(var(--space-2), 1.2vw, var(--space-3));
+    padding-inline: clamp(var(--space-2), 1.2vw, var(--space-3));
+  }
+
+  .stat-cell .stat-value {
+    font-size: 1.05rem;
   }
 
   .avatar-ring .skeleton {
@@ -1142,14 +1204,14 @@ a:hover > .brand-mark {
     height: 80px !important;
   }
 
+  /* Sem toque, o alvo de 44px vira peso desnecessario no canto. */
   .profile-action .rt-Button {
-    --base-button-height: var(--space-6);
-    width: auto;
+    --base-button-height: 2.25rem;
     font-size: var(--font-size-2);
   }
 
   .profile-action .skeleton {
-    width: 9.5rem !important;
+    height: 2.25rem !important;
   }
 }
 

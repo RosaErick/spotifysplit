@@ -16,8 +16,8 @@ const initialsOf = (name?: string) =>
     .toUpperCase() || "SS";
 
 // O plano e a unica informacao propria do usuario nessa linha; o resto era
-// texto de reforco. Juntar tudo num rotulo so libera a linha que o badge
-// ocupava, que na coluna estreita valia mais para a acao do card.
+// texto de reforco. Juntar tudo num rotulo so deixa a linha do topo curta o
+// bastante para dividir espaco com a acao do card.
 const connectionLabel = (product?: string) =>
   product ? `Spotify · ${product}` : "Spotify";
 
@@ -38,7 +38,15 @@ export const Profile = () => {
   return (
     <Reveal>
       <Card className="hero-panel profile-card" mb="2">
-        {/* Quem e voce -> seus numeros -> o que da para fazer. */}
+        {/*
+         * Identidade (plano, nome e a acao do card) -> numeros.
+         *
+         * O plano e o nome formam um par colado; a acao fica fora dessa pilha,
+         * na propria linha do avatar. Dentro da pilha ela quebrava o ritmo do
+         * texto: a caixa de 44px do botao soma ~14px de respiro interno antes do
+         * rotulo, entao o vao ate o nome ficava muito maior que o do nome ate o
+         * plano, por mais que o `gap` fosse o mesmo.
+         */}
         <Box className="profile-layout">
           <Box className="profile-identity">
             <Box className="avatar-ring">
@@ -51,12 +59,17 @@ export const Profile = () => {
             </Box>
 
             <Box className="profile-heading">
-              <Heading className="display-heading truncate-2 profile-name" size="6">
-                {profile.display_name}
-              </Heading>
               <Text as="p" className="profile-meta">
                 {connectionLabel(profile.product)}
               </Text>
+
+              <Heading className="display-heading truncate-2 profile-name" size="6">
+                {profile.display_name}
+              </Heading>
+            </Box>
+
+            <Box className="profile-action">
+              <ImageStudioDialog />
             </Box>
           </Box>
 
@@ -71,10 +84,6 @@ export const Profile = () => {
                 </Text>
               </Box>
             ))}
-          </Box>
-
-          <Box className="profile-action">
-            <ImageStudioDialog />
           </Box>
         </Box>
       </Card>
