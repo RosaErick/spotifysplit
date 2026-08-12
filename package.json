@@ -14,7 +14,8 @@
     "build-client": "cd client && npm run build",
     "build": "npm run build-client",
     "test": "cd client && npm test",
-    "test:coverage": "cd client && npm run test:coverage"
+    "test:coverage": "cd client && npm run test:coverage",
+    "test:mutation": "cd client && npm run test:mutation"
   },
   "keywords": [],
   "author": "",

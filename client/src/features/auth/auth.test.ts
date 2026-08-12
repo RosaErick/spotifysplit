@@ -84,6 +84,9 @@ describe("bootstrapAuthFromUrl", () => {
     bootstrapAuthFromUrl();
 
     expect(getAccessToken()).toBeNull();
+    // A chave nao pode nem existir: gravar a string "null" faria o app mandar
+    // `Bearer null` ao Spotify em vez de ir direto para o login.
+    expect(window.localStorage.getItem(ACCESS_TOKEN_KEY)).toBeNull();
     expect(window.location.hash).toBe("");
   });
 
@@ -179,9 +182,20 @@ describe("refreshAccessToken", () => {
     expect(JSON.stringify(window.localStorage)).not.toContain("AQnaodeveria");
   });
 
+  /*
+   * O corpo do erro NAO e JSON de proposito: proxy e CDN respondem 502 com
+   * HTML. O status precisa ser checado antes de tentar `json()`, senao a falha
+   * vira uma excecao generica e a sessao morta continua no storage.
+   */
   it("derruba a sessao quando a resposta nao e ok", async () => {
     window.localStorage.setItem(ACCESS_TOKEN_KEY, "BQvelho");
-    mockFetch({ ok: false, status: 401, json: async () => ({}) });
+    mockFetch({
+      ok: false,
+      status: 502,
+      json: async () => {
+        throw new SyntaxError("Unexpected token '<'");
+      },
+    });
 
     const { refreshAccessToken, getAccessToken } = await importAuth();
 

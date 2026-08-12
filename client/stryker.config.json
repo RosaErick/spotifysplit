@@ -1,0 +1,53 @@
+{
+  "$schema": "./node_modules/@stryker-mutator/core/schema/stryker-schema.json",
+  "packageManager": "npm",
+  "testRunner": "vitest",
+  "vitest": {
+    "configFile": "vitest.mutation.config.ts"
+  },
+  "coverageAnalysis": "perTest",
+  "reporters": ["html", "clear-text", "progress"],
+  "htmlReporter": {
+    "fileName": "../reports/mutation/index.html"
+  },
+  "clearTextReporter": {
+    "maxTestsToLog": 3
+  },
+  "tempDirName": "../.stryker-tmp",
+
+  "_escopo": [
+    "So os modulos de logica pura entram. Mutar client/src inteiro levaria",
+    "dezenas de minutos e produziria um mar de sobreviventes em componente de",
+    "tela, onde o mutante costuma ser equivalente (trocar uma classe de CSS, um",
+    "espacamento) e o sinal nao paga o tempo. Aqui cada mutante que sobrevive e",
+    "uma pergunta legitima sobre o teste."
+  ],
+  "mutate": [
+    "src/utils/format.ts",
+    "src/shared/api/errors.ts",
+    "src/shared/constants/app.ts",
+    "src/shared/constants/timeRanges.ts",
+    "src/features/tour/tourStorage.ts",
+    "src/features/auth/auth.ts",
+    "src/features/auth/tokenStorage.ts"
+  ],
+
+  "_medicao": [
+    "Score medido em 12/08/2026: 94,95% (188 mortos, 10 sobreviventes).",
+    "Os 10 sobreviventes foram revisados um a um e sao EQUIVALENTES, nao",
+    "buracos de teste:",
+    "- 9 em tourStorage.ts: as guardas de SSR (typeof window) e o if (!raw)",
+    "  ficam dentro de um try/catch que ja devolve null em qualquer falha.",
+    "  Removida a guarda, o acesso estoura, o catch pega, e o retorno e o",
+    "  mesmo. Nenhum teste consegue distinguir os dois caminhos de fora.",
+    "- 1 em auth.ts: /^#/ virando /#/ no replace do fragment. window.location",
+    "  .hash sempre comeca com # (ou e vazio), entao as duas expressoes cortam",
+    "  exatamente o mesmo caractere.",
+    "O break fica em 90: abaixo disso apareceu buraco novo, nao ruido."
+  ],
+  "thresholds": {
+    "high": 95,
+    "low": 90,
+    "break": 90
+  }
+}

@@ -35,6 +35,12 @@ describe("SpotifyAuthError", () => {
     expect(error.name).toBe("SpotifyAuthError");
     expect(error).toBeInstanceOf(SpotifyApiError);
   });
+
+  // A mensagem e o que aparece no log: sem o motivo, um 401 de token expirado
+  // fica indistinguivel de um 401 de escopo faltando.
+  it("diz na mensagem que o motivo e autenticacao", () => {
+    expect(new SpotifyAuthError().message).toContain("unauthorized");
+  });
 });
 
 describe("isAuthError", () => {
