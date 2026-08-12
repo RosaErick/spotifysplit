@@ -1,11 +1,15 @@
 [build]
-  # O campo "Base directory" na UI da Netlify precisa ficar VAZIO. Se apontar
-  # para `client`, todos os caminhos abaixo passam a resolver a partir dali
-  # (`client/client/dist`) e o diretorio de functions some.
+  # Fixa a raiz do repo como base, sobrepondo o que estiver na UI. A deteccao
+  # automatica da Netlify sugere `client` (e onde esta o app Vite), mas as
+  # functions ficam na raiz: com base em `client` o publish vira
+  # `client/client/dist` e o diretorio de functions deixa de existir.
   #
-  # A instalacao de dependencias roda na raiz, mas o build e do `client/`, que
-  # tem package.json proprio. Por isso o install explicito com --prefix: sem
-  # ele o build quebra com "vite: not found".
+  # Todos os caminhos deste arquivo sao relativos a este base.
+  base = "/"
+
+  # A instalacao de dependencias roda na base, mas o app fica em `client/`, com
+  # package.json proprio. Sem o install explicito o build quebra com
+  # "vite: not found".
   command = "npm install --prefix client && npm run build"
   publish = "client/dist"
 
