@@ -40,6 +40,14 @@ const playableSubtitle = (item: PlayableItem) =>
     ? item.artists?.map((artist) => artist.name).join(", ")
     : item.show?.name;
 
+// A barra e um retrato do ultimo polling (30s), nao um cronometro: por isso ela
+// e decorativa e o tempo continua escrito ao lado do artista.
+const progressPercent = (durationMs?: number, progressMs?: number | null) => {
+  if (!durationMs || !progressMs) return null;
+
+  return Math.min(100, Math.max(0, (progressMs / durationMs) * 100));
+};
+
 export const useNowPlaying = (): NowPlayingState => {
   const playbackQuery = usePlaybackState();
   const queueQuery = useQueue();
@@ -130,24 +138,48 @@ type PlayerDockProps = {
   onDismiss: () => void;
 };
 
+/*
+ * No mobile o alvo primario e a faixa inteira, que abre no Spotify: o dedo mira
+ * a barra, nao um botao "Abrir" de 24px (que some abaixo de 640px). Sobram dois
+ * utilitarios, ambos com alvo de 44px, e o dispensar fica isolado por um filete
+ * — facil de acertar de proposito, dificil por acidente.
+ */
 export const PlayerDock = ({ state, onDismiss }: PlayerDockProps) => {
   if (!state.isPlaying || !state.item) return null;
+
+  const item = state.item;
+  const spotifyUrl = item.external_urls?.spotify;
+  const progress = progressPercent(item.duration_ms, state.progressMs);
 
   return (
     <Box className="player-dock" role="region" aria-label="Tocando agora">
       <Card className="player-dock-card">
-        <Flex align="center" justify="between" gap="4" wrap="wrap">
-          <PlayerSummary state={state} />
+        <Box className="player-dock-row">
+          {spotifyUrl ? (
+            <a
+              className="player-dock-link"
+              href={spotifyUrl}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={`Abrir ${item.name} no Spotify`}
+            >
+              <PlayerSummary state={state} />
+            </a>
+          ) : (
+            <Box className="player-dock-link is-static">
+              <PlayerSummary state={state} />
+            </Box>
+          )}
 
-          <Flex align="center" gap="2" wrap="wrap" justify="end">
+          <Flex className="player-dock-actions" align="center" gap="2" justify="end">
             {state.nextItem && (
               <Text size="1" color="gray" className="mini-player-next">
                 Próxima: {state.nextItem.name}
               </Text>
             )}
-            {state.item.external_urls?.spotify && (
-              <Button asChild size="1" variant="soft">
-                <a href={state.item.external_urls.spotify} target="_blank" rel="noreferrer">
+            {spotifyUrl && (
+              <Button asChild size="1" variant="soft" className="player-dock-open">
+                <a href={spotifyUrl} target="_blank" rel="noreferrer">
                   <OpenInNewWindowIcon />
                   Abrir
                 </a>
@@ -155,8 +187,9 @@ export const PlayerDock = ({ state, onDismiss }: PlayerDockProps) => {
             )}
             <IconButton
               size="1"
-              variant="soft"
+              variant="ghost"
               color="gray"
+              className="player-dock-action clickable-control"
               aria-label="Atualizar player"
               onClick={state.refetch}
             >
@@ -166,13 +199,20 @@ export const PlayerDock = ({ state, onDismiss }: PlayerDockProps) => {
               size="1"
               variant="ghost"
               color="gray"
+              className="player-dock-action player-dock-dismiss clickable-control"
               aria-label="Recolher player"
               onClick={onDismiss}
             >
               <Cross2Icon />
             </IconButton>
           </Flex>
-        </Flex>
+        </Box>
+
+        {progress !== null && (
+          <Box className="player-dock-progress" aria-hidden="true">
+            <Box className="player-dock-progress-fill" style={{ width: `${progress}%` }} />
+          </Box>
+        )}
       </Card>
     </Box>
   );
@@ -265,6 +305,9 @@ const PlayerSummary = ({
 
   const imageUrl = playableImageUrl(state.item);
   const subtitle = playableSubtitle(state.item);
+  const durationMs = state.item.duration_ms;
+  const elapsed = state.progressMs ? formatDuration(state.progressMs) : "";
+  const timing = elapsed && durationMs ? `${elapsed} / ${formatDuration(durationMs)}` : elapsed;
 
   return (
     <Flex align="center" gap="3" minWidth="0">
@@ -286,7 +329,7 @@ const PlayerSummary = ({
         </Text>
         <Text as="p" size="1" color="gray" className="truncate-2">
           {subtitle || "Spotify"}
-          {state.progressMs ? ` · ${formatDuration(state.progressMs)}` : ""}
+          {timing ? ` · ${timing}` : ""}
         </Text>
       </Box>
     </Flex>
