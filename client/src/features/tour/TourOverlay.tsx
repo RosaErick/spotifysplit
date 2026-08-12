@@ -14,7 +14,8 @@ import {
 } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { Button, Card, Heading, Text } from "@radix-ui/themes";
+import { Button, Card, Heading, Text, Theme } from "@radix-ui/themes";
+import { useAppTheme } from "../../components/Layout/AppThemeProvider";
 import { useAnchorRect } from "./useAnchorRect";
 import { useTour } from "./TourProvider";
 import "./tour.css";
@@ -47,7 +48,11 @@ const formatStepNumber = (index: number) => String(index + 1).padStart(2, "0");
 
 export const TourOverlay = () => {
   const tour = useTour();
+  const { theme, accent } = useAppTheme();
   const step = tour?.step ?? null;
+  // Precisa vir antes dos hooks de foco: dentro do modal o tour nao pode
+  // disputar o foco com o focus trap do Radix.
+  const stepInsideStudio = Boolean(step?.insideStudio);
   const rect = useAnchorRect(step?.anchors ?? null);
 
   const cardRef = useRef<HTMLDivElement>(null);
@@ -88,15 +93,18 @@ export const TourOverlay = () => {
   // `preventScroll` importa: sem ele o navegador rola ate o card e briga com o
   // `scrollIntoView` que ja levou o alvo para o centro.
   useLayoutEffect(() => {
-    if (!isRunning) return;
+    if (!isRunning || stepInsideStudio) return;
     cardRef.current?.focus({ preventScroll: true });
-  }, [isRunning, tour?.stepIndex]);
+  }, [isRunning, tour?.stepIndex, stepInsideStudio]);
 
   const handleWindowKey = useCallback(
     (event: KeyboardEvent) => {
       if (!tour) return;
 
+      // Dentro do estudio o Esc pertence ao modal: ele fecha, e o tour avanca
+      // sozinho por causa disso.
       if (event.key === "Escape") {
+        if (stepInsideStudio) return;
         event.stopPropagation();
         tour.dismiss();
         return;
@@ -104,7 +112,7 @@ export const TourOverlay = () => {
       if (event.key === "ArrowRight") tour.next();
       if (event.key === "ArrowLeft") tour.back();
     },
-    [tour]
+    [tour, stepInsideStudio]
   );
 
   useEffect(() => {
@@ -208,7 +216,15 @@ export const TourOverlay = () => {
   }
 
   return createPortal(
-    <div className="tour-root">
+    <Theme
+      appearance={theme}
+      accentColor={accent}
+      grayColor="sand"
+      radius="large"
+      scaling="100%"
+      hasBackground={false}
+      className="tour-theme"
+    >
       {blocksClicks && <div className="tour-blocker" aria-hidden="true" />}
 
       {/* Sem ancora nao ha spotlight, entao o escurecimento precisa vir daqui. */}
@@ -234,10 +250,10 @@ export const TourOverlay = () => {
             ref={cardRef}
             tabIndex={-1}
             role="dialog"
-            aria-modal="true"
+            aria-modal={insideStudio ? undefined : true}
             aria-labelledby={`tour-title-${step.id}`}
             aria-describedby={`tour-body-${step.id}`}
-            onKeyDown={trapTab}
+            onKeyDown={insideStudio ? undefined : trapTab}
           >
             <p className="tour-progress" aria-hidden="true">
               {Array.from({ length: stepCount }).map((_, index) => (
@@ -299,7 +315,7 @@ export const TourOverlay = () => {
           </Card>
         </motion.div>
       </AnimatePresence>
-    </div>,
+    </Theme>,
     document.body
   );
 };

@@ -13,19 +13,47 @@
  * clique.
  */
 
+/*
+ * Raiz do portal. Precisa ser um `<Theme>` do Radix, e nao uma div qualquer:
+ * TODOS os tokens (--color-panel-solid, --sand-*, --accent-*, --space-*) sao
+ * escopados em `:where(.radix-themes)`. Portalizado no body sem isso, o card
+ * ficava sem fundo e o spotlight sem escurecimento — a "UI transparente".
+ *
+ * `pointer-events: none` aqui, `auto` em cada camada interativa: o Radix Dialog
+ * usa react-remove-scroll, que poe `pointer-events: none` no body enquanto o
+ * modal esta aberto. Como o tour e filho do body, ele herdava isso e nada
+ * respondia a clique.
+ *
+ * `position: fixed` + z-index cria o contexto de empilhamento do tour inteiro
+ * acima do modal, que nao declara z-index proprio.
+ */
+.tour-theme {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  pointer-events: none;
+  background: none;
+}
+
+.tour-blocker,
+.tour-scrim,
+.tour-card-shell {
+  pointer-events: auto;
+}
+
 /* Invisivel: existe so para engolir cliques no app durante os passos passivos.
    Nao escurece nada — quem escurece e a sombra do spotlight. */
 .tour-blocker {
   position: fixed;
   inset: 0;
-  z-index: 9000;
+  z-index: 1;
 }
 
 /* Usado apenas quando nao ha ancora e, portanto, nao ha spotlight. */
 .tour-scrim {
   position: fixed;
   inset: 0;
-  z-index: 9000;
+  z-index: 1;
   background: color-mix(in srgb, var(--sand-1) 78%, transparent);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
@@ -42,7 +70,7 @@
  */
 .tour-spotlight {
   position: fixed;
-  z-index: 9001;
+  z-index: 2;
   border-radius: var(--radius-4);
   box-shadow:
     0 0 0 9999px color-mix(in srgb, var(--sand-1) 78%, transparent),
@@ -66,7 +94,7 @@
 
 .tour-card-shell {
   position: fixed;
-  z-index: 9002;
+  z-index: 3;
   width: min(24rem, calc(100vw - 2rem));
 }
 
