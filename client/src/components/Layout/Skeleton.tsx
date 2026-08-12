@@ -52,12 +52,13 @@ export const ProfileSkeleton = () => (
           <Skeleton width="64px" height="64px" radius="999px" />
         </Box>
 
-        <Box className="profile-heading" style={{ flex: "1 1 auto", minWidth: 0 }}>
+        <Box className="profile-heading">
           <Skeleton width="7rem" height="0.68rem" />
-          <Skeleton width="min(15rem, 62%)" height="1.65rem" />
-          <Box className="profile-action">
-            <Skeleton width="9.5rem" height="2.75rem" radius="999px" />
-          </Box>
+          <Skeleton width="min(15rem, 80%)" height="1.65rem" />
+        </Box>
+
+        <Box className="profile-action">
+          <Skeleton width="9.5rem" height="2.75rem" radius="999px" />
         </Box>
       </Box>
 

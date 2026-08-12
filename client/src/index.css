@@ -960,25 +960,52 @@ a:hover > .brand-mark {
   gap: var(--space-4);
 }
 
+/*
+ * Avatar, texto e acao. Em telas muito estreitas a acao desce para uma linha
+ * propria; a partir de 26rem ela cabe ao lado, encostada a direita e centrada
+ * com o avatar — que e onde o espaco vazio estava sobrando.
+ */
 .profile-identity {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  grid-template-areas:
+    "avatar heading"
+    "action action";
   align-items: center;
-  gap: var(--space-3);
+  column-gap: var(--space-3);
+  row-gap: var(--space-3);
   min-width: 0;
 }
 
+.avatar-ring {
+  grid-area: avatar;
+}
+
+.profile-heading {
+  grid-area: heading;
+}
+
+.profile-action {
+  grid-area: action;
+}
+
+@media (min-width: 26rem) {
+  .profile-identity {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-areas: "avatar heading action";
+  }
+}
+
 /*
- * Coluna de texto ao lado do avatar: plano, nome e acao empilhados e alinhados
- * a esquerda. Empilhar em vez de espalhar mantem os tres como um bloco so — era
- * isso que faltava quando o plano e a acao dividiam uma linha de largura total,
- * cada um grudado numa borda do card.
+ * Plano e nome sao um par: o vao entre eles e o menor do card, para lerem como
+ * uma coisa so e nao como duas linhas soltas.
  */
 .profile-heading {
   display: flex;
   min-width: 0;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.3rem;
+  gap: 0.1rem;
 }
 
 /* Nomes longos quebram em duas linhas (`truncate-2`); o break evita que um
@@ -989,13 +1016,18 @@ a:hover > .brand-mark {
 }
 
 /*
- * Eyebrow da identidade. Sobe de 0.62 para 0.68rem com menos entreletra: a 10px
- * e 0.16em ele lia como ruido acima do nome, nao como informacao.
+ * Eyebrow da identidade, em cinza. Ele estava em acento e disputava com o botao
+ * logo abaixo — dois elementos ambar num bloco de tres linhas. A direcao visual
+ * do projeto ja pede eyebrow em cinza, com o acento reservado para o que e
+ * acionavel.
+ *
+ * Sobe de 0.62 para 0.68rem com menos entreletra: a 10px e 0.16em ele lia como
+ * ruido acima do nome, nao como informacao.
  */
 .profile-meta {
   max-width: 100%;
   overflow: hidden;
-  color: var(--accent-11);
+  color: var(--gray-11);
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.13em;
@@ -1081,18 +1113,16 @@ a:hover > .brand-mark {
 }
 
 /*
- * Unica acao do card, logo abaixo do nome e na mesma coluna: assim ela pertence
- * ao bloco de identidade em vez de flutuar num canto.
+ * Unica acao do card. Mantem 2.75rem (44px) de alvo no toque, com o rotulo em
+ * `font-size-2`: a 44px de altura com fonte de 12px a pilula parecia inflada.
  *
- * Mantem 2.75rem (44px) de alvo no toque, mas com o rotulo em `font-size-2`. A
- * 44px de altura com fonte de 12px a pilula parecia inflada — o problema de
- * tamanho era proporcao entre caixa e texto, nao a altura em si. O `:active` e
- * obrigatorio porque o reset global apaga o realce nativo e no celular nao
- * existe `:hover`.
+ * O anel interno da contorno a pilula. Sem ele, o fundo `soft` sobre o painel
+ * escuro do card fica quase invisivel e o botao le como texto solto, nao como
+ * controle. O `:active` e obrigatorio porque o reset global apaga o realce
+ * nativo e no celular nao existe `:hover`.
  */
 .profile-action {
   display: flex;
-  margin-top: 0.15rem;
 }
 
 .profile-action .rt-Button {
@@ -1100,6 +1130,7 @@ a:hover > .brand-mark {
   gap: var(--space-2);
   padding-inline: var(--space-4);
   border-radius: 999px;
+  box-shadow: inset 0 0 0 1px var(--accent-a5);
   font-size: var(--font-size-2);
   letter-spacing: 0.01em;
   transition:

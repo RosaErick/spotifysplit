@@ -39,13 +39,13 @@ export const Profile = () => {
     <Reveal>
       <Card className="hero-panel profile-card" mb="2">
         {/*
-         * Identidade (procedencia, nome e a acao do card) -> numeros.
+         * Identidade (plano, nome e a acao do card) -> numeros.
          *
-         * Os tres ficam na mesma coluna, ao lado do avatar: o plano descreve a
-         * conta e a acao age sobre ela, entao eles pertencem ao bloco de
-         * identidade. Espalhar isso numa linha de topo de largura total abria um
-         * vao enorme no desktop e deixava o rotulo pequeno pareado com um botao
-         * grande, sem relacao visual entre os dois.
+         * O plano e o nome formam um par colado; a acao fica fora dessa pilha,
+         * na propria linha do avatar. Dentro da pilha ela quebrava o ritmo do
+         * texto: a caixa de 44px do botao soma ~14px de respiro interno antes do
+         * rotulo, entao o vao ate o nome ficava muito maior que o do nome ate o
+         * plano, por mais que o `gap` fosse o mesmo.
          */}
         <Box className="profile-layout">
           <Box className="profile-identity">
@@ -66,10 +66,10 @@ export const Profile = () => {
               <Heading className="display-heading truncate-2 profile-name" size="6">
                 {profile.display_name}
               </Heading>
+            </Box>
 
-              <Box className="profile-action">
-                <ImageStudioDialog />
-              </Box>
+            <Box className="profile-action">
+              <ImageStudioDialog />
             </Box>
           </Box>
 
