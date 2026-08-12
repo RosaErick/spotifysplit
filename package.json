@@ -12,7 +12,9 @@
     "server": "nodemon ./server/index.js",
     "client": "cd client && npm run dev",
     "build-client": "cd client && npm run build",
-    "build": "npm run build-client"
+    "build": "npm run build-client",
+    "cf:dev": "wrangler dev",
+    "cf:deploy": "npm run build && wrangler deploy"
   },
   "keywords": [],
   "author": "",
@@ -28,6 +30,7 @@
   },
   "devDependencies": {
     "concurrently": "^7.5.0",
-    "nodemon": "^2.0.20"
+    "nodemon": "^2.0.20",
+    "wrangler": "^4.121.0"
   }
 }

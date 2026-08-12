@@ -1,0 +1,17 @@
+name = "spotifysplit"
+main = "worker/index.js"
+compatibility_date = "2026-01-01"
+
+# Assets estaticos = build do Vite.
+#
+# `run_worker_first` mantem o Worker fora das rotas estaticas: so /api/* invoca
+# codigo. O resto sai direto do CDN, o que nao consome o limite de 100k
+# requisicoes/dia do plano free e nao tem cold start.
+#
+# `single-page-application` faz as rotas do React Router (/top-tracks, /sobre,
+# ...) caírem no index.html em vez de 404.
+[assets]
+directory = "./client/dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+run_worker_first = ["/api/*"]
