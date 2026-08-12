@@ -1,9 +1,9 @@
-# Spotifysplit
+# SonarStats
 
 A personal web app that shows your Spotify listening stats — the ones the
 official app doesn't surface. Built for practice, not for profit.
 
-**Live:** https://spotfysplit.netlify.app
+**Live:** https://sonarstats.netlify.app
 
 You log in with your own Spotify account. The app reads your data and never
 writes to it.

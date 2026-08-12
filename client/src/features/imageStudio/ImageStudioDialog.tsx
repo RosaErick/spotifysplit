@@ -18,13 +18,19 @@ type StudioFormat = "poster" | "collage";
 
 const DEFAULT_PERIOD: SpotifyTopTimeRange = "medium_term";
 
-// Nome legado (a cor nasceu no poster); mantido para nao descartar a escolha de
-// quem ja usava o app.
-const STUDIO_COLOR_KEY = "spotifysplit_poster_color";
+// "poster" no nome e legado: a cor nasceu no poster e hoje vale para o estudio
+// inteiro. A chave antiga so e lida, nunca gravada, para nao descartar a escolha
+// de quem ja usava o app antes do rename.
+const STUDIO_COLOR_KEY = "sonarstats_studio_color";
+const LEGACY_STUDIO_COLOR_KEY = "spotifysplit_poster_color";
 
 const getInitialColor = (): string => {
   if (typeof window === "undefined") return defaultStudioColor;
-  const stored = window.localStorage.getItem(STUDIO_COLOR_KEY);
+
+  const stored =
+    window.localStorage.getItem(STUDIO_COLOR_KEY) ??
+    window.localStorage.getItem(LEGACY_STUDIO_COLOR_KEY);
+
   return stored && isValidHex(stored) ? stored : defaultStudioColor;
 };
 

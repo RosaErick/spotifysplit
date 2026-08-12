@@ -6,6 +6,7 @@
 
 import { useCallback, useState } from "react";
 import { toCanvas } from "html-to-image";
+import { APP_NAME } from "../constants/app";
 
 export type ImageExportStatus = "idle" | "working" | "success" | "error";
 
@@ -147,7 +148,7 @@ export const useImageExport = () => {
           try {
             await navigator.share({
               files: [file],
-              title: "Spotifysplit",
+              title: APP_NAME,
               text: request.shareText,
             });
             setStatus("success");

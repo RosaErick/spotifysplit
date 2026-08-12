@@ -53,7 +53,7 @@ export const AppShell = ({ children, onLogout }: AppShellProps) => {
                 </Flex>
                 <Box className="brand-copy">
                   <Text as="p" size="2" className="brand-title">
-                    SpotfySplit
+                    SonarStats
                   </Text>
                   <Text as="p" size="1" color="gray">
                     Seus stats do Spotify

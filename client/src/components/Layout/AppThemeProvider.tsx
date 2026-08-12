@@ -25,14 +25,23 @@ type ThemeContextValue = {
   setAccent: (accent: AppAccent) => void;
 };
 
-const THEME_KEY = "spotifysplit_theme";
-const ACCENT_KEY = "spotifysplit_accent";
+const THEME_KEY = "sonarstats_theme";
+const ACCENT_KEY = "sonarstats_accent";
+
+// Chaves usadas antes do rename. So sao lidas, nunca gravadas: sem isso quem ja
+// usava o app perderia tema e cor de acento na primeira visita apos a troca.
+const LEGACY_THEME_KEY = "spotifysplit_theme";
+const LEGACY_ACCENT_KEY = "spotifysplit_accent";
+
+const readStored = (key: string, legacyKey: string) =>
+  window.localStorage.getItem(key) ?? window.localStorage.getItem(legacyKey);
+
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 const getInitialTheme = (): AppTheme => {
   if (typeof window === "undefined") return "dark";
 
-  const storedTheme = window.localStorage.getItem(THEME_KEY);
+  const storedTheme = readStored(THEME_KEY, LEGACY_THEME_KEY);
   if (storedTheme === "light" || storedTheme === "dark") return storedTheme;
 
   return window.matchMedia("(prefers-color-scheme: dark)").matches
@@ -46,7 +55,7 @@ const isAppAccent = (value: string | null): value is AppAccent =>
 const getInitialAccent = (): AppAccent => {
   if (typeof window === "undefined") return "amber";
 
-  const stored = window.localStorage.getItem(ACCENT_KEY);
+  const stored = readStored(ACCENT_KEY, LEGACY_ACCENT_KEY);
   return isAppAccent(stored) ? stored : "amber";
 };
 

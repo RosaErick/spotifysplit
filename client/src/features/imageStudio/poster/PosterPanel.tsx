@@ -17,7 +17,7 @@ import {
   useTopArtists,
   useTopTracks,
 } from "../../../shared/api/queries";
-import { APP_NAME } from "../../../shared/constants/app";
+import { APP_BRAND, APP_NAME } from "../../../shared/constants/app";
 import { getTopTimeRangeOption } from "../../../shared/constants/timeRanges";
 import {
   pickImageUrl,
@@ -142,7 +142,7 @@ export const PosterPanel = ({
   const fileFormatConfig = imageFileFormats[fileFormat];
 
   const exportRequest = {
-    fileName: `spotifysplit-top-${content}-${timeRange}.${fileFormatConfig.extension}`,
+    fileName: `${APP_BRAND}-top-${content}-${timeRange}.${fileFormatConfig.extension}`,
     // O poster ja pinta o proprio fundo; isso cobre as bordas e da ao JPEG a
     // base opaca que ele exige.
     backgroundColor: buildStudioTheme(accentColor).backgroundColor,
