@@ -22,6 +22,8 @@ app.get("/", (req, res) => {
   res.send("health check");
 });
 
-app.use(authRoutes);
+// Prefixo /api para o dev local falar o mesmo contrato do deploy same-origin,
+// onde a raiz pertence ao SPA (o React Router ja usa /login).
+app.use("/api", authRoutes);
 
 export default app;

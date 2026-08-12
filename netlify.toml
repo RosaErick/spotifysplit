@@ -1,0 +1,20 @@
+[build]
+  command = "npm run build"
+  publish = "client/dist"
+
+[build.environment]
+  NODE_VERSION = "20.19.0"
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+# Fallback de SPA: as rotas do React Router (/top-tracks, /sobre, ...) precisam
+# cair no index.html em vez de 404.
+#
+# Os endpoints em /api/* nao sao afetados: cada function declara o proprio
+# `config.path`, resolvido antes desta regra de redirect.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
