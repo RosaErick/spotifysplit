@@ -6,6 +6,7 @@ import { EqualizerMark } from "../components/Layout/EqualizerMark";
 import { GitHubNavButton } from "../components/Layout/GitHubNavButton";
 import { Reveal } from "../components/Layout/Reveal";
 import { ThemeToggle } from "../components/Layout/ThemeToggle";
+import { InAppBrowserNotice } from "../features/auth/InAppBrowserNotice";
 import { LoginButton } from "../features/auth/LoginButton";
 import { isAuthenticated } from "../features/auth/auth";
 
@@ -74,12 +75,17 @@ export const Login = () => {
               </Text>
             </Reveal>
             <Reveal delay={0.24}>
-              <Flex mt="6" align="center" gap="4" wrap="wrap">
-                <LoginButton />
-                <Text size="1" color="gray" className="serif-accent">
-                  leva poucos segundos
-                </Text>
-              </Flex>
+              <Box mt="6">
+                {/* So aparece em navegador embutido de app, onde o login falha. */}
+                <InAppBrowserNotice />
+
+                <Flex align="center" gap="4" wrap="wrap">
+                  <LoginButton />
+                  <Text size="1" color="gray" className="serif-accent">
+                    leva poucos segundos
+                  </Text>
+                </Flex>
+              </Box>
             </Reveal>
             <Reveal delay={0.3}>
               <Text as="p" size="2" color="gray" mt="4">

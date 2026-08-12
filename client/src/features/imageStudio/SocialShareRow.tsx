@@ -5,14 +5,20 @@
 // - X, WhatsApp e Telegram tem endpoint de composicao por URL. Ele aceita texto
 //   e link, mas nao arquivo: abrimos a rede com a legenda pronta e baixamos a
 //   imagem para o usuario anexar.
-// - Instagram nao tem endpoint nenhum. O unico caminho que leva a imagem ate o
-//   story e a folha nativa (Web Share API), onde "Instagram > Stories" aparece
-//   como destino com o arquivo anexado — disponivel no celular. Fora dela, so da
-//   para baixar a imagem, copiar a legenda e avisar que a publicacao e no app.
+// - Instagram nao tem endpoint nenhum. O unico caminho que leva o arquivo a
+//   qualquer app e a folha nativa (Web Share API), disponivel no celular — mas
+//   quem escolhe o destino ali e o usuario, nao o site. Por isso o botao se
+//   chama "Compartilhar" e nao "Instagram Stories": prometer um destino
+//   especifico seria mentira, a folha pode nem listar o Instagram. Fora dela, so
+//   da para baixar a imagem, copiar a legenda e avisar que a publicacao e no app.
 
 import { useState } from "react";
 import { Button, Flex, Text } from "@radix-ui/themes";
-import { ExternalLinkIcon, InstagramLogoIcon } from "@radix-ui/react-icons";
+import {
+  ExternalLinkIcon,
+  InstagramLogoIcon,
+  Share2Icon,
+} from "@radix-ui/react-icons";
 import { APP_URL } from "../../shared/constants/app";
 import { canShareFiles } from "../../shared/image/useImageExport";
 import { INSTAGRAM_URL, socialTargets } from "./socialTargets";
@@ -74,8 +80,8 @@ export const SocialShareRow = ({
           disabled={disabled}
           onClick={shareToInstagram}
         >
-          <InstagramLogoIcon />
-          {nativeShare ? "Instagram Stories" : "Instagram"}
+          {nativeShare ? <Share2Icon /> : <InstagramLogoIcon />}
+          {nativeShare ? "Compartilhar" : "Instagram"}
         </Button>
 
         {socialTargets.map((target) => (
@@ -95,7 +101,7 @@ export const SocialShareRow = ({
 
       <Text as="p" size="1" color="gray">
         {nativeShare
-          ? "O Instagram abre a folha de compartilhamento do sistema — escolha Stories e a imagem vai anexada. Nas outras redes a legenda vai pronta e a imagem é baixada para você anexar."
+          ? "Compartilhar abre a folha do sistema com a imagem anexada — de lá você escolhe o app. Nas outras redes a legenda vai pronta e a imagem é baixada para você anexar."
           : "As redes não aceitam anexo por link: a imagem é baixada e a legenda vai preenchida — é só anexar o arquivo na hora de postar."}
       </Text>
 
