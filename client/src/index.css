@@ -1575,7 +1575,7 @@ a:hover > .brand-mark {
 
   /* Com o player aberto, ele empilha acima da barra. */
   .has-player-dock {
-    padding-bottom: calc(10rem + env(safe-area-inset-bottom));
+    padding-bottom: calc(10.75rem + env(safe-area-inset-bottom));
   }
 
   .player-dock {
