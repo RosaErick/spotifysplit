@@ -16,7 +16,11 @@ export const TopRankingsOverview = () => {
   const tracks = tracksQuery.data?.items ?? [];
 
   return (
-    <Grid columns={{ initial: "1", lg: "1fr 1fr" }} gap={{ initial: "2", lg: "6" }}>
+    <Grid
+      data-tour-id="rankings"
+      columns={{ initial: "1", lg: "1fr 1fr" }}
+      gap={{ initial: "2", lg: "6" }}
+    >
       <Section
         title="Top artistas do último ano"
         titleTo="/top-artists"

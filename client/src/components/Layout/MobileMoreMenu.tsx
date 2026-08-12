@@ -5,6 +5,7 @@ import {
   GitHubLogoIcon,
   InfoCircledIcon,
   MoonIcon,
+  QuestionMarkCircledIcon,
   SunIcon,
 } from "@radix-ui/react-icons";
 import { Popover, Text } from "@radix-ui/themes";
@@ -12,6 +13,7 @@ import { Link } from "react-router-dom";
 import { useState } from "react";
 import { ACCENT_OPTIONS, useAppTheme } from "./AppThemeProvider";
 import { GITHUB_URL } from "./GitHubNavButton";
+import { useTour } from "../../features/tour";
 
 const THEME_OPTIONS = [
   { value: "light", label: "Claro", Icon: SunIcon },
@@ -25,6 +27,7 @@ const THEME_OPTIONS = [
 // mais e o clique-fora fecha os dois.
 export const MobileMoreMenu = ({ onLogout }: { onLogout: () => void }) => {
   const { theme, toggleTheme, accent, setAccent } = useAppTheme();
+  const tour = useTour();
   const [open, setOpen] = useState(false);
 
   const close = () => setOpen(false);
@@ -103,6 +106,20 @@ export const MobileMoreMenu = ({ onLogout }: { onLogout: () => void }) => {
         </div>
 
         <hr className="mobile-more-divider" />
+
+        {tour && (
+          <button
+            type="button"
+            className="mobile-more-item"
+            onClick={() => {
+              close();
+              tour.startTour();
+            }}
+          >
+            <QuestionMarkCircledIcon />
+            <span>Como funciona</span>
+          </button>
+        )}
 
         <Link to="/sobre" className="mobile-more-item" onClick={close}>
           <InfoCircledIcon />
