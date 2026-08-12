@@ -10,6 +10,7 @@ import React, { useState } from "react";
 import { AccentPicker } from "./AccentPicker";
 import { EqualizerMark } from "./EqualizerMark";
 import { GitHubNavButton } from "./GitHubNavButton";
+import { MobileTabBar } from "./MobileTabBar";
 import { ThemeToggle } from "./ThemeToggle";
 import { useAuth } from "../../features/auth/useAuth";
 import { PlayerDock, PlayerNavControl, useNowPlaying } from "../Player/MiniPlayer";
@@ -39,7 +40,7 @@ export const AppShell = ({ children, onLogout }: AppShellProps) => {
                 <Flex className="brand-mark" align="center" justify="center">
                   <EqualizerMark />
                 </Flex>
-                <Box display={{ initial: "none", xs: "block" }}>
+                <Box className="brand-copy">
                   <Text as="p" size="2" className="brand-title">
                     SpotfySplit
                   </Text>
@@ -114,6 +115,7 @@ export const AppShell = ({ children, onLogout }: AppShellProps) => {
         {children}
       </Container>
       <PlayerDock state={playerState} onDismiss={() => setIsPlayerDockHidden(true)} />
+      <MobileTabBar onLogout={handleLogout} />
     </Box>
   );
 };

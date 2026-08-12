@@ -327,73 +327,290 @@ a:hover > .brand-mark {
   background: var(--gray-a3) !important;
 }
 
+.brand-copy {
+  min-width: 0;
+}
+
+.brand-copy > * {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/*
+ * Abaixo de 820px o cabecalho para de tentar ser a versao web comprimida: a
+ * navegacao principal desce para a barra inferior (`.mobile-tabbar`), no alcance
+ * do polegar, e as acoes de baixa frequencia vao para o menu "Mais".
+ *
+ * Sobra um header de uma linha so com marca e player — o que liberou espaco para
+ * o nome do app voltar a aparecer no mobile.
+ */
 @media (max-width: 820px) {
   .app-header-row {
     grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-areas:
-      "brand tools"
-      "nav nav";
     column-gap: var(--space-3);
-    row-gap: var(--space-3);
-  }
-
-  .brand-link {
-    grid-area: brand;
+    padding-block: var(--space-2);
   }
 
   .nav-actions {
-    grid-area: nav;
-    width: 100%;
-    justify-self: stretch;
+    display: none;
   }
 
-  .utility-actions {
-    grid-area: tools;
-    justify-self: end;
+  /* O player fica: e contextual e muda sozinho. O resto e configuracao. */
+  .utility-actions > *:not(.player-nav-slot) {
+    display: none;
   }
 }
 
 @media (max-width: 640px) {
-  /*
-   * No toque os alvos crescem (~38px) e o header encolhe: sem hover, o que vale
-   * e acertar o botao com o dedo, e o cabecalho e sticky — cada pixel dele fica
-   * ocupando a tela o tempo todo.
-   */
   .app-header {
     --nav-target: 2.4rem;
-  }
-
-  .app-header-row {
-    row-gap: var(--space-1);
-    padding-block: var(--space-2);
   }
 
   .brand-mark {
     width: 2.25rem;
     height: 2.25rem;
   }
+}
 
-  .nav-actions {
-    gap: 0;
-    padding: 0.15rem;
-    justify-content: space-between;
-  }
+/* ---------- Navegacao inferior (mobile) ---------- */
 
-  .nav-action {
-    flex: 1 1 0;
-    min-width: 0;
-    padding: 0 0.4rem;
-  }
+/*
+ * Some no desktop, onde o header em uma linha ja resolve. Nao e o header
+ * reposicionado: e a navegacao primaria tratada como primaria, com alvos
+ * grandes e no terco inferior da tela.
+ */
+.mobile-tabbar {
+  display: none;
+}
 
-  .utility-actions {
-    flex: 0 0 auto;
-    gap: 0.3rem;
-  }
+.mobile-tabbar-inner {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.15rem;
+  padding: 0.25rem;
+  border: 1px solid var(--sand-a5);
+  border-radius: 1.2rem;
+  background:
+    linear-gradient(120deg, var(--accent-a2), transparent 55%),
+    color-mix(in srgb, var(--color-panel-solid) 90%, transparent);
+  box-shadow:
+    0 20px 50px -30px var(--sand-a12),
+    inset 0 1px 0 color-mix(in srgb, #fff 22%, transparent);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+}
 
-  .logout-action {
-    width: var(--nav-target);
-    min-width: var(--nav-target);
-    padding: 0;
+.mobile-tab {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 2.9rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.18rem;
+  padding: 0.32rem 0.25rem 0.26rem;
+  border: 0;
+  border-radius: 0.95rem;
+  background: transparent;
+  color: var(--gray-11);
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    color 180ms ease,
+    background 180ms ease,
+    transform 140ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/*
+ * Marca de indice sobre a aba ativa — eco da numeracao de tracklist do conceito
+ * "Liner Notes". Cresce a partir do centro em vez de aparecer seca.
+ */
+.mobile-tab-mark {
+  position: absolute;
+  top: 0.24rem;
+  width: 1.05rem;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--accent-9);
+  opacity: 0;
+  transform: scaleX(0.2);
+  transition:
+    transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 200ms ease;
+}
+
+.mobile-tab-icon {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.mobile-tab-label {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 0.64rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mobile-tab-active,
+.mobile-tab-more[data-state="open"] {
+  color: var(--accent-12);
+  background: var(--accent-a3);
+}
+
+.mobile-tab-active .mobile-tab-mark,
+.mobile-tab-more[data-state="open"] .mobile-tab-mark {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+/* O reset global tira o realce nativo de toque; isto ocupa o lugar dele. */
+.mobile-tab:active {
+  transform: scale(0.94);
+}
+
+.mobile-more-panel {
+  display: flex;
+  width: min(17rem, calc(100vw - 1.5rem));
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.mobile-more-segment {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.2rem;
+  padding: 0.2rem;
+  border: 1px solid var(--sand-a5);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-panel-solid) 72%, transparent);
+}
+
+.mobile-more-segment-option {
+  display: inline-flex;
+  min-height: 2.2rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--gray-11);
+  font: inherit;
+  font-size: var(--font-size-1);
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    color 180ms ease,
+    background 180ms ease;
+}
+
+.mobile-more-segment-option-active {
+  color: var(--accent-12);
+  background: var(--accent-a4);
+  box-shadow: inset 0 0 0 1px var(--accent-a5);
+}
+
+.mobile-more-accents {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.mobile-more-accent {
+  position: relative;
+  display: inline-flex;
+  width: 2.2rem;
+  height: 2.2rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--sand-a5);
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+  transition:
+    box-shadow 180ms ease,
+    transform 140ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.mobile-more-accent-active {
+  box-shadow: 0 0 0 2px var(--accent-a7);
+}
+
+.mobile-more-accent:active {
+  transform: scale(0.92);
+}
+
+.mobile-more-accent-swatch {
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 999px;
+}
+
+.mobile-more-accent-check {
+  position: absolute;
+  color: #fff;
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 45%));
+}
+
+.mobile-more-divider {
+  height: 1px;
+  margin: 0;
+  border: 0;
+  background: var(--sand-a5);
+}
+
+.mobile-more-item {
+  display: flex;
+  min-height: 2.5rem;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0 0.6rem;
+  border: 0;
+  border-radius: 0.7rem;
+  background: transparent;
+  color: var(--gray-12);
+  font: inherit;
+  font-size: var(--font-size-2);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background 180ms ease,
+    color 180ms ease;
+}
+
+.mobile-more-item:hover {
+  background: var(--accent-a3);
+}
+
+.mobile-more-item:active {
+  background: var(--accent-a4);
+}
+
+.mobile-more-item-danger {
+  color: var(--red-11);
+}
+
+.mobile-more-item-danger:hover,
+.mobile-more-item-danger:active {
+  background: var(--red-a3);
+}
+
+@media (max-width: 820px) {
+  .mobile-tabbar {
+    display: block;
+    position: fixed;
+    right: max(var(--space-3), env(safe-area-inset-right));
+    bottom: max(var(--space-3), env(safe-area-inset-bottom));
+    left: max(var(--space-3), env(safe-area-inset-left));
+    /* Acima do player dock (35) e do header (40). */
+    z-index: 45;
   }
 }
 
@@ -1132,12 +1349,30 @@ a:hover > .brand-mark {
 
   .player-dock {
     right: var(--space-3);
-    bottom: var(--space-3);
     left: var(--space-3);
   }
 
   .player-dock-card {
     padding: var(--space-3);
+  }
+}
+
+/*
+ * Espaco da barra inferior. Precisa vir depois das regras base de `.player-dock`
+ * e `.has-player-dock`: mesma especificidade, entao quem ganha e a ultima.
+ */
+@media (max-width: 820px) {
+  .app-background {
+    padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+  }
+
+  /* Com o player aberto, ele empilha acima da barra. */
+  .has-player-dock {
+    padding-bottom: calc(10rem + env(safe-area-inset-bottom));
+  }
+
+  .player-dock {
+    bottom: calc(4.15rem + max(var(--space-3), env(safe-area-inset-bottom)));
   }
 }
 
