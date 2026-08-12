@@ -327,73 +327,290 @@ a:hover > .brand-mark {
   background: var(--gray-a3) !important;
 }
 
+.brand-copy {
+  min-width: 0;
+}
+
+.brand-copy > * {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/*
+ * Abaixo de 820px o cabecalho para de tentar ser a versao web comprimida: a
+ * navegacao principal desce para a barra inferior (`.mobile-tabbar`), no alcance
+ * do polegar, e as acoes de baixa frequencia vao para o menu "Mais".
+ *
+ * Sobra um header de uma linha so com marca e player — o que liberou espaco para
+ * o nome do app voltar a aparecer no mobile.
+ */
 @media (max-width: 820px) {
   .app-header-row {
     grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-areas:
-      "brand tools"
-      "nav nav";
     column-gap: var(--space-3);
-    row-gap: var(--space-3);
-  }
-
-  .brand-link {
-    grid-area: brand;
+    padding-block: var(--space-2);
   }
 
   .nav-actions {
-    grid-area: nav;
-    width: 100%;
-    justify-self: stretch;
+    display: none;
   }
 
-  .utility-actions {
-    grid-area: tools;
-    justify-self: end;
+  /* O player fica: e contextual e muda sozinho. O resto e configuracao. */
+  .utility-actions > *:not(.player-nav-slot) {
+    display: none;
   }
 }
 
 @media (max-width: 640px) {
-  /*
-   * No toque os alvos crescem (~38px) e o header encolhe: sem hover, o que vale
-   * e acertar o botao com o dedo, e o cabecalho e sticky — cada pixel dele fica
-   * ocupando a tela o tempo todo.
-   */
   .app-header {
     --nav-target: 2.4rem;
-  }
-
-  .app-header-row {
-    row-gap: var(--space-1);
-    padding-block: var(--space-2);
   }
 
   .brand-mark {
     width: 2.25rem;
     height: 2.25rem;
   }
+}
 
-  .nav-actions {
-    gap: 0;
-    padding: 0.15rem;
-    justify-content: space-between;
-  }
+/* ---------- Navegacao inferior (mobile) ---------- */
 
-  .nav-action {
-    flex: 1 1 0;
-    min-width: 0;
-    padding: 0 0.4rem;
-  }
+/*
+ * Some no desktop, onde o header em uma linha ja resolve. Nao e o header
+ * reposicionado: e a navegacao primaria tratada como primaria, com alvos
+ * grandes e no terco inferior da tela.
+ */
+.mobile-tabbar {
+  display: none;
+}
 
-  .utility-actions {
-    flex: 0 0 auto;
-    gap: 0.3rem;
-  }
+.mobile-tabbar-inner {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.15rem;
+  padding: 0.25rem;
+  border: 1px solid var(--sand-a5);
+  border-radius: 1.2rem;
+  background:
+    linear-gradient(120deg, var(--accent-a2), transparent 55%),
+    color-mix(in srgb, var(--color-panel-solid) 90%, transparent);
+  box-shadow:
+    0 20px 50px -30px var(--sand-a12),
+    inset 0 1px 0 color-mix(in srgb, #fff 22%, transparent);
+  backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
+}
 
-  .logout-action {
-    width: var(--nav-target);
-    min-width: var(--nav-target);
-    padding: 0;
+.mobile-tab {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 2.9rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.18rem;
+  padding: 0.32rem 0.25rem 0.26rem;
+  border: 0;
+  border-radius: 0.95rem;
+  background: transparent;
+  color: var(--gray-11);
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    color 180ms ease,
+    background 180ms ease,
+    transform 140ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/*
+ * Marca de indice sobre a aba ativa — eco da numeracao de tracklist do conceito
+ * "Liner Notes". Cresce a partir do centro em vez de aparecer seca.
+ */
+.mobile-tab-mark {
+  position: absolute;
+  top: 0.24rem;
+  width: 1.05rem;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--accent-9);
+  opacity: 0;
+  transform: scaleX(0.2);
+  transition:
+    transform 260ms cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 200ms ease;
+}
+
+.mobile-tab-icon {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.mobile-tab-label {
+  max-width: 100%;
+  overflow: hidden;
+  font-size: 0.64rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mobile-tab-active,
+.mobile-tab-more[data-state="open"] {
+  color: var(--accent-12);
+  background: var(--accent-a3);
+}
+
+.mobile-tab-active .mobile-tab-mark,
+.mobile-tab-more[data-state="open"] .mobile-tab-mark {
+  opacity: 1;
+  transform: scaleX(1);
+}
+
+/* O reset global tira o realce nativo de toque; isto ocupa o lugar dele. */
+.mobile-tab:active {
+  transform: scale(0.94);
+}
+
+.mobile-more-panel {
+  display: flex;
+  width: min(17rem, calc(100vw - 1.5rem));
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.mobile-more-segment {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.2rem;
+  padding: 0.2rem;
+  border: 1px solid var(--sand-a5);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-panel-solid) 72%, transparent);
+}
+
+.mobile-more-segment-option {
+  display: inline-flex;
+  min-height: 2.2rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--gray-11);
+  font: inherit;
+  font-size: var(--font-size-1);
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    color 180ms ease,
+    background 180ms ease;
+}
+
+.mobile-more-segment-option-active {
+  color: var(--accent-12);
+  background: var(--accent-a4);
+  box-shadow: inset 0 0 0 1px var(--accent-a5);
+}
+
+.mobile-more-accents {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.mobile-more-accent {
+  position: relative;
+  display: inline-flex;
+  width: 2.2rem;
+  height: 2.2rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--sand-a5);
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+  transition:
+    box-shadow 180ms ease,
+    transform 140ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.mobile-more-accent-active {
+  box-shadow: 0 0 0 2px var(--accent-a7);
+}
+
+.mobile-more-accent:active {
+  transform: scale(0.92);
+}
+
+.mobile-more-accent-swatch {
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 999px;
+}
+
+.mobile-more-accent-check {
+  position: absolute;
+  color: #fff;
+  filter: drop-shadow(0 1px 1px rgb(0 0 0 / 45%));
+}
+
+.mobile-more-divider {
+  height: 1px;
+  margin: 0;
+  border: 0;
+  background: var(--sand-a5);
+}
+
+.mobile-more-item {
+  display: flex;
+  min-height: 2.5rem;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0 0.6rem;
+  border: 0;
+  border-radius: 0.7rem;
+  background: transparent;
+  color: var(--gray-12);
+  font: inherit;
+  font-size: var(--font-size-2);
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background 180ms ease,
+    color 180ms ease;
+}
+
+.mobile-more-item:hover {
+  background: var(--accent-a3);
+}
+
+.mobile-more-item:active {
+  background: var(--accent-a4);
+}
+
+.mobile-more-item-danger {
+  color: var(--red-11);
+}
+
+.mobile-more-item-danger:hover,
+.mobile-more-item-danger:active {
+  background: var(--red-a3);
+}
+
+@media (max-width: 820px) {
+  .mobile-tabbar {
+    display: block;
+    position: fixed;
+    right: max(var(--space-3), env(safe-area-inset-right));
+    bottom: max(var(--space-3), env(safe-area-inset-bottom));
+    left: max(var(--space-3), env(safe-area-inset-left));
+    /* Acima do player dock (35) e do header (40). */
+    z-index: 45;
   }
 }
 
@@ -709,43 +926,63 @@ a:hover > .brand-mark {
 
 /* ---------- Card de perfil unificado ---------- */
 
+/*
+ * Base = coluna estreita (mobile); o bloco de 768px reconstroi a versao larga.
+ * `--profile-pad` guarda o padding do Card porque a faixa de numeros precisa da
+ * mesma medida em negativo para sangrar ate a borda.
+ */
 .profile-card {
-  padding: clamp(var(--space-3), 1.4vw, var(--space-4));
+  --profile-pad: var(--space-4);
+  padding: var(--profile-pad);
   box-shadow:
     0 1px 0 color-mix(in srgb, #fff 12%, transparent) inset,
     0 14px 38px -34px var(--sand-a9);
 }
 
-.profile-eyebrow {
-  font-size: 0.62rem;
-  letter-spacing: 0.16em;
-  opacity: 0.75;
-}
-
 .profile-card::after {
-  top: clamp(3rem, 5vw, 4.6rem);
+  top: 3.4rem;
   right: auto;
-  left: clamp(3rem, 5vw, 4.4rem);
-  width: clamp(5.2rem, 10vw, 7.5rem);
-  height: clamp(5.2rem, 10vw, 7.5rem);
+  left: 3.4rem;
+  width: 5.8rem;
+  height: 5.8rem;
   transform: translate(-50%, -50%);
   background: radial-gradient(circle, var(--accent-a3), transparent 70%);
-  opacity: 0.34;
-  filter: blur(16px);
+  opacity: 0.28;
+  filter: blur(14px);
 }
 
+/* Identidade, numeros e acao: um bloco por linha, na ordem de leitura. */
 .profile-layout {
   position: relative;
   z-index: 1;
+  display: grid;
+  gap: var(--space-4);
 }
 
 .profile-identity {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
   min-width: 0;
-  flex: 1 1 auto;
 }
 
+.profile-heading {
+  min-width: 0;
+}
+
+/* Nomes longos quebram em duas linhas (`truncate-2`); o break evita que um
+ * nome sem espacos empurre a largura do card. */
 .profile-name {
-  max-width: 22ch;
+  overflow-wrap: break-word;
+}
+
+.profile-meta {
+  margin-top: 0.3rem;
+  color: var(--accent-11);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
 }
 
 .avatar-ring {
@@ -770,26 +1007,19 @@ a:hover > .brand-mark {
   height: 64px !important;
 }
 
-@media (min-width: 640px) {
-  .avatar-ring .skeleton {
-    width: 80px !important;
-    height: 80px !important;
-  }
-}
-
 /*
- * Base = card empilhado (mobile). Aqui a faixa NAO pode ter `flex-basis`: o eixo
- * principal do `.profile-layout` e vertical, entao um basis viraria altura fixa
- * e a caixa ficaria alta e vazia, com os numeros boiando no meio.
+ * Faixa de numeros. No mobile ela sangra ate a borda do card: sem as laterais,
+ * a moldura da faixa para de repetir a moldura do card e a linha vira uma
+ * secao do encarte em vez de uma caixa dentro de outra. O padding devolvido
+ * mantem o primeiro numero alinhado com o nome.
  */
 .stat-strip {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  width: 100%;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   min-width: 0;
-  overflow: hidden;
-  border: 1px solid var(--sand-a5);
-  border-radius: var(--radius-3);
+  margin-inline: calc(var(--profile-pad) * -1);
+  padding-inline: calc(var(--profile-pad) - var(--space-2));
+  border-block: 1px solid var(--sand-a5);
   background:
     linear-gradient(180deg, var(--accent-a1), transparent),
     color-mix(in srgb, var(--color-panel-solid) 80%, transparent);
@@ -802,62 +1032,124 @@ a:hover > .brand-mark {
   flex-direction: column;
   justify-content: center;
   min-width: 0;
-  padding: clamp(var(--space-2), 1.2vw, var(--space-3));
+  padding: var(--space-3) var(--space-2);
 }
 
 .stat-cell + .stat-cell {
   border-left: 1px solid var(--sand-a5);
 }
 
+/* O numero e o conteudo da celula; o rotulo e legenda. */
 .stat-cell .stat-value {
   font-family: "JetBrains Mono", ui-monospace, "SFMono-Regular", monospace;
   font-variation-settings: normal;
   font-feature-settings: "tnum" 1;
   font-weight: 600;
+  font-size: clamp(1.05rem, 4.4vw, 1.35rem);
   line-height: 1;
   letter-spacing: -0.03em;
 }
 
-/*
- * A partir daqui o card vira linha. 768px e o breakpoint `sm` do Radix, usado no
- * `direction={{ initial: "column", sm: "row" }}` do Profile — os dois precisam
- * bater, senao existe uma faixa de larguras com o layout empilhado e o CSS de
- * desktop valendo ao mesmo tempo.
- */
-@media (min-width: 768px) {
-  .stat-strip {
-    flex: 0 1 20rem;
-    align-self: center;
-    width: auto;
-    max-width: 21rem;
-  }
+.stat-cell .stat-label {
+  margin-top: 0.4rem;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  line-height: 1.1;
+  text-transform: uppercase;
 }
 
-/* Card empilhado: tudo que so faz sentido antes do layout virar linha. */
-@media (max-width: 767px) {
+/*
+ * Unica acao do card. No toque ela vale a largura inteira e a altura minima de
+ * alvo (44px); o `:active` e obrigatorio porque o reset global apaga o realce
+ * nativo e no celular nao existe `:hover`.
+ */
+.profile-action {
+  display: flex;
+}
+
+.profile-action .rt-Button {
+  --base-button-height: 2.75rem;
+  width: 100%;
+  font-size: var(--font-size-3);
+  transition:
+    background 180ms ease,
+    transform 140ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.profile-action .rt-Button:active {
+  transform: scale(0.97);
+}
+
+.profile-action .skeleton {
+  width: 100% !important;
+}
+
+/*
+ * A partir daqui o card vira linha: identidade e acao empilhadas a esquerda,
+ * faixa de numeros a direita ocupando as duas linhas.
+ */
+@media (min-width: 768px) {
   .profile-card {
-    padding: var(--space-4);
+    --profile-pad: clamp(var(--space-3), 1.4vw, var(--space-4));
   }
 
   .profile-card::after {
-    top: 3.4rem;
-    left: 3.4rem;
-    width: 5.8rem;
-    height: 5.8rem;
-    opacity: 0.28;
-    filter: blur(14px);
+    top: clamp(3rem, 5vw, 4.6rem);
+    left: clamp(3rem, 5vw, 4.4rem);
+    width: clamp(5.2rem, 10vw, 7.5rem);
+    height: clamp(5.2rem, 10vw, 7.5rem);
+    opacity: 0.34;
+    filter: blur(16px);
+  }
+
+  .profile-layout {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 20rem);
+    grid-template-areas:
+      "identity stats"
+      "action stats";
+    align-content: center;
+    column-gap: var(--space-6);
+    row-gap: var(--space-3);
   }
 
   .profile-identity {
-    align-items: flex-start;
+    grid-area: identity;
+    gap: var(--space-4);
+  }
+
+  .profile-action {
+    grid-area: action;
+    justify-self: start;
+  }
+
+  .stat-strip {
+    grid-area: stats;
+    align-self: center;
+    margin-inline: 0;
+    padding-inline: 0;
+    overflow: hidden;
+    border: 1px solid var(--sand-a5);
+    border-radius: var(--radius-3);
   }
 
   .stat-cell {
-    padding: var(--space-3) var(--space-2);
+    padding: clamp(var(--space-2), 1.2vw, var(--space-3));
   }
 
-  .stat-cell .stat-value {
-    font-size: clamp(0.9rem, 3.6vw, 1.05rem);
+  .avatar-ring .skeleton {
+    width: 80px !important;
+    height: 80px !important;
+  }
+
+  .profile-action .rt-Button {
+    --base-button-height: var(--space-6);
+    width: auto;
+    font-size: var(--font-size-2);
+  }
+
+  .profile-action .skeleton {
+    width: 9.5rem !important;
   }
 }
 
@@ -1077,7 +1369,78 @@ a:hover > .brand-mark {
     0 20px 60px -34px var(--sand-a12),
     inset 0 1px 0 color-mix(in srgb, #fff 18%, transparent);
   backdrop-filter: blur(18px) saturate(140%);
+  -webkit-backdrop-filter: blur(18px) saturate(140%);
   pointer-events: auto;
+}
+
+.player-dock-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+}
+
+/* A faixa inteira e o link para o Spotify — o alvo grande do dock. */
+.player-dock-link {
+  display: block;
+  min-width: 0;
+  flex: 1 1 16rem;
+  border-radius: var(--radius-3);
+  color: inherit;
+  text-decoration: none;
+  transition:
+    background 180ms ease,
+    transform 140ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.player-dock-link:not(.is-static):hover {
+  background: var(--accent-a3);
+}
+
+.player-dock-link:not(.is-static):active {
+  transform: scale(0.985);
+}
+
+.player-dock-actions {
+  flex: 0 0 auto;
+}
+
+/*
+ * Os dois utilitarios ganham caixa propria: no `ghost` do Radix o botao e so o
+ * icone com 4px de respiro (e uma margem negativa para compensar), alvo pequeno
+ * demais para o dedo. Aqui o alvo cresce sem o icone crescer junto.
+ */
+.player-dock-actions .player-dock-action {
+  width: 2rem;
+  min-width: 2rem;
+  height: 2rem;
+  margin: 0;
+  border-radius: 999px;
+  color: var(--gray-11);
+}
+
+.player-dock-actions .player-dock-action:active {
+  transform: scale(0.94);
+}
+
+/*
+ * O unico uso de acento no dock: o progresso. Vale o destaque porque e o unico
+ * dado que muda sozinho enquanto a barra fica na tela.
+ */
+.player-dock-progress {
+  overflow: hidden;
+  height: 3px;
+  margin-top: var(--space-2);
+  border-radius: 999px;
+  background: var(--sand-a4);
+}
+
+.player-dock-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent-9);
+  transition: width 600ms ease;
 }
 
 .mini-player-next {
@@ -1132,12 +1495,91 @@ a:hover > .brand-mark {
 
   .player-dock {
     right: var(--space-3);
-    bottom: var(--space-3);
     left: var(--space-3);
   }
 
+  /*
+   * Abaixo de 640px o dock para de ser a versao desktop encolhida. Ele vira uma
+   * barra de uma linha: capa, titulo e artista (uma linha cada), dois
+   * utilitarios de 44px e o progresso como filete no rodape. Altura e o recurso
+   * escasso aqui — o dock divide a base da tela com a barra de navegacao.
+   */
   .player-dock-card {
-    padding: var(--space-3);
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .player-dock-row {
+    flex-wrap: nowrap;
+    gap: var(--space-2);
+  }
+
+  .player-dock-link {
+    flex: 1 1 auto;
+  }
+
+  /* O botao "Abrir" sai: no toque o alvo passa a ser a barra inteira. */
+  .player-dock-open {
+    display: none;
+  }
+
+  /* "Tocando agora" e redundante: o dock so existe quando esta tocando. */
+  .player-dock-card .section-eyebrow {
+    display: none;
+  }
+
+  .player-dock-card .truncate-2 {
+    -webkit-line-clamp: 1;
+  }
+
+  .player-dock-card .mini-player-thumb {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  .player-dock-actions .player-dock-action {
+    width: 2.75rem;
+    min-width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  /*
+   * Dispensar precisa ser facil de proposito e dificil por acidente: alvo cheio
+   * de 44px, mas separado do atualizar por um filete e afastado dele. O resto da
+   * barra e link, entao o toque que erra cai no Spotify, nao no X.
+   */
+  .player-dock-actions .player-dock-dismiss {
+    position: relative;
+    margin-left: var(--space-2);
+    background: var(--sand-a3);
+  }
+
+  .player-dock-actions .player-dock-dismiss::before {
+    content: "";
+    position: absolute;
+    top: 25%;
+    bottom: 25%;
+    left: calc(var(--space-2) * -0.5);
+    width: 1px;
+    background: var(--sand-a5);
+  }
+}
+
+/*
+ * Espaco da barra inferior. Precisa vir depois das regras base de `.player-dock`
+ * e `.has-player-dock`: mesma especificidade, entao quem ganha e a ultima.
+ */
+@media (max-width: 820px) {
+  .app-background {
+    padding-bottom: calc(5rem + env(safe-area-inset-bottom));
+  }
+
+  /* Com o player aberto, ele empilha acima da barra. */
+  .has-player-dock {
+    padding-bottom: calc(10.75rem + env(safe-area-inset-bottom));
+  }
+
+  .player-dock {
+    bottom: calc(4.15rem + max(var(--space-3), env(safe-area-inset-bottom)));
   }
 }
 

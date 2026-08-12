@@ -42,40 +42,38 @@ export const CardGridSkeleton = ({
   </Grid>
 );
 
+// Espelha o layout do card de perfil: identidade, faixa de numeros e acao.
 export const ProfileSkeleton = () => (
   <Card className="hero-panel profile-card" mb="2">
-    <Flex
-      className="profile-layout"
-      align="center"
-      gap={{ initial: "4", sm: "6" }}
-      direction={{ initial: "column", sm: "row" }}
-    >
-      <Flex className="profile-identity" align="center" gap="4">
+    <Box className="profile-layout">
+      <Box className="profile-identity">
         <Box className="avatar-ring">
-          <Skeleton width="80px" height="80px" radius="999px" />
+          <Skeleton width="64px" height="64px" radius="999px" />
         </Box>
 
-        <Flex direction="column" gap="2" style={{ minWidth: 0, flex: "1 1 auto" }}>
-          <Skeleton width="8rem" height="0.55rem" />
-          <Skeleton width="min(18rem, 70vw)" height="1.65rem" />
-          <Flex align="center" gap="3" wrap="wrap">
-            <Skeleton width="4.4rem" height="1.25rem" radius="999px" />
-            <Skeleton width="7rem" height="1.75rem" radius="999px" />
-          </Flex>
-        </Flex>
-      </Flex>
+        <Box className="profile-heading" style={{ flex: "1 1 auto" }}>
+          <Skeleton width="min(15rem, 62%)" height="1.65rem" />
+          <Box mt="2">
+            <Skeleton width="7rem" height="0.6rem" />
+          </Box>
+        </Box>
+      </Box>
 
       <Box className="stat-strip">
         {Array.from({ length: 3 }).map((_, index) => (
           <Box className="stat-cell" key={index}>
-            <Skeleton width="56%" height="1rem" />
-            <Box mt="1">
-              <Skeleton width="72%" height="0.58rem" />
+            <Skeleton width="60%" height="1.2rem" />
+            <Box mt="2">
+              <Skeleton width="78%" height="0.58rem" />
             </Box>
           </Box>
         ))}
       </Box>
-    </Flex>
+
+      <Box className="profile-action">
+        <Skeleton height="2.75rem" />
+      </Box>
+    </Box>
   </Card>
 );
 
