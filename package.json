@@ -12,7 +12,11 @@
     "server": "nodemon ./server/index.js",
     "client": "cd client && npm run dev",
     "build-client": "cd client && npm run build",
-    "build": "npm run build-client"
+    "build": "npm run build-client",
+    "test": "cd client && npm test",
+    "test:coverage": "cd client && npm run test:coverage",
+    "test:mutation": "cd client && npm run test:mutation",
+    "test:e2e": "playwright test"
   },
   "keywords": [],
   "author": "",
@@ -27,6 +31,7 @@
     "sucrase": "^3.28.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.1",
     "concurrently": "^7.5.0",
     "nodemon": "^2.0.20"
   }

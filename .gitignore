@@ -10,3 +10,10 @@ docs/
 # Artefatos locais do wrangler (a alternativa Cloudflare vive em main_cloudfare)
 .dev.vars
 .wrangler
+
+# Relatorios gerados pelos testes: cobertura, mutation testing e Playwright.
+coverage/
+reports/
+.stryker-tmp/
+test-results/
+playwright-report/

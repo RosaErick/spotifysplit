@@ -97,6 +97,28 @@ breaks login with `state_mismatch` and silently returns you to the login screen.
 
 Use `127.0.0.1` everywhere: in both `.env` files and in the browser address bar.
 
+## Tests
+
+```bash
+npm test              # unit + component + backend (Vitest)
+npm run test:coverage # same, with a coverage report
+npm run test:mutation # mutation testing (Stryker), scoped to the logic modules
+npm run test:e2e      # end-to-end (Playwright)
+```
+
+The E2E suite needs a browser binary the first time:
+
+```bash
+npx playwright install chromium
+```
+
+It builds the client and serves it with `vite preview`, so it exercises the
+production bundle — the one where the API base is the same-origin `/api`. No
+Spotify account or backend is needed: each spec intercepts what it calls.
+
+Coverage and mutation reports land in `coverage/` and `reports/mutation/`, both
+git-ignored.
+
 ## Limitations
 
 This is a learning project, and it's honest about what the Web API can and can't
