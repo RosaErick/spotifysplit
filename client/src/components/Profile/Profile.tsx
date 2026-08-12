@@ -1,4 +1,4 @@
-import { Avatar, Badge, Box, Card, Flex, Heading, Text } from "@radix-ui/themes";
+import { Avatar, Box, Card, Heading, Text } from "@radix-ui/themes";
 import { useProfileOverview } from "../../shared/api/queries";
 import { formatNumber } from "../../utils/format";
 import { ImageStudioDialog } from "../../features/imageStudio";
@@ -14,6 +14,12 @@ const initialsOf = (name?: string) =>
     .slice(0, 2)
     .join("")
     .toUpperCase() || "SS";
+
+// O plano e a unica informacao propria do usuario nessa linha; o resto era
+// texto de reforco. Juntar tudo num rotulo so libera a linha que o badge
+// ocupava, que na coluna estreita valia mais para a acao do card.
+const connectionLabel = (product?: string) =>
+  product ? `Spotify · ${product}` : "Spotify";
 
 export const Profile = () => {
   const { data, isLoading, isError, error, refetch } = useProfileOverview();
@@ -32,13 +38,9 @@ export const Profile = () => {
   return (
     <Reveal>
       <Card className="hero-panel profile-card" mb="2">
-        <Flex
-          className="profile-layout"
-          align="center"
-          gap={{ initial: "4", sm: "6" }}
-          direction={{ initial: "column", sm: "row" }}
-        >
-          <Flex className="profile-identity" align="center" gap="4">
+        {/* Quem e voce -> seus numeros -> o que da para fazer. */}
+        <Box className="profile-layout">
+          <Box className="profile-identity">
             <Box className="avatar-ring">
               <Avatar
                 src={imageUrl}
@@ -48,35 +50,33 @@ export const Profile = () => {
               />
             </Box>
 
-            <Box style={{ minWidth: 0 }}>
-              <Text as="p" color="gray" className="section-eyebrow profile-eyebrow" mb="1">
-                Conectado ao Spotify
-              </Text>
-              <Heading className="display-heading truncate-2 profile-name" size={{ initial: "5", sm: "6" }}>
+            <Box className="profile-heading">
+              <Heading className="display-heading truncate-2 profile-name" size="6">
                 {profile.display_name}
               </Heading>
-              <Flex mt="2" align="center" gap="3" wrap="wrap">
-                <Badge variant="soft" radius="full" size="1">
-                  {profile.product || "spotify"}
-                </Badge>
-                <ImageStudioDialog />
-              </Flex>
+              <Text as="p" className="profile-meta">
+                {connectionLabel(profile.product)}
+              </Text>
             </Box>
-          </Flex>
+          </Box>
 
           <Box className="stat-strip">
             {stats.map(([label, value]) => (
               <Box className="stat-cell" key={label}>
-                <Heading className="display-heading stat-value" size={{ initial: "2", sm: "3" }}>
+                <Heading className="display-heading stat-value" size="3">
                   {value}
                 </Heading>
-                <Text as="p" size="1" color="gray" mt="1">
+                <Text as="p" size="1" color="gray" className="stat-label">
                   {label}
                 </Text>
               </Box>
             ))}
           </Box>
-        </Flex>
+
+          <Box className="profile-action">
+            <ImageStudioDialog />
+          </Box>
+        </Box>
       </Card>
     </Reveal>
   );
