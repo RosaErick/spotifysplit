@@ -9,10 +9,16 @@ import { ThemeToggle } from "../components/Layout/ThemeToggle";
 import { LoginButton } from "../features/auth/LoginButton";
 import { isAuthenticated } from "../features/auth/auth";
 
+// O estudio de imagem entra como uma linha so: no app tambem e um unico lugar
+// (um botao, um modal), onde poster e mosaico sao abas do mesmo formulario.
 const highlights: Array<[string, string]> = [
   ["Top artistas", "Seu ranking dos artistas mais ouvidos."],
   ["Top faixas", "As músicas que você mais repete."],
   ["Biblioteca", "Suas faixas, álbuns e shows salvos."],
+  [
+    "Pôster e mosaico",
+    "Um pôster do seu ranking ou um mosaico de capas e artistas, para baixar.",
+  ],
 ];
 
 export const Login = () => {
