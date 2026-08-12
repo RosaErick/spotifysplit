@@ -2,18 +2,30 @@
  * Estilos do tour.
  *
  * Arquivo proprio e uma quebra consciente do padrao do projeto (estilo
- * concentrado em `index.css`): o tour e autocontido e opcional, e manter ~150
- * linhas dele fora do arquivo de 1500 linhas evita conflito e deixa a feature
- * removivel de uma vez. Precedente: o estudio de imagem ja gera tokens proprios
- * em `studioTheme.ts`.
+ * concentrado em `index.css`): o tour e autocontido e opcional, e manter ~170
+ * linhas dele fora do arquivo de 1500 linhas deixa a feature removivel de uma
+ * vez. Precedente: o estudio de imagem ja gera tokens proprios em
+ * `studioTheme.ts`.
  *
- * Empilhamento: header 40, tab bar 45, scrim 60, spotlight 61, card 62.
+ * Empilhamento: o overlay e portalizado no `body` e usa 9000+. Precisa passar do
+ * modal do Radix, cujo overlay nao declara z-index (fica em `auto`) e ganharia
+ * so por ordem de DOM. Fica abaixo do grao global (9999), que nao intercepta
+ * clique.
  */
 
+/* Invisivel: existe so para engolir cliques no app durante os passos passivos.
+   Nao escurece nada — quem escurece e a sombra do spotlight. */
+.tour-blocker {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+}
+
+/* Usado apenas quando nao ha ancora e, portanto, nao ha spotlight. */
 .tour-scrim {
   position: fixed;
   inset: 0;
-  z-index: 60;
+  z-index: 9000;
   background: color-mix(in srgb, var(--sand-1) 78%, transparent);
   backdrop-filter: blur(2px);
   -webkit-backdrop-filter: blur(2px);
@@ -22,13 +34,15 @@
 /*
  * O spotlight nao usa mascara SVG nem quatro divs: uma sombra de 9999px pinta a
  * tela toda menos este retangulo, e o proprio `border-radius` recorta o buraco.
+ * Por isso nao pode haver um scrim junto — ele cobriria o buraco e o alvo
+ * destacado ficaria escuro tambem.
  *
- * O anel em `--accent-8` e o mesmo token do `:focus-visible` global — e o que
- * faz o recorte ler como parte do app, e nao como overlay de plugin.
+ * O anel em `--accent-8` e o mesmo token do `:focus-visible` global: e o que faz
+ * o recorte ler como parte do app, e nao como overlay de plugin.
  */
 .tour-spotlight {
   position: fixed;
-  z-index: 61;
+  z-index: 9001;
   border-radius: var(--radius-4);
   box-shadow:
     0 0 0 9999px color-mix(in srgb, var(--sand-1) 78%, transparent),
@@ -42,9 +56,17 @@
     height 320ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
+/* Dentro do estudio quem escurece e o overlay do proprio modal; aqui sobra so
+   o anel, senao o modal levaria duas camadas de escuro. */
+.tour-spotlight-ring {
+  box-shadow:
+    0 0 0 2px var(--accent-8),
+    0 0 44px -8px var(--accent-a6);
+}
+
 .tour-card-shell {
   position: fixed;
-  z-index: 62;
+  z-index: 9002;
   width: min(24rem, calc(100vw - 2rem));
 }
 
@@ -55,15 +77,17 @@
 }
 
 /*
- * No mobile o card nao flutua: vira folha ancorada numa borda, largura total.
- * A de baixo para acima da barra de navegacao; a de cima e usada quando o
- * proprio alvo esta na metade inferior, senao a folha cobriria o alvo.
+ * Folha ancorada numa borda, largura total. A de baixo fica acima da barra de
+ * navegacao; a de cima entra quando o proprio alvo esta na metade inferior,
+ * senao a folha cobriria o alvo.
  */
 .tour-card-sheet-bottom,
 .tour-card-sheet-top {
   right: var(--space-3);
   left: var(--space-3);
   width: auto;
+  max-width: 34rem;
+  margin-inline: auto;
 }
 
 .tour-card-sheet-bottom {
@@ -75,9 +99,8 @@
 }
 
 /*
- * Mais opaco que o `.hero-panel`: o card fica sobre o scrim escurecido, e vidro
- * fosco em cima de vidro fosco derruba a legibilidade do texto. O vidro fica no
- * scrim e no anel do spotlight, nao aqui.
+ * Mais opaco que o `.hero-panel`: o card fica sobre area escurecida, e vidro
+ * fosco em cima de vidro fosco derruba a legibilidade do texto.
  */
 .tour-card {
   background: var(--color-panel-solid);

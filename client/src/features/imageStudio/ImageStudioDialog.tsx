@@ -84,6 +84,7 @@ export const ImageStudioDialog = () => {
         maxWidth="900px"
         ref={contentRef}
         onOpenAutoFocus={focusActiveTab}
+        data-tour-id="studio-dialog"
       >
         <Dialog.Title>Gerar imagem</Dialog.Title>
         <Dialog.Description size="2" color="gray" mb="4">
@@ -94,7 +95,7 @@ export const ImageStudioDialog = () => {
           value={format}
           onValueChange={(value) => setFormat(value as StudioFormat)}
         >
-          <Tabs.List mb="4">
+          <Tabs.List mb="4" data-tour-id="studio-formats">
             <Tabs.Trigger value="poster">Pôster</Tabs.Trigger>
             <Tabs.Trigger value="collage">Mosaico</Tabs.Trigger>
           </Tabs.List>

@@ -1,7 +1,8 @@
 // Conteudo do tour: so dados e texto, sem JSX e sem DOM.
 //
-// Todos os passos ficam na home, na ordem de leitura da propria pagina: quem
-// voce e, seus rankings, como ler os numeros, para onde ir, como ajustar.
+// Os dois primeiros passos sao interativos: o tour pede para abrir o estudio de
+// imagem e so avanca quando o modal abre de fato. Os quatro seguintes rodam na
+// home, na ordem de leitura da propria pagina.
 
 export type TourStep = {
   id: string;
@@ -11,6 +12,14 @@ export type TourStep = {
   note?: string;
   /** Seletores em ordem de prioridade; vence o primeiro que estiver visivel. */
   anchors: string[];
+  /**
+   * O passo espera o usuario abrir o estudio. O tour nao bloqueia cliques aqui,
+   * avanca sozinho quando o modal aparece, e "Avancar" pula o passo de dentro
+   * do modal (que nao teria ancora).
+   */
+  opensStudio?: boolean;
+  /** O passo vive dentro do modal; sai sozinho quando o modal fecha. */
+  insideStudio?: boolean;
 };
 
 /*
@@ -22,10 +31,18 @@ export const TOUR_VERSION = 1;
 
 export const TOUR_STEPS: TourStep[] = [
   {
-    id: "profile",
-    title: "Seu cartão e a imagem pra baixar",
-    body: "Seus números de conta ficam aqui: seguidores, playlists e artistas que você segue. O botão \"Gerar imagem\" monta um pôster do seu ranking ou um mosaico de capas, pra baixar.",
-    anchors: [".profile-card"],
+    id: "studio-open",
+    title: "Uma imagem com os seus stats",
+    body: "Esse botão monta uma imagem pronta pra baixar a partir do que você mais ouve. Abre ele pra ver os dois formatos.",
+    anchors: [".profile-action"],
+    opensStudio: true,
+  },
+  {
+    id: "studio-formats",
+    title: "Pôster ou mosaico",
+    body: "O pôster lista o seu ranking de artistas ou de faixas. O mosaico monta uma grade de capas de álbum ou de fotos de artista. Nos dois dá pra escolher o período e a cor, e exportar em PNG ou JPG.",
+    anchors: ['[data-tour-id="studio-formats"]'],
+    insideStudio: true,
   },
   {
     id: "rankings",
@@ -37,20 +54,43 @@ export const TOUR_STEPS: TourStep[] = [
   {
     id: "popularity",
     title: "Popularidade é um número de catálogo",
-    body: "Vai de 0 a 100 e é calculado pelo Spotify a partir do total de reproduções da faixa e de quão recentes elas são — de todo mundo, não das suas. Não mede qualidade: um clássico com bilhões de plays antigos pode pontuar abaixo de um lançamento em alta. A mesma música em single e em álbum recebe notas separadas, e a nota do artista sai da popularidade das faixas dele.",
+    body: "Vai de 0 a 100 e é calculado pelo Spotify a partir do total de reproduções da faixa e de quão recentes elas são — de todo mundo, não das suas. Não mede qualidade: um clássico com bilhões de plays antigos pode pontuar abaixo de um lançamento em alta.",
     note: "Os gêneros embaixo do nome são a classificação do próprio Spotify, feita por artista e não por faixa — por isso às vezes destoam do que a pessoa lança hoje.",
     anchors: ['[data-tour-id="popularity"]', '[data-tour-id="ranking-row"]'],
   },
   {
     id: "navigation",
     title: "Busca e biblioteca",
-    body: "A busca varre o catálogo inteiro do Spotify — músicas, artistas e álbuns. A biblioteca mostra o que você salvou: músicas curtidas, álbuns e os artistas que segue.",
+    body: "A busca varre o catálogo inteiro do Spotify. A biblioteca mostra o que você salvou: músicas curtidas, álbuns e os artistas que segue.",
     anchors: [".mobile-tabbar", ".nav-actions"],
   },
   {
     id: "appearance",
-    title: "Cor, tema e o que o app não faz",
-    body: "Dá pra alternar entre claro e escuro e escolher a cor de destaque; a escolha fica salva neste navegador. Em \"Sobre\" está o resto: o login acontece no Spotify, o app só lê os seus dados e não guarda nada.",
+    title: "Cor e tema",
+    body: "Dá pra alternar entre claro e escuro e escolher a cor de destaque. A escolha fica salva neste navegador.",
     anchors: [".mobile-tab-more", ".utility-actions"],
   },
 ];
+
+/**
+ * Proximo indice na direcao dada, pulando os passos que so existem com o modal
+ * do estudio aberto. Funcao pura para poder ser testada sem DOM.
+ */
+export const resolveStepIndex = (
+  from: number,
+  direction: 1 | -1,
+  studioOpen: boolean
+): number => {
+  let target = from + direction;
+
+  while (
+    target >= 0 &&
+    target < TOUR_STEPS.length &&
+    TOUR_STEPS[target].insideStudio &&
+    !studioOpen
+  ) {
+    target += direction;
+  }
+
+  return target;
+};

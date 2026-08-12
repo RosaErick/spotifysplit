@@ -1,10 +1,18 @@
 // Scrim, spotlight e o card do passo.
 //
-// Nao usa Popover do Radix: ele gerencia foco, clique-fora e dismiss de um jeito
-// que precisaria ser desligado item a item para conviver com o overlay, e no
-// mobile o comportamento certo nao e popover — e folha ancorada na borda.
+// Vai para um portal no `body` porque `.app-background` tem `isolation:
+// isolate`, ou seja, e um contexto de empilhamento proprio: de dentro dele
+// nenhum z-index alcanca o modal do Radix, que e irmao no `body`. E o passo de
+// dentro do estudio precisa ficar acima do modal.
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
+import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { Button, Card, Heading, Text } from "@radix-ui/themes";
 import { useAnchorRect } from "./useAnchorRect";
@@ -14,8 +22,8 @@ import "./tour.css";
 const CARD_WIDTH = 384;
 const ANCHOR_GAP = 12;
 const VIEWPORT_MARGIN = 16;
-/** Espaco minimo abaixo do alvo para o card caber la; senao vai para cima. */
-const SPACE_FOR_CARD = 260;
+/** Altura suposta antes da primeira medida, so para o primeiro frame. */
+const CARD_HEIGHT_GUESS = 240;
 
 const MOBILE_QUERY = "(max-width: 820px)";
 
@@ -44,13 +52,11 @@ export const TourOverlay = () => {
 
   const cardRef = useRef<HTMLDivElement>(null);
   const returnFocusRef = useRef<HTMLElement | null>(null);
+  const [cardHeight, setCardHeight] = useState(CARD_HEIGHT_GUESS);
   const isMobile = useIsMobile();
 
   const isRunning = tour?.phase === "running";
 
-  // Guarda para onde devolver o foco. O convite some ao ser aceito, entao o
-  // proprio botao que abriu o tour pode nao existir mais na saida — por isso a
-  // saida cai no card de perfil e nao neste elemento.
   useEffect(() => {
     if (!isRunning) return;
     returnFocusRef.current = document.activeElement as HTMLElement | null;
@@ -62,6 +68,22 @@ export const TourOverlay = () => {
       alive?.focus?.({ preventScroll: true });
     };
   }, [isRunning]);
+
+  // A altura real do card decide se ele cabe acima ou abaixo da ancora. Sem
+  // medir, uma ancora mais alta que a viewport empurrava o card para fora da
+  // tela — era o passo dos rankings aparecendo cortado.
+  useLayoutEffect(() => {
+    const element = cardRef.current;
+    if (!element) return;
+
+    const measure = () => setCardHeight(element.offsetHeight);
+    measure();
+
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+
+    return () => observer.disconnect();
+  }, [isRunning, step?.id]);
 
   // `preventScroll` importa: sem ele o navegador rola ate o card e briga com o
   // `scrollIntoView` que ja levou o alvo para o centro.
@@ -91,8 +113,6 @@ export const TourOverlay = () => {
     return () => window.removeEventListener("keydown", handleWindowKey);
   }, [isRunning, handleWindowKey]);
 
-  // Trap manual: o card e filho do mesmo root da app, entao `inert` no resto da
-  // arvore nao serve. Sao tres ou quatro botoes, o ciclo e barato.
   const trapTab = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key !== "Tab") return;
 
@@ -120,8 +140,21 @@ export const TourOverlay = () => {
   const isFirst = stepIndex === 0;
   const isLast = stepIndex === stepCount - 1;
 
-  // Sem alvo visivel, o card fica centrado e o spotlight nao aparece. Nenhum
-  // texto do tour usa "o botao ao lado", justamente para esse caso.
+  const insideStudio = Boolean(step.insideStudio);
+  const opensStudio = Boolean(step.opensStudio);
+
+  /*
+   * O escurecimento vem da sombra de 9999px do spotlight, nunca de um scrim por
+   * cima: um scrim de tela cheia cobriria o proprio buraco e o alvo destacado
+   * ficaria escuro tambem. O scrim solido so entra quando nao ha ancora.
+   *
+   * Dentro do estudio quem escurece e o overlay do proprio modal; aqui fica so
+   * o anel.
+   */
+  const spotlightClass = insideStudio
+    ? "tour-spotlight tour-spotlight-ring"
+    : "tour-spotlight";
+
   const spotlightStyle = rect
     ? {
         top: rect.top - 6,
@@ -131,42 +164,64 @@ export const TourOverlay = () => {
       }
     : undefined;
 
-  let cardStyle: React.CSSProperties | undefined;
-  let cardPlacement = "floating";
+  // O bloqueio de clique sai quando o passo espera uma acao do usuario: no
+  // passo que pede para abrir o estudio, o clique precisa chegar no botao.
+  const blocksClicks = !opensStudio && !insideStudio;
 
-  if (isMobile) {
-    // A folha iria cobrir o alvo quando ele mesmo esta embaixo (passos que
-    // apontam para a tab bar); nesse caso ela sobe para o topo.
-    cardPlacement =
+  let cardStyle: React.CSSProperties | undefined;
+  let placement = "floating";
+
+  if (insideStudio) {
+    // Folha na base em qualquer largura: o modal ocupa o centro da tela, e um
+    // card ancorado nas abas cobriria justamente a previa que ele descreve.
+    placement = "sheet-bottom";
+  } else if (isMobile) {
+    placement =
       rect && rect.top > window.innerHeight * 0.55 ? "sheet-top" : "sheet-bottom";
   } else if (rect) {
-    const below = window.innerHeight - rect.bottom >= SPACE_FOR_CARD;
+    const viewportHeight = window.innerHeight;
+    const spaceBelow = viewportHeight - rect.bottom - ANCHOR_GAP - VIEWPORT_MARGIN;
+    const spaceAbove = rect.top - ANCHOR_GAP - VIEWPORT_MARGIN;
+
+    let top: number;
+    if (spaceBelow >= cardHeight) {
+      top = rect.bottom + ANCHOR_GAP;
+    } else if (spaceAbove >= cardHeight) {
+      top = rect.top - ANCHOR_GAP - cardHeight;
+    } else {
+      // Ancora maior que a viewport (os dois rankings juntos, por exemplo):
+      // nao ha lado bom, entao o card centraliza.
+      top = (viewportHeight - cardHeight) / 2;
+    }
+
+    const maxTop = Math.max(VIEWPORT_MARGIN, viewportHeight - cardHeight - VIEWPORT_MARGIN);
+    top = Math.min(Math.max(VIEWPORT_MARGIN, top), maxTop);
+
     const left = Math.min(
       Math.max(VIEWPORT_MARGIN, rect.left),
-      window.innerWidth - CARD_WIDTH - VIEWPORT_MARGIN
+      Math.max(VIEWPORT_MARGIN, window.innerWidth - CARD_WIDTH - VIEWPORT_MARGIN)
     );
 
-    cardStyle = below
-      ? { top: rect.bottom + ANCHOR_GAP, left }
-      : { bottom: window.innerHeight - rect.top + ANCHOR_GAP, left };
+    cardStyle = { top, left };
   } else {
-    cardPlacement = "centered";
+    placement = "centered";
   }
 
-  return (
+  return createPortal(
     <div className="tour-root">
-      {/* Engole cliques no app. Clicar aqui nao fecha: fechar por clique-fora
-          num tour e o jeito classico de perder o usuario sem querer. */}
-      <div className="tour-scrim" aria-hidden="true" />
+      {blocksClicks && <div className="tour-blocker" aria-hidden="true" />}
+
+      {/* Sem ancora nao ha spotlight, entao o escurecimento precisa vir daqui. */}
+      {!rect && !insideStudio && <div className="tour-scrim" aria-hidden="true" />}
 
       {rect && (
-        <div className="tour-spotlight" style={spotlightStyle} aria-hidden="true" />
+        <div className={spotlightClass} style={spotlightStyle} aria-hidden="true" />
       )}
 
       <AnimatePresence mode="wait">
         <motion.div
           key={step.id}
-          className={`tour-card-shell tour-card-${cardPlacement}`}
+          className={`tour-card-shell tour-card-${placement}`}
           style={cardStyle}
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -213,9 +268,7 @@ export const TourOverlay = () => {
               {step.body}
             </Text>
 
-            {step.note && (
-              <p className="tour-note serif-accent">{step.note}</p>
-            )}
+            {step.note && <p className="tour-note serif-accent">{step.note}</p>}
 
             <div className="tour-footer">
               <Button
@@ -239,13 +292,14 @@ export const TourOverlay = () => {
                   </Button>
                 )}
                 <Button variant="soft" className="clickable-control" onClick={next}>
-                  {isLast ? "Concluir" : "Avançar"}
+                  {isLast ? "Concluir" : opensStudio ? "Pular" : "Avançar"}
                 </Button>
               </div>
             </div>
           </Card>
         </motion.div>
       </AnimatePresence>
-    </div>
+    </div>,
+    document.body
   );
 };
