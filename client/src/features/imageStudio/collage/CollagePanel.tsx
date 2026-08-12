@@ -7,7 +7,7 @@
 import { useMemo, useRef, useState } from "react";
 import { Flex, SegmentedControl, Spinner, Switch, Text } from "@radix-ui/themes";
 import { useProfileOverview } from "../../../shared/api/queries";
-import { APP_NAME } from "../../../shared/constants/app";
+import { APP_BRAND, APP_NAME } from "../../../shared/constants/app";
 import { getTopTimeRangeOption } from "../../../shared/constants/timeRanges";
 import { useElementWidth } from "../../../shared/hooks/useElementWidth";
 import {
@@ -122,7 +122,7 @@ export const CollagePanel = ({
   const fileFormatConfig = imageFileFormats[fileFormat];
 
   const exportRequest = {
-    fileName: `spotifysplit-mosaico-${source}-${timeRange}-${gridSize}x${gridSize}.${fileFormatConfig.extension}`,
+    fileName: `${APP_BRAND}-mosaico-${source}-${timeRange}-${gridSize}x${gridSize}.${fileFormatConfig.extension}`,
     // O mosaico ja pinta o proprio fundo; isso cobre as bordas e da ao JPEG a
     // base opaca que ele exige.
     backgroundColor: buildStudioTheme(accentColor).backgroundColor,

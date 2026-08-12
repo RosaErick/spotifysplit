@@ -2,3 +2,11 @@
 node_modules
 .env
 .netlify
+
+# A documentacao e local e NUNCA vai para o GitHub. O unico arquivo publico
+# de documentacao e o README.md da raiz.
+docs/
+
+# Artefatos locais do wrangler (a alternativa Cloudflare vive em main_cloudfare)
+.dev.vars
+.wrangler

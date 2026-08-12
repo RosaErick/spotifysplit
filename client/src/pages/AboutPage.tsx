@@ -30,13 +30,13 @@ type Topic = {
 const topics: Topic[] = [
   {
     icon: <MixIcon />,
-    title: "O que é o SpotfySplit",
+    title: "O que é o SonarStats",
     body: "Um projeto pessoal de desenvolvimento, criado pra testar na prática a Web API do Spotify e o fluxo de autenticação OAuth 2.0. Não é um produto comercial — é só pra aprendizado e brincadeira.",
   },
   {
     icon: <PersonIcon />,
     title: "Você entra pelo Spotify, não por aqui",
-    body: "Você não cria conta no SpotfySplit. O login acontece no próprio Spotify, via OAuth 2.0: você só autoriza o app a ler os seus dados de escuta direto da sua conta. Quem valida quem você é, é o Spotify.",
+    body: "Você não cria conta no SonarStats. O login acontece no próprio Spotify, via OAuth 2.0: você só autoriza o app a ler os seus dados de escuta direto da sua conta. Quem valida quem você é, é o Spotify.",
   },
   {
     icon: <LockClosedIcon />,
@@ -61,7 +61,7 @@ export const AboutPage = () => {
                 <EqualizerMark />
               </Flex>
               <Text size="2" className="brand-title">
-                SpotfySplit
+                SonarStats
               </Text>
             </Link>
           </Flex>
@@ -94,7 +94,7 @@ export const AboutPage = () => {
               color="gray"
               style={{ maxWidth: 620, lineHeight: 1.7 }}
             >
-              O SpotfySplit reúne os seus stats do Spotify num painel próprio. Por
+              O SonarStats reúne os seus stats do Spotify num painel próprio. Por
               trás disso, é um exercício de desenvolvimento com a Web API do
               Spotify e o fluxo OAuth 2.0.
             </Text>

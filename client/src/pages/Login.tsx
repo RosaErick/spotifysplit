@@ -35,7 +35,7 @@ export const Login = () => {
               <EqualizerMark />
             </Flex>
             <Text size="2" className="brand-title">
-              SpotfySplit
+              SonarStats
             </Text>
           </Flex>
           <Flex align="center" gap="3">

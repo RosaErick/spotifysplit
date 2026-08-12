@@ -3,7 +3,7 @@
 // para que a captura nunca toque recurso cross-origin. Serve tanto para top
 // artistas quanto para top faixas (lista generica de itens).
 import { forwardRef } from "react";
-import { APP_DOMAIN } from "../../../shared/constants/app";
+import { APP_BRAND, APP_DOMAIN } from "../../../shared/constants/app";
 import { ShareFormatConfig } from "./formats";
 import { buildStudioTheme } from "../studioTheme";
 import styles from "./PosterCard.module.css";
@@ -127,7 +127,7 @@ export const PosterCard = forwardRef<HTMLDivElement, PosterCardProps>(
           <footer className={styles.footer}>
             <hr className={styles.divider} />
             <div className={styles.wordmarkRow}>
-              <span className={styles.wordmark}>SPOTIFYSPLIT</span>
+              <span className={styles.wordmark}>{APP_BRAND.toUpperCase()}</span>
               <EqualizerStatic />
             </div>
             <span className={styles.tagline}>{tagline}</span>
